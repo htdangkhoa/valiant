@@ -1,5 +1,5 @@
 {
-  "name": "electron-boilerplate",
+  "name": "valiant",
   "version": "0.0.1",
   "description": "",
   "license": "MIT",
@@ -8,11 +8,12 @@
     "email": "huynhtran.dangkhoa@gmail.com",
     "url": "https://github.com/htdangkhoa"
   },
-  "main": "src/main/index.js",
+  "main": "dist/main.js",
   "scripts": {
+    "start": "electron .",
+    "dev:main": "webpack",
+    "dev:render": "webpack serve --config webpack.config.renderer.js",
     "dev": "npm-run-all --parallel dev:render dev:main",
-    "dev:main": "electron .",
-    "dev:render": "webpack serve",
     "prebuild": "webpack --config webpack.config.prod.js",
     "build": "env-cmd -f .env.production electron-packager . --out=build --overwrite"
   },
@@ -55,5 +56,5 @@
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.7.3"
   },
-  "productName": "electron-boilerplate"
+  "productName": "Valiant"
 }

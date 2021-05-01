@@ -1,7 +1,9 @@
-require('dotenv').config();
-const path = require('path');
-const { app, BrowserWindow } = require('electron');
-const url = require('url');
+import dotenv from 'dotenv';
+import { app, BrowserWindow } from 'electron';
+import { format } from 'url';
+import path from 'path';
+
+dotenv.config();
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -9,8 +11,11 @@ function createWindow() {
   const win = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
+    backgroundColor: '#ffffff',
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
     },
   });
 
@@ -22,22 +27,17 @@ function createWindow() {
   win.loadURL(
     isDev
       ? 'http://localhost:8080'
-      : url.format({
+      : format({
           protocol: 'file',
           slashes: true,
           pathname: path.resolve(__dirname, '..', '..', 'dist', 'index.html'),
         }),
   );
+
+  return win;
 }
 
-async function main() {
-  if (isDev) {
-    // eslint-disable-next-line global-require
-    require('electron-reload')(__dirname, {
-      electron: path.resolve(process.cwd(), 'node_modules/.bin/electron'),
-    });
-  }
-
+function main() {
   app
     .whenReady()
     .then(() => {
@@ -49,8 +49,8 @@ async function main() {
         }
       });
     })
-    .catch((error) => {
-      console.error(error);
+    .catch((e) => {
+      console.error(e);
 
       app.exit();
     });
