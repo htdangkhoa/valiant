@@ -9,7 +9,12 @@ dotenv.config();
 
 const isDev = process.env.NODE_ENV === 'development';
 
-function createWindow() {
+function createBrowserView(win) {
+  const view = new View(win, { url: 'https://github.com' });
+  win.webContents.send('fetch_browser_views');
+}
+
+async function createWindow() {
   const win = new BrowserWindow({
     // frame: false,
     thickFrame: true,
@@ -38,7 +43,7 @@ function createWindow() {
   win.setBounds({ height: bounds.height + 1 });
   win.setBounds(bounds);
 
-  win.loadURL(
+  await win.loadURL(
     isDev
       ? 'http://localhost:8080'
       : format({
@@ -48,6 +53,8 @@ function createWindow() {
         }),
   );
 
+  createBrowserView(win);
+
   return win;
 }
 
@@ -55,12 +62,12 @@ let win;
 
 app
   .whenReady()
-  .then(() => {
-    win = createWindow();
+  .then(async () => {
+    win = await createWindow();
 
-    app.on('activate', () => {
+    app.on('activate', async () => {
       if (BrowserWindow.getAllWindows().length === 0) {
-        win = createWindow();
+        win = await createWindow();
       }
     });
   })
@@ -77,5 +84,5 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('new_tab', () => {
-  const view = new View(win, { url: 'https://github.com' });
+  createBrowserView(win);
 });

@@ -1,5 +1,5 @@
-import React, { memo, useRef, useEffect, useCallback, useMemo } from 'react';
-import { ipcRenderer, ipcMain, remote } from 'electron';
+import React, { memo, useRef, useEffect, useCallback, useState } from 'react';
+import { ipcRenderer, remote } from 'electron';
 import './style.scss';
 
 import IconAdd from 'root/renderer/assets/svg/icon-add.svg';
@@ -8,8 +8,7 @@ import Close from '../../assets/svg/close.svg';
 const TabBar = () => {
   const win = remote.getCurrentWindow();
 
-  const browserViews = win.getBrowserViews();
-  console.log('🚀 ~ file: index.js ~ line 12 ~ TabBar ~ browserViews', browserViews);
+  const [browserViews, setBrowserViews] = useState([]);
 
   const ref = useRef();
 
@@ -34,44 +33,54 @@ const TabBar = () => {
     }
   }, []);
 
-  const onClose = useCallback(() => {
-    const win = remote.getCurrentWindow();
+  const onClose = useCallback(
+    (i) => {
+      const browserView = browserViews[i];
 
-    const browserView = win.getBrowserView();
-
-    if (browserView) {
-      win.removeBrowserView(browserView);
-    }
-  }, []);
+      if (browserView) {
+        win.removeBrowserView(browserView);
+        win.webContents.send('fetch_browser_views');
+      }
+    },
+    [browserViews],
+  );
 
   const onAddNewTab = useCallback(() => {
     ipcRenderer.send('new_tab', 'hahaha');
   }, []);
 
-  return useMemo(
-    () => (
-      <div className='tabs-container'>
-        <div className='tabs' ref={ref}>
-          {browserViews.map((_, i) => (
-            <div key={i.toString()} className='tab flex items-center'>
-              <p title='Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel | Tinh tế'>
-                Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel |
-                Tinh tế
-              </p>
+  useEffect(() => {
+    const listener = () => {
+      const views = win.getBrowserViews();
+      setBrowserViews(() => [].concat(views));
+    };
 
-              <div className='btn p-0' onClick={onClose}>
-                <Close fill='#ffffff' style={{ width: 16, height: 16 }} />
-              </div>
+    ipcRenderer.addListener('fetch_browser_views', listener);
+
+    return () => ipcRenderer.removeListener('fetch_browser_views', listener);
+  }, []);
+
+  return (
+    <div className='tabs-container'>
+      <div className='tabs' ref={ref}>
+        {browserViews.map((_, i) => (
+          <div key={i.toString()} className='tab flex items-center'>
+            <p title='Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel | Tinh tế'>
+              Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel | Tinh
+              tế
+            </p>
+
+            <div className='btn p-0' onClick={() => onClose(i)}>
+              <Close fill='#ffffff' style={{ width: 16, height: 16 }} />
             </div>
-          ))}
-        </div>
-
-        <div className='btn mx-4' onClick={onAddNewTab}>
-          <IconAdd fill='#ffffff' width={20} height={20} />
-        </div>
+          </div>
+        ))}
       </div>
-    ),
-    [browserViews.length],
+
+      <div className='btn mx-4' onClick={onAddNewTab}>
+        <IconAdd fill='#ffffff' width={20} height={20} />
+      </div>
+    </div>
   );
 };
 
