@@ -65,7 +65,9 @@ class View {
   }
 
   async resize() {
-    const tabBarHeight = await this.win.webContents.executeJavaScript(`document.querySelector('body').offsetHeight`);
+    const tabBarHeight = await this.win.webContents.executeJavaScript(
+      `document.getElementById('toolbar').offsetHeight`,
+    );
 
     this.view.setBounds({
       x: 0,

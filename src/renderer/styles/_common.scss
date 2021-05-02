@@ -1,5 +1,35 @@
-.flex {
-  display: flex;
+@for $i from 0 through 100 {
+  .p-#{$i} {
+    padding: #{$i}px !important;
+  }
+
+  .m-#{$i} {
+    margin: #{$i}px !important;
+  }
+
+  .mx-#{$i} {
+    margin-left: #{$i}px !important;
+    margin-right: #{$i}px !important;
+  }
+
+  .my-#{$i} {
+    margin-top: #{$i}px !important;
+    margin-bottom: #{$i}px !important;
+  }
+}
+
+$displays: block, inline-block, inline, flex, inline-flex, table, inline-table, table-caption, table-cell, table-column,
+  table-column-group, table-footer-group, table-header-group, table-row-group, table-row, flow-root, grid, inline-grid,
+  contents, list-item;
+
+@each $display in $displays {
+  .#{$display} {
+    display: $display;
+  }
+}
+
+.hidden {
+  display: none;
 }
 
 $contents: start, end, center, between, around, evenly;

@@ -7,6 +7,8 @@
 //   cursor: default;
 // }
 
+@import '../../styles/_vars';
+
 * {
   margin: unset;
 }
@@ -18,7 +20,7 @@
   padding-left: 7.5rem;
   padding-right: 5.5rem;
   -webkit-app-region: drag;
-  background-color: #2b2a32;
+  background-color: $title-dark;
 
   * {
     -webkit-app-region: no-drag;
@@ -48,18 +50,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-      }
-
-      .btn-close {
-        border-radius: 4px;
-        display: inherit;
-        // padding: 4px;
-
-        // width: 48px;
-
-        &:hover {
-          background-color: rgba($color: white, $alpha: 0.5);
-        }
       }
     }
   }

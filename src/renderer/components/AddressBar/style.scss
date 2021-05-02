@@ -1,0 +1,38 @@
+@import '../../styles/vars';
+
+.address-bar {
+  background-color: $dark;
+  padding: 4px;
+  gap: 4px;
+
+  .btn {
+    display: inherit;
+    border-radius: $radius;
+    padding: 4px;
+
+    &:hover {
+      background-color: rgba($color: #ffffff, $alpha: 0.5);
+    }
+
+    &:active {
+      background-color: rgba($color: #ffffff, $alpha: 0.25);
+    }
+  }
+
+  .search-field {
+    border-radius: $radius;
+    border: 1px solid white;
+    width: 100%;
+
+    .btn {
+      border-radius: 0;
+    }
+
+    input {
+      width: 100%;
+      outline: none;
+      padding: 0 4px;
+      border: none;
+    }
+  }
+}
