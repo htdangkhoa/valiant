@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { format } from 'url';
 import path from 'path';
+
+import View from './View';
 
 dotenv.config();
 
@@ -9,20 +11,32 @@ const isDev = process.env.NODE_ENV === 'development';
 
 function createWindow() {
   const win = new BrowserWindow({
+    // frame: false,
+    thickFrame: true,
+    titleBarStyle: 'hidden',
     minWidth: 800,
     minHeight: 600,
+    width: 1280,
+    height: 720,
     backgroundColor: '#ffffff',
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
+      plugins: true,
+      javascript: true,
+      worldSafeExecuteJavaScript: false,
     },
   });
 
   if (isDev) {
-    win.maximize();
-    win.webContents.openDevTools();
+    // win.maximize();
+    win.webContents.openDevTools({ mode: 'detach' });
   }
+
+  const bounds = win.getBounds();
+  win.setBounds({ height: bounds.height + 1 });
+  win.setBounds(bounds);
 
   win.loadURL(
     isDev
@@ -37,29 +51,31 @@ function createWindow() {
   return win;
 }
 
-function main() {
-  app
-    .whenReady()
-    .then(() => {
-      createWindow();
+let win;
 
-      app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-          createWindow();
-        }
-      });
-    })
-    .catch((e) => {
-      console.error(e);
+app
+  .whenReady()
+  .then(() => {
+    win = createWindow();
 
-      app.exit();
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        win = createWindow();
+      }
     });
+  })
+  .catch((e) => {
+    console.error(e);
 
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
+    app.exit();
   });
-}
 
-main();
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+ipcMain.on('new_tab', () => {
+  const view = new View(win, { url: 'https://github.com' });
+});

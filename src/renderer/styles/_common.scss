@@ -1,0 +1,17 @@
+.flex {
+  display: flex;
+}
+
+$contents: start, end, center, between, around, evenly;
+@each $content in $contents {
+  .justify-#{$content} {
+    justify-content: $content;
+  }
+}
+
+$items: start, end, center, baseline, stretch;
+@each $item in $items {
+  .items-#{$item} {
+    align-items: $item;
+  }
+}

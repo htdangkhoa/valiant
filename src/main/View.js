@@ -1,22 +1,32 @@
-const { BrowserWindow, BrowserView, Menu } = require('electron');
+import { BrowserView, Menu } from 'electron';
 
-class TabView {
+class View {
   constructor(win, options = { url: '' }) {
     this.win = win;
     // eslint-disable-next-line prefer-object-spread
     const opts = Object.assign({}, options);
 
-    this.view = new BrowserView({ webPreferences: { nodeIntegrationInSubFrames: false } });
-    this.view.webContents.loadURL(opts.url);
+    this.view = new BrowserView({
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        plugins: true,
+        nativeWindowOpen: true,
+        webSecurity: true,
+        javascript: true,
+        worldSafeExecuteJavaScript: false,
+        navigateOnDragDrop: false,
+      },
+    });
     this.win.addBrowserView(this.view);
-    this.win.setBrowserView(this.view);
+
+    this.view.setBackgroundColor('#ffffff');
+    this.view.webContents.loadURL(opts.url);
 
     this.resize();
-    // this.view.webContents.loadURL(opts.url);
+    this.win.on('resize', this.resize.bind(this));
 
     this.registerMenu();
-
-    win.on('resize', this.resize.bind(this));
 
     return this.view;
   }
@@ -50,13 +60,25 @@ class TabView {
         { label: 'Inspect Element', click: () => webContents.inspectElement(param.x, param.y) },
       ]);
 
-      contextMenu.popup(webContents);
+      contextMenu.popup();
     });
   }
 
-  resize() {
-    this.view.setBounds({ x: 0, y: 85, width: this.win.getBounds().width, height: this.win.getBounds().height - 85 });
+  async resize() {
+    const tabBarHeight = await this.win.webContents.executeJavaScript(`document.querySelector('body').offsetHeight`);
+
+    this.view.setBounds({
+      x: 0,
+      y: tabBarHeight,
+      width: this.win.getBounds().width,
+      height: this.win.getBounds().height - tabBarHeight,
+    });
+
+    // fix the BrowserView can draggable
+    const bounds = this.win.getContentBounds();
+    this.win.setContentBounds({ y: tabBarHeight, height: bounds.height + 1 });
+    this.win.setContentBounds(bounds);
   }
 }
 
-module.exports = TabView;
+export default View;

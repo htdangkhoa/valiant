@@ -12,6 +12,11 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
+  "settings": {
+    "import/resolver": {
+      "babel-module": {}
+    }
+  },
   "plugins": ["react"],
   "rules": {
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],

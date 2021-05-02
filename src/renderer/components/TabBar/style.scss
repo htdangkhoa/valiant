@@ -1,0 +1,66 @@
+// *,
+// *::after,
+// *::before {
+//   -webkit-user-select: none;
+//   -webkit-user-drag: none;
+//   -webkit-app-region: no-drag;
+//   cursor: default;
+// }
+
+* {
+  margin: unset;
+}
+
+.tabs-container {
+  display: flex;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 7.5rem;
+  padding-right: 5.5rem;
+  -webkit-app-region: drag;
+  background-color: #2b2a32;
+
+  * {
+    -webkit-app-region: no-drag;
+  }
+
+  .tabs {
+    // width: 100%;
+    display: flex;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    gap: 4px;
+
+    .tab {
+      border: 1px solid white;
+      border-radius: 4px;
+      min-width: 120px;
+      padding: 4px;
+      max-width: 180px;
+      font-size: 0.75rem;
+
+      * {
+        color: white;
+      }
+
+      p {
+        user-select: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .btn-close {
+        border-radius: 4px;
+        display: inherit;
+        // padding: 4px;
+
+        // width: 48px;
+
+        &:hover {
+          background-color: rgba($color: white, $alpha: 0.5);
+        }
+      }
+    }
+  }
+}
