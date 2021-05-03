@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 
 import './style.scss';
 
@@ -51,4 +51,4 @@ const AddressBard = () => {
   );
 };
 
-export default AddressBard;
+export default memo(AddressBard);

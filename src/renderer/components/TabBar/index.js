@@ -1,9 +1,9 @@
-import React, { memo, useRef, useEffect, useCallback, useState } from 'react';
+import React, { memo, useRef, useEffect, useCallback } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import './style.scss';
 
 import IconAdd from 'root/renderer/assets/svg/icon-add.svg';
-import Close from '../../assets/svg/close.svg';
+import Close from 'root/renderer/assets/svg/close.svg';
 
 import ToolbarState from 'root/renderer/state';
 import { classnames } from 'root/renderer/utils';
@@ -16,16 +16,15 @@ const TabBar = () => {
 
   const ref = useRef();
 
-  // eslint-disable-next-line consistent-return
   useEffect(() => {
     const ele = ref.current;
 
     if (ele) {
       const onWheel = (e) => {
+        if (e.deltaY === 0) return;
+
         e.preventDefault();
 
-        if (e.deltaY === 0) return;
-        e.preventDefault();
         ele.scrollTo({
           left: ele.scrollLeft + e.deltaY,
           behavior: 'smooth',
@@ -36,6 +35,15 @@ const TabBar = () => {
       return () => ele.removeEventListener('wheel', onWheel);
     }
   }, []);
+
+  // scroll to end
+  useEffect(() => {
+    const currentTab = tabs.find((tab) => !!tab.active);
+
+    if (currentTab) {
+      document.querySelector(`[id='${currentTab.id}']`).scrollIntoView();
+    }
+  }, [tabs]);
 
   const onDoubleClick = useCallback(() => {
     if (win.isMaximized()) {
@@ -83,13 +91,12 @@ const TabBar = () => {
         {tabs.map((tab, i) => (
           <div
             key={tab.id}
+            id={tab.id}
             className={classnames('tab flex items-center', tab.active && 'active')}
             onClick={() => onClick(i)}
-            onDoubleClick={overrideOnDoubleClick}>
-            <p title='Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel | Tinh tế'>
-              Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel | Tinh
-              tế
-            </p>
+            onDoubleClick={overrideOnDoubleClick}
+            title={tab.title}>
+            <p title={tab.title}>{tab.title}</p>
 
             <div
               className='btn btn-close p-0'

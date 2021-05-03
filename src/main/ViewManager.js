@@ -1,5 +1,5 @@
 import { app, ipcMain, BrowserWindow, BrowserView } from 'electron';
-import { CLOSE_TAB, FETCH_BROWSER_VIEWS, NEW_TAB, SWITCH_TAB } from 'root/constants/event-names';
+import { CLOSE_TAB, FETCH_BROWSER_VIEWS, NEW_TAB, SWITCH_TAB, TAB_EVENTS } from 'root/constants/event-names';
 import View from './View';
 
 class ViewManager {
@@ -15,7 +15,7 @@ class ViewManager {
     ipcMain.on(SWITCH_TAB, (e, message) => {
       const { id } = message;
 
-      const { browserView } = this.views.get(id);
+      const { browserView } = this.getView.apply(this, [id]);
 
       this.win.setBrowserView(browserView);
 
@@ -35,12 +35,6 @@ class ViewManager {
 
       if (indexKey === -1) return;
 
-      // this.win.removeBrowserView(view);
-
-      // view.browserView.webContents.destroy();
-
-      // this.views.delete(id);
-
       async function removeTab() {
         this.win.removeBrowserView(view);
 
@@ -51,9 +45,15 @@ class ViewManager {
         await this.fetchTabs();
       }
 
-      keys = Array.from(this.views.keys());
+      function setActiveToAnotherTab(key) {
+        const v = this.views.get(key);
 
-      // tab 1 | tab 2 | tab 3
+        this.selected = key;
+
+        this.win.setBrowserView(v.browserView);
+      }
+
+      keys = Array.from(this.views.keys());
 
       if (indexKey === keys.length - 1) {
         const previousKey = keys[indexKey - 1];
@@ -66,11 +66,7 @@ class ViewManager {
           return;
         }
 
-        const previousView = this.views.get(previousKey);
-
-        this.selected = previousKey;
-
-        this.win.setBrowserView(previousView.browserView);
+        setActiveToAnotherTab.apply(this, [previousKey]);
 
         await removeTab.apply(this);
 
@@ -79,11 +75,7 @@ class ViewManager {
 
       const nextKey = keys[indexKey + 1];
 
-      const nextView = this.views.get(nextKey);
-
-      this.selected = nextKey;
-
-      this.win.setBrowserView(nextView.browserView);
+      setActiveToAnotherTab.apply(this, [nextKey]);
 
       await removeTab.apply(this);
     });
@@ -94,7 +86,7 @@ class ViewManager {
       url: 'about:blank',
     },
   ) {
-    const view = new View(this.appWindow, options);
+    const view = new View(this.appWindow, options, this.fetchTabs.bind(this));
     this.views.set(view.id, view);
 
     this.selected = view.id;
@@ -154,9 +146,16 @@ class ViewManager {
     const tabs = Array.from(this.views.keys()).map((key) => ({
       id: key,
       active: this.selected === key,
+      title: this.views.get(key).browserView.title,
     }));
 
-    this.win.webContents.send(FETCH_BROWSER_VIEWS, tabs);
+    this.appWindow.updateTitle();
+
+    this.win.webContents.send(TAB_EVENTS, FETCH_BROWSER_VIEWS, tabs);
+  }
+
+  getView(id) {
+    return this.views.get(id);
   }
 }
 

@@ -52,6 +52,18 @@ class AppWindow {
   get webContents() {
     return this.win.webContents;
   }
+
+  updateTitle() {
+    const { selected, getView } = this.viewManager;
+
+    const view = getView.apply(this.viewManager, [selected]);
+
+    if (!view) return this.win.setTitle(app.name);
+
+    const { browserView } = view;
+
+    this.win.setTitle(`${browserView.title} | ${app.name}`);
+  }
 }
 
 export default AppWindow;

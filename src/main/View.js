@@ -1,9 +1,10 @@
 import { BrowserView, Menu, clipboard, Event, ContextMenuParams, MenuItem } from 'electron';
 import { isURL } from 'root/common';
+import { TAB_EVENTS, UPDATE_TITLE } from 'root/constants/event-names';
 import { v4 as uuid } from 'uuid';
 
 class View {
-  constructor(appWindow, options = { url: 'about:blank' }) {
+  constructor(appWindow, options = { url: 'about:blank' }, updateFunction) {
     const opts = Object.assign({}, options);
 
     this.appWindow = appWindow;
@@ -22,11 +23,19 @@ class View {
       },
     });
     this.browserView.id = uuid();
+    this.browserView.title = 'Untitled';
     this.win.addBrowserView(this.browserView);
     this.browserView.setBackgroundColor('#ffffff');
     this.browserView.webContents.loadURL(opts.url);
     this.browserView.setAutoResize({ width: true, height: true, vertical: true, horizontal: true });
     this.browserView.webContents.on('context-menu', this.registerContextMenu.bind(this));
+    this.browserView.webContents.on('page-title-updated', (e, title) => {
+      this.browserView.title = title;
+
+      this.appWindow.updateTitle();
+
+      if (typeof updateFunction === 'function') updateFunction();
+    });
     this.browserView.webContents.addListener('new-window', (e, url, frameName, disposition) => {
       if (disposition === 'new-window') {
         if (frameName === '_self') {
@@ -194,6 +203,10 @@ class View {
     const menu = Menu.buildFromTemplate(menuItems);
 
     menu.popup();
+  }
+
+  emit(event, ...args) {
+    this.win.webContents.send(TAB_EVENTS, event, ...args);
   }
 }
 
