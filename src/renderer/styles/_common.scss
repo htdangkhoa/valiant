@@ -6,15 +6,20 @@
   .m-#{$i} {
     margin: #{$i}px !important;
   }
-
   .mx-#{$i} {
     margin-left: #{$i}px !important;
     margin-right: #{$i}px !important;
   }
-
   .my-#{$i} {
     margin-top: #{$i}px !important;
     margin-bottom: #{$i}px !important;
+  }
+
+  .w-#{$i} {
+    width: #{$i}px !important;
+  }
+  .h-#{$i} {
+    height: #{$i}px !important;
   }
 }
 
@@ -32,11 +37,20 @@ $displays: block, inline-block, inline, flex, inline-flex, table, inline-table, 
   display: none;
 }
 
-$contents: start, end, center, between, around, evenly;
+$contents: start, end, center;
 @each $content in $contents {
   .justify-#{$content} {
     justify-content: $content;
   }
+}
+.justify-around {
+  justify-content: space-around;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-evenly {
+  justify-content: space-evenly;
 }
 
 $items: start, end, center, baseline, stretch;

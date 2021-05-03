@@ -5,10 +5,14 @@ import './style.scss';
 import IconAdd from 'root/renderer/assets/svg/icon-add.svg';
 import Close from '../../assets/svg/close.svg';
 
-const TabBar = () => {
-  const win = remote.getCurrentWindow();
+import ToolbarState from 'root/renderer/state';
+import { classnames } from 'root/renderer/utils';
+import { CLOSE_TAB, NEW_TAB, SWITCH_TAB } from 'root/constants/event-names';
 
-  const [browserViews, setBrowserViews] = useState([]);
+const TabBar = () => {
+  const { tabs } = ToolbarState.useContainer();
+
+  const win = remote.getCurrentWindow();
 
   const ref = useRef();
 
@@ -33,52 +37,76 @@ const TabBar = () => {
     }
   }, []);
 
+  const onDoubleClick = useCallback(() => {
+    if (win.isMaximized()) {
+      win.unmaximize();
+
+      return;
+    }
+
+    win.maximize();
+  }, []);
+
   const onClose = useCallback(
     (i) => {
-      const browserView = browserViews[i];
+      const currentTab = tabs[i];
 
-      if (browserView) {
-        win.removeBrowserView(browserView);
-        win.webContents.send('fetch_browser_views');
-      }
+      ipcRenderer.send(CLOSE_TAB, { id: currentTab.id });
     },
-    [browserViews],
+    [tabs],
   );
 
   const onAddNewTab = useCallback(() => {
-    ipcRenderer.send('new_tab', 'hahaha');
+    ipcRenderer.send(NEW_TAB);
   }, []);
 
-  useEffect(() => {
-    const listener = () => {
-      const views = win.getBrowserViews();
-      setBrowserViews(() => [].concat(views));
-    };
+  const onClick = useCallback(
+    (i) => {
+      const currentTab = tabs[i];
 
-    ipcRenderer.addListener('fetch_browser_views', listener);
+      ipcRenderer.send(SWITCH_TAB, { id: currentTab.id });
+    },
+    [tabs],
+  );
 
-    return () => ipcRenderer.removeListener('fetch_browser_views', listener);
-  }, []);
+  const overrideOnDoubleClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    [tabs],
+  );
 
   return (
-    <div className='tabs-container'>
+    <div className='tabs-container' onDoubleClick={onDoubleClick}>
       <div className='tabs' ref={ref}>
-        {browserViews.map((_, i) => (
-          <div key={i.toString()} className='tab flex items-center'>
+        {tabs.map((tab, i) => (
+          <div
+            key={tab.id}
+            className={classnames('tab flex items-center', tab.active && 'active')}
+            onClick={() => onClick(i)}
+            onDoubleClick={overrideOnDoubleClick}>
             <p title='Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel | Tinh tế'>
               Touch ID trên bàn phím Magic Keyboard mới không thể dùng được với iPad Pro M1 và các máy Mac Intel | Tinh
               tế
             </p>
 
-            <div className='btn p-0' onClick={() => onClose(i)}>
-              <Close fill='#ffffff' style={{ width: 16, height: 16 }} />
+            <div
+              className='btn btn-close p-0'
+              onClick={(e) => {
+                e.stopPropagation();
+
+                onClose(i);
+              }}
+              onDoubleClick={overrideOnDoubleClick}>
+              <Close fill='#ffffff' />
             </div>
           </div>
         ))}
       </div>
 
-      <div className='btn mx-4' onClick={onAddNewTab}>
-        <IconAdd fill='#ffffff' width={20} height={20} />
+      <div className='btn btn-add mx-4' onClick={onAddNewTab} onDoubleClick={overrideOnDoubleClick}>
+        <IconAdd fill='#ffffff' />
       </div>
     </div>
   );

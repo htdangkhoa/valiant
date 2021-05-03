@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+
 import './style.scss';
 
 import IconBack from 'root/renderer/assets/svg/icon-back.svg';
@@ -8,36 +9,46 @@ import IconLock from 'root/renderer/assets/svg/icon-lock.svg';
 import IconStar from 'root/renderer/assets/svg/icon-start.svg';
 import IconMenu from 'root/renderer/assets/svg/icon-menu.svg';
 
-const AddressBard = () => (
-  <div className='address-bar flex'>
-    <div className='btn'>
-      <IconBack fill='#ffffff' width={16} height={16} />
-    </div>
+import ToolbarState from 'root/renderer/state';
 
-    <div className='btn'>
-      <IconForward fill='#ffffff' width={16} height={16} />
-    </div>
+const AddressBard = () => {
+  const { url, handleUrlChange, tabs } = ToolbarState.useContainer();
 
-    <div className='btn'>
-      <IconRefresh fill='#ffffff' width={16} height={16} />
-    </div>
+  const onRefresh = useCallback(() => {
+    console.log(tabs);
+  }, [tabs]);
 
-    <div className='search-field flex'>
-      <div className='btn'>
-        <IconLock fill='#ffffff' width={16} height={16} />
+  return (
+    <div className='address-bar flex items-center'>
+      <div className='btn w-24 h-24'>
+        <IconBack fill='#ffffff' />
       </div>
 
-      <input type='text' />
+      <div className='btn w-24 h-24'>
+        <IconForward fill='#ffffff' />
+      </div>
 
-      <div className='btn'>
-        <IconStar fill='#ffffff' width={16} height={16} />
+      <div className='btn w-24 h-24' onClick={onRefresh}>
+        <IconRefresh fill='#ffffff' />
+      </div>
+
+      <div className='search-field flex'>
+        <div className='btn w-24 h-24'>
+          <IconLock fill='#ffffff' />
+        </div>
+
+        <input type='text' value={url} onChange={handleUrlChange} />
+
+        <div className='btn w-24 h-24'>
+          <IconStar fill='#ffffff' />
+        </div>
+      </div>
+
+      <div className='btn w-24 h-24'>
+        <IconMenu fill='#ffffff' />
       </div>
     </div>
-
-    <div className='btn'>
-      <IconMenu fill='#ffffff' width={16} height={16} />
-    </div>
-  </div>
-);
+  );
+};
 
 export default AddressBard;
