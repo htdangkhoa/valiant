@@ -5,8 +5,5 @@
       "root/*": ["./src/*"]
     }
   },
-  "exclude": ["node_modules"],
-  "typeAcquisition": {
-    "exclude": ["dotenv"]
-  }
+  "exclude": ["node_modules"]
 }

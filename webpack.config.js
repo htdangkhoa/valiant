@@ -1,12 +1,15 @@
 const path = require('path');
 const { spawn, execSync } = require('child_process');
 
+const isDev = process.env.NODE_ENV === 'development';
+
 let electronProcess;
 
 module.exports = {
-  mode: 'development',
+  mode: isDev ? 'development' : 'production',
   target: 'electron-main',
-  watch: true,
+  devtool: isDev ? 'source-map' : false,
+  watch: isDev,
   entry: {
     main: path.resolve(process.cwd(), 'src/main/index.js'),
   },
@@ -20,7 +23,7 @@ module.exports = {
     ],
   },
   plugins: [
-    {
+    isDev && {
       apply(compiler) {
         compiler.hooks.afterEmit.tap('AfterEmitPlugin', () => {
           if (electronProcess) {
@@ -41,7 +44,7 @@ module.exports = {
         });
       },
     },
-  ],
+  ].filter(Boolean),
   resolve: {
     modules: ['node_modules'],
     extensions: ['.js', '.json'],

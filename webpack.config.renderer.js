@@ -2,16 +2,20 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+
+const isDev = process.env.NODE_ENV === 'development';
 
 module.exports = {
-  mode: 'development',
+  mode: isDev ? 'development' : 'production',
   target: 'electron-renderer',
+  devtool: isDev ? 'source-map' : false,
   entry: {
     renderer: path.resolve(process.cwd(), 'src/renderer/index.js'),
   },
   output: {
     path: path.resolve(process.cwd(), 'dist'),
-    publicPath: '/',
+    publicPath: './',
     filename: '[name].[fullhash].js',
     chunkFilename: '[id].[contenthash].js',
   },
@@ -72,6 +76,21 @@ module.exports = {
   resolve: {
     modules: ['node_modules'],
     extensions: ['.js', '.json', '.jsx'],
+  },
+  optimization: {
+    minimizer: [
+      !isDev &&
+        new TerserPlugin({
+          extractComments: true,
+          terserOptions: {
+            ecma: 8,
+            output: {
+              comments: false,
+            },
+          },
+          parallel: true,
+        }),
+    ].filter(Boolean),
   },
   devServer: {
     disableHostCheck: true,

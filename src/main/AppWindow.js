@@ -19,6 +19,7 @@ class AppWindow {
         contextIsolation: false,
         plugins: true,
         javascript: true,
+        worldSafeExecuteJavaScript: false,
       },
     });
 
@@ -41,7 +42,7 @@ class AppWindow {
         format({
           protocol: 'file',
           slashes: true,
-          pathname: path.resolve(__dirname, '..', '..', 'dist', 'index.html'),
+          pathname: path.resolve(__dirname, 'index.html'),
         }),
       );
     }

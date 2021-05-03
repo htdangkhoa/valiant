@@ -11,15 +11,16 @@
   "main": "dist/main.js",
   "scripts": {
     "start": "electron .",
-    "dev:main": "webpack",
-    "dev:render": "webpack serve --config webpack.config.renderer.js",
+    "dev:main": "env-cmd -f .env webpack",
+    "dev:render": "env-cmd -f .env webpack serve --config webpack.config.renderer.js",
     "dev": "npm-run-all --parallel dev:render dev:main",
-    "prebuild": "webpack --config webpack.config.prod.js",
-    "build": "env-cmd -f .env.production electron-packager . --out=build --overwrite"
+    "build:main": "env-cmd -f .env webpack",
+    "build:renderer": "env-cmd -f .env webpack --config webpack.config.renderer.js",
+    "prebuild": "npm-run-all --sequential build:main build:renderer",
+    "build": "env-cmd -f .env electron-packager . --out=build --overwrite"
   },
   "dependencies": {
     "@babel/runtime": "^7.14.0",
-    "dotenv": "^8.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "unstated-next": "^1.1.0",
@@ -55,6 +56,7 @@
     "node-sass": "^5.0.0",
     "npm-run-all": "^4.1.5",
     "sass-loader": "^11.0.1",
+    "terser-webpack-plugin": "^5.1.1",
     "webpack": "^5.36.2",
     "webpack-cli": "^4.6.0",
     "webpack-dev-server": "^3.11.2",
