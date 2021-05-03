@@ -1,5 +1,6 @@
 const path = require('path');
 const { spawn, execSync } = require('child_process');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -45,6 +46,21 @@ module.exports = {
       },
     },
   ].filter(Boolean),
+  optimization: {
+    minimizer: [
+      !isDev &&
+        new TerserPlugin({
+          extractComments: true,
+          terserOptions: {
+            ecma: 8,
+            output: {
+              comments: false,
+            },
+          },
+          parallel: true,
+        }),
+    ].filter(Boolean),
+  },
   resolve: {
     modules: ['node_modules'],
     extensions: ['.js', '.json'],
