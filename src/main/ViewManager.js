@@ -1,5 +1,5 @@
 import { app, ipcMain, BrowserWindow, BrowserView } from 'electron';
-import { CLOSE_TAB, FETCH_BROWSER_VIEWS, NEW_TAB, SWITCH_TAB, TAB_EVENTS } from 'root/constants/event-names';
+import { CLOSE_TAB, CLOSE_WINDOW, NEW_TAB, SWITCH_TAB, TAB_EVENTS } from 'root/constants/event-names';
 import View from './View';
 
 class ViewManager {
@@ -20,64 +20,22 @@ class ViewManager {
       this.win.setBrowserView(browserView);
 
       this.selected = id;
-
-      this.fetchTabs();
     });
 
     ipcMain.on(CLOSE_TAB, async (e, message) => {
-      let keys = Array.from(this.views.keys());
-
       const { id } = message;
 
-      const view = this.views.get(id);
+      const { browserView } = this.getView.apply(this, [id]);
 
-      const indexKey = keys.indexOf(id);
+      this.win.removeBrowserView(browserView);
 
-      if (indexKey === -1) return;
+      browserView.webContents.destroy();
 
-      async function removeTab() {
-        this.win.removeBrowserView(view);
+      this.views.delete(id);
+    });
 
-        view.browserView.webContents.destroy();
-
-        this.views.delete(id);
-
-        await this.fetchTabs();
-      }
-
-      function setActiveToAnotherTab(key) {
-        const v = this.views.get(key);
-
-        this.selected = key;
-
-        this.win.setBrowserView(v.browserView);
-      }
-
-      keys = Array.from(this.views.keys());
-
-      if (indexKey === keys.length - 1) {
-        const previousKey = keys[indexKey - 1];
-
-        if (!previousKey) {
-          await removeTab.apply(this);
-
-          app.quit();
-
-          return;
-        }
-
-        setActiveToAnotherTab.apply(this, [previousKey]);
-
-        await removeTab.apply(this);
-
-        return;
-      }
-
-      const nextKey = keys[indexKey + 1];
-
-      setActiveToAnotherTab.apply(this, [nextKey]);
-
-      await removeTab.apply(this);
+    ipcMain.on(CLOSE_WINDOW, () => {
+      this.win.close();
     });
   }
 
@@ -92,6 +50,8 @@ class ViewManager {
     this.selected = view.id;
 
     this.win.webContents.send(TAB_EVENTS, 'create-tab', view.id);
+
+    this.fixBounds();
 
     this.setBoundsListener();
 
@@ -138,20 +98,6 @@ class ViewManager {
         this.fixBounds();
       }
     });
-  }
-
-  fetchTabs() {
-    const tabs = Array.from(this.views.keys()).map((key) => ({
-      id: key,
-      active: this.selected === key,
-      title: this.views.get(key).browserView.title,
-    }));
-
-    this.appWindow.updateTitle();
-
-    this.win.webContents.send(TAB_EVENTS, FETCH_BROWSER_VIEWS, tabs);
-
-    // await this.fixBounds();
   }
 
   getView(id) {

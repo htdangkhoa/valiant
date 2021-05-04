@@ -3,7 +3,10 @@ import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
 
 import {
+  CLOSE_TAB,
+  CLOSE_WINDOW,
   FETCH_BROWSER_VIEWS,
+  SWITCH_TAB,
   TAB_EVENTS,
   UPDATE_FAVICON,
   UPDATE_LOADING,
@@ -17,11 +20,7 @@ const useToolbarState = () => {
 
   useEffect(() => {
     function listener(e, tabEvent, message) {
-      console.log('🚀 ~ file: state.js ~ line 14 ~ listener ~ tabEvent, message', tabEvent, message);
-
       if (tabEvent === 'create-tab') {
-        console.log('1');
-
         setTabs((his) =>
           [...his]
             .map((tab) => ({ ...tab, active: false }))
@@ -76,35 +75,62 @@ const useToolbarState = () => {
           }),
         );
       }
-
-      // console.log('_____', $tabs);
-
-      // setTabs(() => $tabs);
     }
 
     ipcRenderer.on(TAB_EVENTS, listener);
 
-    // return () => ipcRenderer.removeListener(TAB_EVENTS, listener);
+    return () => ipcRenderer.removeListener(TAB_EVENTS, listener);
   }, []);
 
-  // useEffect(() => {
-  //   if (tabs.length !== 0) {
-  //     const listener = (e, message) => {
-  //       const { id, title } = message;
+  const handleTabChange = (i) => {
+    const selectedTab = tabs[i];
 
-  //       console.log(tabs.find((tab) => tab.id === id));
+    if (!selectedTab) return;
 
-  //       // setTimeout(() => {
-  //       document.querySelector(`[id='${id}'] p`).setAttribute('title', title);
-  //       document.querySelector(`[id='${id}'] p`).innerHTML = title;
-  //       // }, 0);
-  //     };
+    setTabs((his) =>
+      [...his].map((tab) => {
+        tab.active = false;
 
-  //     ipcRenderer.addListener(UPDATE_TITLE, listener);
+        if (tab.id === selectedTab.id) {
+          tab.active = true;
+        }
 
-  //     return () => ipcRenderer.removeListener(UPDATE_TITLE, listener);
-  //   }
-  // }, [tabs]);
+        return tab;
+      }),
+    );
+
+    ipcRenderer.send(SWITCH_TAB, { id: selectedTab.id });
+  };
+
+  const handleCloseTab = (i) => {
+    function requestCloseTab() {
+      const selectedTab = tabs[i];
+
+      if (!selectedTab) return;
+
+      setTabs((his) => [...his].filter((tab) => tab.id !== selectedTab.id));
+
+      ipcRenderer.send(CLOSE_TAB, { id: selectedTab.id });
+    }
+
+    if (i === tabs.length - 1) {
+      const previous = i - 1;
+
+      if (previous < 0) {
+        ipcRenderer.send(CLOSE_WINDOW);
+
+        return;
+      }
+
+      handleTabChange(previous);
+
+      requestCloseTab();
+
+      return;
+    }
+
+    requestCloseTab();
+  };
 
   const handleUrlChange = useCallback((e) => {
     setUrl(e.target.value);
@@ -114,6 +140,8 @@ const useToolbarState = () => {
     url,
     handleUrlChange,
     tabs,
+    handleTabChange,
+    handleCloseTab,
   };
 };
 

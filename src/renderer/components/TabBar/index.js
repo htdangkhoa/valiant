@@ -12,7 +12,7 @@ import { classnames } from 'root/renderer/utils';
 import { CLOSE_TAB, NEW_TAB, SWITCH_TAB } from 'root/constants/event-names';
 
 const TabBar = () => {
-  const { tabs } = ToolbarState.useContainer();
+  const { tabs, handleTabChange, handleCloseTab } = ToolbarState.useContainer();
 
   const win = remote.getCurrentWindow();
 
@@ -57,27 +57,9 @@ const TabBar = () => {
     win.maximize();
   }, []);
 
-  const onClose = useCallback(
-    (i) => {
-      const currentTab = tabs[i];
-
-      ipcRenderer.send(CLOSE_TAB, { id: currentTab.id });
-    },
-    [tabs],
-  );
-
   const onAddNewTab = useCallback(() => {
     ipcRenderer.send(NEW_TAB);
   }, []);
-
-  const onClick = useCallback(
-    (i) => {
-      const currentTab = tabs[i];
-
-      ipcRenderer.send(SWITCH_TAB, { id: currentTab.id });
-    },
-    [tabs],
-  );
 
   const overrideOnDoubleClick = useCallback(
     (e) => {
@@ -98,7 +80,7 @@ const TabBar = () => {
               key={tab.id}
               id={tab.id}
               className={classnames('tab flex items-center', tab.active && 'active')}
-              onClick={() => onClick(i)}
+              onClick={() => handleTabChange(i)}
               onDoubleClick={overrideOnDoubleClick}
               title={tab.title}>
               {!tab.loading && (
@@ -125,7 +107,7 @@ const TabBar = () => {
                 onClick={(e) => {
                   e.stopPropagation();
 
-                  onClose(i);
+                  handleCloseTab(i);
                 }}
                 onDoubleClick={overrideOnDoubleClick}>
                 <IconClose fill='#ffffff' />
