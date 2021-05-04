@@ -15,7 +15,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(process.cwd(), 'dist'),
-    publicPath: './',
+    publicPath: isDev ? '/' : './',
     filename: '[name].[fullhash].js',
     chunkFilename: '[id].[contenthash].js',
   },
