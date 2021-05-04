@@ -34,20 +34,22 @@ class AppWindow {
     this.win.setBounds({ height: bounds.height + 1 });
     this.win.setBounds(bounds);
 
-    if (isDev) {
-      this.win.webContents.openDevTools({ mode: 'detach' });
-      this.win.loadURL('http://localhost:8080');
-    } else {
-      this.win.loadURL(
-        format({
-          protocol: 'file',
-          slashes: true,
-          pathname: path.resolve(__dirname, 'index.html'),
-        }),
-      );
-    }
+    (async () => {
+      if (isDev) {
+        this.win.webContents.openDevTools({ mode: 'detach' });
+        await this.win.loadURL('http://localhost:8080');
+      } else {
+        await this.win.loadURL(
+          format({
+            protocol: 'file',
+            slashes: true,
+            pathname: path.resolve(__dirname, 'index.html'),
+          }),
+        );
+      }
 
-    this.viewManager.create({ url: 'https://github.com' });
+      this.viewManager.create({ url: 'https://github.com' });
+    })();
   }
 
   get webContents() {

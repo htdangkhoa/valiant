@@ -6,6 +6,8 @@ export const SWITCH_TAB = 'SWITCH_TAB';
 
 export const CLOSE_TAB = 'CLOSE_TAB';
 
-export const UPDATE_TITLE = 'UPDATE_TITLE';
-
+// tab events
 export const TAB_EVENTS = 'TAB_EVENTS';
+export const UPDATE_TITLE = 'UPDATE_TITLE';
+export const UPDATE_FAVICON = 'UPDATE_FAVICON';
+export const UPDATE_LOADING = 'UPDATE_LOADING';

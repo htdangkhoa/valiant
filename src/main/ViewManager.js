@@ -86,14 +86,14 @@ class ViewManager {
       url: 'about:blank',
     },
   ) {
-    const view = new View(this.appWindow, options, this.fetchTabs.bind(this));
+    const view = new View(this.appWindow, options);
     this.views.set(view.id, view);
 
     this.selected = view.id;
 
-    this.setBoundsListener();
+    this.win.webContents.send(TAB_EVENTS, 'create-tab', view.id);
 
-    await this.fetchTabs();
+    this.setBoundsListener();
 
     return view;
   }
@@ -140,9 +140,7 @@ class ViewManager {
     });
   }
 
-  async fetchTabs() {
-    await this.fixBounds();
-
+  fetchTabs() {
     const tabs = Array.from(this.views.keys()).map((key) => ({
       id: key,
       active: this.selected === key,
@@ -152,6 +150,8 @@ class ViewManager {
     this.appWindow.updateTitle();
 
     this.win.webContents.send(TAB_EVENTS, FETCH_BROWSER_VIEWS, tabs);
+
+    // await this.fixBounds();
   }
 
   getView(id) {

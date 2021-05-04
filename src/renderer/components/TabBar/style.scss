@@ -53,6 +53,15 @@
         color: white;
       }
 
+      .favicon {
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+
       p {
         user-select: none;
         overflow: hidden;
@@ -62,11 +71,10 @@
       }
 
       .btn-close {
-        min-width: 16px;
-        min-height: 16px;
-        width: 16px;
-        height: 16px;
-        margin-left: 4px;
+        min-width: 20px;
+        min-height: 20px;
+        width: 20px;
+        height: 20px;
       }
 
       &.active {

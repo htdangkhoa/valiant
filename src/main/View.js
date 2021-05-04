@@ -1,10 +1,10 @@
 import { BrowserView, Menu, clipboard, Event, ContextMenuParams, MenuItem } from 'electron';
 import { isURL } from 'root/common';
-import { TAB_EVENTS, UPDATE_TITLE } from 'root/constants/event-names';
+import { TAB_EVENTS, UPDATE_FAVICON, UPDATE_TITLE, UPDATE_LOADING } from 'root/constants/event-names';
 import { v4 as uuid } from 'uuid';
 
 class View {
-  constructor(appWindow, options = { url: 'about:blank' }, updateFunction) {
+  constructor(appWindow, options = { url: 'about:blank' }) {
     const opts = Object.assign({}, options);
 
     this.appWindow = appWindow;
@@ -26,17 +26,33 @@ class View {
     this.browserView.title = 'Untitled';
     this.win.addBrowserView(this.browserView);
     this.browserView.setBackgroundColor('#ffffff');
-    this.browserView.webContents.loadURL(opts.url);
     this.browserView.setAutoResize({ width: true, height: true, vertical: true, horizontal: true });
-    this.browserView.webContents.on('context-menu', this.registerContextMenu.bind(this));
-    this.browserView.webContents.on('page-title-updated', (e, title) => {
+
+    this.webContents.on('context-menu', this.registerContextMenu.bind(this));
+    this.webContents.on('page-title-updated', (e, title) => {
       this.browserView.title = title;
 
       this.appWindow.updateTitle();
 
-      if (typeof updateFunction === 'function') updateFunction();
+      this.emit(UPDATE_TITLE, { id: this.browserView.id, title });
     });
-    this.browserView.webContents.addListener('new-window', (e, url, frameName, disposition) => {
+    this.webContents.on('page-favicon-updated', (e, favicons) => {
+      const [favicon] = favicons;
+      this.browserView.favicon = favicon;
+
+      this.emit(UPDATE_FAVICON, { id: this.browserView.id, favicon });
+    });
+    this.webContents.on('did-start-loading', () => {
+      this.browserView.loading = true;
+
+      this.emit(UPDATE_LOADING, { id: this.browserView.id, loading: true });
+    });
+    this.webContents.on('did-stop-loading', () => {
+      this.browserView.loading = false;
+
+      this.emit(UPDATE_LOADING, { id: this.browserView.id, loading: false });
+    });
+    this.webContents.addListener('new-window', (e, url, frameName, disposition) => {
       if (disposition === 'new-window') {
         if (frameName === '_self') {
           e.preventDefault();
@@ -53,6 +69,8 @@ class View {
         this.appWindow.viewManager.create({ url });
       }
     });
+
+    this.browserView.webContents.loadURL(opts.url);
   }
 
   get id() {

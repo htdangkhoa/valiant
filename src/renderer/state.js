@@ -2,7 +2,13 @@ import { useEffect, useCallback, useState } from 'react';
 import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
 
-import { FETCH_BROWSER_VIEWS, TAB_EVENTS, UPDATE_TITLE } from 'root/constants/event-names';
+import {
+  FETCH_BROWSER_VIEWS,
+  TAB_EVENTS,
+  UPDATE_FAVICON,
+  UPDATE_LOADING,
+  UPDATE_TITLE,
+} from 'root/constants/event-names';
 
 const useToolbarState = () => {
   const [tabs, setTabs] = useState([]);
@@ -11,32 +17,74 @@ const useToolbarState = () => {
 
   useEffect(() => {
     function listener(e, tabEvent, message) {
-      let $tabs = [];
+      console.log('🚀 ~ file: state.js ~ line 14 ~ listener ~ tabEvent, message', tabEvent, message);
 
-      if (tabEvent === FETCH_BROWSER_VIEWS) {
-        $tabs = [].concat(message);
+      if (tabEvent === 'create-tab') {
+        console.log('1');
+
+        setTabs((his) =>
+          [...his]
+            .map((tab) => ({ ...tab, active: false }))
+            .concat({
+              id: message,
+              active: true,
+              title: 'Untitled',
+              favicon: null,
+              loading: false,
+            }),
+        );
       }
 
       if (tabEvent === UPDATE_TITLE) {
         const { id, title } = message;
 
-        $tabs = $tabs.map((tab) => {
-          if (tab.id === id) {
-            tab.title = title;
-          }
+        setTabs((his) =>
+          [...his].map((tab) => {
+            if (tab.id === id) {
+              tab.title = title;
+            }
 
-          return tab;
-        });
+            return tab;
+          }),
+        );
       }
 
-      console.log('_____', $tabs);
+      if (tabEvent === UPDATE_FAVICON) {
+        const { id, favicon } = message;
 
-      setTabs(() => $tabs);
+        setTabs((his) =>
+          [...his].map((tab) => {
+            if (tab.id === id) {
+              tab.favicon = favicon;
+            }
+
+            return tab;
+          }),
+        );
+      }
+
+      if (tabEvent === UPDATE_LOADING) {
+        const { id, loading } = message;
+
+        setTabs((his) =>
+          [...his].map((tab) => {
+            if (tab.id === id) {
+              tab.loading = loading;
+            }
+
+            return tab;
+          }),
+        );
+      }
+
+      // console.log('_____', $tabs);
+
+      // setTabs(() => $tabs);
     }
 
-    ipcRenderer.addListener(TAB_EVENTS, listener);
+    ipcRenderer.on(TAB_EVENTS, listener);
 
-    return () => ipcRenderer.removeListener(TAB_EVENTS, listener);
+    // return () => ipcRenderer.removeListener(TAB_EVENTS, listener);
   }, []);
 
   // useEffect(() => {

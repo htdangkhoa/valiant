@@ -14,6 +14,18 @@
     margin-top: #{$i}px !important;
     margin-bottom: #{$i}px !important;
   }
+  .ml-#{$i} {
+    margin-left: #{$i}px !important;
+  }
+  .mt-#{$i} {
+    margin-top: #{$i}px !important;
+  }
+  .mr-#{$i} {
+    margin-right: #{$i}px !important;
+  }
+  .mb-#{$i} {
+    margin-bottom: #{$i}px !important;
+  }
 
   .w-#{$i} {
     width: #{$i}px !important;
