@@ -75,6 +75,10 @@ const useToolbarState = () => {
           }),
         );
       }
+
+      if (tabEvent === 'did-navigate') {
+        console.log(message);
+      }
     }
 
     ipcRenderer.on(TAB_EVENTS, listener);

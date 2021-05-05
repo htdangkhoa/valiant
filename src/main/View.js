@@ -53,6 +53,9 @@ class View {
 
       this.emit(UPDATE_LOADING, { id: this.browserView.id, loading: false });
     });
+    this.webContents.on('did-navigate', (e, url) => {
+      this.emit('did-navigate', { id: this.id, url });
+    });
     this.webContents.addListener('new-window', (e, url, frameName, disposition) => {
       if (disposition === 'new-window') {
         if (frameName === '_self') {

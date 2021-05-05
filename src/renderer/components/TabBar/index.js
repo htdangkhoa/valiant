@@ -74,6 +74,7 @@ const TabBar = () => {
             <div
               key={tab.id}
               id={tab.id}
+              draggable
               className={classnames('tab flex items-center', tab.active && 'active')}
               onClick={() => handleTabChange(i)}
               onDoubleClick={onPreventDoubleClick}
