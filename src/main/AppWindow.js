@@ -1,4 +1,6 @@
 import { app, BrowserWindow } from 'electron';
+import { initialize as initializeRemoteModule } from '@electron/remote/main';
+
 import { format } from 'url';
 import path from 'path';
 import ViewManager from './ViewManager';
@@ -7,6 +9,8 @@ const isDev = process.env.NODE_ENV === 'development';
 
 class AppWindow {
   constructor() {
+    initializeRemoteModule();
+
     this.win = new BrowserWindow({
       minWidth: 800,
       minHeight: 600,
@@ -28,11 +32,6 @@ class AppWindow {
     if (isDev) {
       this.win.webContents.openDevTools({ mode: 'detach' });
     }
-
-    // fix draggable
-    const bounds = this.win.getBounds();
-    this.win.setBounds({ height: bounds.height + 1 });
-    this.win.setBounds(bounds);
 
     (async () => {
       if (isDev) {

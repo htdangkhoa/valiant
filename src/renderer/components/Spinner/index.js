@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { classnames } from 'root/renderer/utils';
 import './style.scss';
@@ -16,4 +16,4 @@ Spinner.propTypes = {
   className: PropTypes.string,
 };
 
-export default Spinner;
+export default memo(Spinner);

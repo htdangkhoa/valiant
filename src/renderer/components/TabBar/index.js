@@ -1,5 +1,5 @@
 import React, { memo, useRef, useEffect, useCallback } from 'react';
-import { ipcRenderer, remote } from 'electron';
+import * as ElectronRemote from '@electron/remote';
 import './style.scss';
 
 import IconAdd from 'root/renderer/assets/svg/icon-add.svg';
@@ -9,12 +9,11 @@ import IconEarth from 'root/renderer/assets/svg/icon-earth.svg';
 import Spinner from 'root/renderer/components/Spinner';
 import ToolbarState from 'root/renderer/state';
 import { classnames } from 'root/renderer/utils';
-import { CLOSE_TAB, NEW_TAB, SWITCH_TAB } from 'root/constants/event-names';
 
 const TabBar = () => {
-  const { tabs, handleTabChange, handleCloseTab } = ToolbarState.useContainer();
+  const { tabs, handleTabChange, handleCloseTab, handleAddNewTab } = ToolbarState.useContainer();
 
-  const win = remote.getCurrentWindow();
+  const win = ElectronRemote.getCurrentWindow();
 
   const ref = useRef();
 
@@ -57,11 +56,7 @@ const TabBar = () => {
     win.maximize();
   }, []);
 
-  const onAddNewTab = useCallback(() => {
-    ipcRenderer.send(NEW_TAB);
-  }, []);
-
-  const overrideOnDoubleClick = useCallback(
+  const onPreventDoubleClick = useCallback(
     (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -81,7 +76,7 @@ const TabBar = () => {
               id={tab.id}
               className={classnames('tab flex items-center', tab.active && 'active')}
               onClick={() => handleTabChange(i)}
-              onDoubleClick={overrideOnDoubleClick}
+              onDoubleClick={onPreventDoubleClick}
               title={tab.title}>
               {!tab.loading && (
                 <>
@@ -109,7 +104,7 @@ const TabBar = () => {
 
                   handleCloseTab(i);
                 }}
-                onDoubleClick={overrideOnDoubleClick}>
+                onDoubleClick={onPreventDoubleClick}>
                 <IconClose fill='#ffffff' />
               </div>
             </div>
@@ -117,7 +112,7 @@ const TabBar = () => {
         })}
       </div>
 
-      <div className='btn btn-add mx-4' title='New Tab' onClick={onAddNewTab} onDoubleClick={overrideOnDoubleClick}>
+      <div className='btn btn-add mx-4' title='New Tab' onClick={handleAddNewTab} onDoubleClick={onPreventDoubleClick}>
         <IconAdd fill='#ffffff' />
       </div>
     </div>

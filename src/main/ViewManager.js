@@ -59,7 +59,7 @@ class ViewManager {
   }
 
   async fixBounds() {
-    const view = this.views.get(this.selected);
+    const view = this.getView.apply(this, [this.selected]);
 
     if (!view) return;
 

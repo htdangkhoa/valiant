@@ -5,6 +5,7 @@
     "node": true
   },
   "extends": ["plugin:react/recommended", "airbnb-base", "prettier"],
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -24,6 +25,7 @@
     "prefer-object-spread": "off",
     "class-methods-use-this": "off",
     "no-param-reassign": "off",
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "import/prefer-default-export": "off"
   }
 }

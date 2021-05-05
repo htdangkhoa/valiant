@@ -1,4 +1,4 @@
-import { BrowserView, Menu, clipboard, Event, ContextMenuParams, MenuItem } from 'electron';
+import { BrowserView, Menu, clipboard } from 'electron';
 import { isURL } from 'root/common';
 import { TAB_EVENTS, UPDATE_FAVICON, UPDATE_TITLE, UPDATE_LOADING } from 'root/constants/event-names';
 import { v4 as uuid } from 'uuid';
@@ -20,13 +20,14 @@ class View {
         webSecurity: true,
         javascript: true,
         worldSafeExecuteJavaScript: false,
+        sandbox: true,
       },
     });
     this.browserView.id = uuid();
     this.browserView.title = 'Untitled';
     this.win.addBrowserView(this.browserView);
     this.browserView.setBackgroundColor('#ffffff');
-    this.browserView.setAutoResize({ width: true, height: true, vertical: true, horizontal: true });
+    this.browserView.setAutoResize({ width: true });
 
     this.webContents.on('context-menu', this.registerContextMenu.bind(this));
     this.webContents.on('page-title-updated', (e, title) => {

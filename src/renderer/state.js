@@ -5,7 +5,7 @@ import { ipcRenderer } from 'electron';
 import {
   CLOSE_TAB,
   CLOSE_WINDOW,
-  FETCH_BROWSER_VIEWS,
+  NEW_TAB,
   SWITCH_TAB,
   TAB_EVENTS,
   UPDATE_FAVICON,
@@ -132,6 +132,10 @@ const useToolbarState = () => {
     requestCloseTab();
   };
 
+  const handleAddNewTab = useCallback(() => {
+    ipcRenderer.send(NEW_TAB);
+  }, []);
+
   const handleUrlChange = useCallback((e) => {
     setUrl(e.target.value);
   }, []);
@@ -142,6 +146,7 @@ const useToolbarState = () => {
     tabs,
     handleTabChange,
     handleCloseTab,
+    handleAddNewTab,
   };
 };
 
