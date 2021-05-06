@@ -1,17 +1,16 @@
 import React, { memo, useRef, useEffect, useCallback } from 'react';
 import * as ElectronRemote from '@electron/remote';
-import './style.scss';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import IconAdd from 'root/renderer/assets/svg/icon-add.svg';
-import IconClose from 'root/renderer/assets/svg/icon-close.svg';
-import IconEarth from 'root/renderer/assets/svg/icon-earth.svg';
-
-import Spinner from 'root/renderer/components/Spinner';
 import ToolbarState from 'root/renderer/state';
-import { classnames } from 'root/renderer/utils';
+import Tab from './Tab';
 
-const TabBar = () => {
-  const { tabs, handleTabChange, handleCloseTab, handleAddNewTab } = ToolbarState.useContainer();
+import './style.scss';
+
+const TabBarView = () => {
+  const { tabs, handleAddNewTab, handlePreventDoubleClick } = ToolbarState.useContainer();
 
   const win = ElectronRemote.getCurrentWindow();
 
@@ -37,15 +36,6 @@ const TabBar = () => {
     }
   }, []);
 
-  // scroll to end
-  useEffect(() => {
-    const currentTab = tabs.find((tab) => !!tab.active);
-
-    if (currentTab) {
-      document.querySelector(`[id='${currentTab.id}']`).scrollIntoView();
-    }
-  }, [tabs]);
-
   const onDoubleClick = useCallback(() => {
     if (win.isMaximized()) {
       win.unmaximize();
@@ -56,68 +46,29 @@ const TabBar = () => {
     win.maximize();
   }, []);
 
-  const onPreventDoubleClick = useCallback(
-    (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    },
-    [tabs],
-  );
-
   return (
     <div className='tabs-container' onDoubleClick={onDoubleClick}>
       <div className='tabs' ref={ref}>
-        {tabs.map((tab, i) => {
-          const hasFavicon = !!tab.favicon && typeof tab.favicon === 'string' && tab.favicon.startsWith('http');
-
-          return (
-            <div
-              key={tab.id}
-              id={tab.id}
-              draggable
-              className={classnames('tab flex items-center', tab.active && 'active')}
-              onClick={() => handleTabChange(i)}
-              onDoubleClick={onPreventDoubleClick}
-              title={tab.title}>
-              {!tab.loading && (
-                <>
-                  {hasFavicon && <img className='favicon mx-4' src={tab.favicon} width={16} height={16} />}
-
-                  {!hasFavicon && (
-                    <div className='flex mx-4'>
-                      <IconEarth fill='#ffffff' width={23} height={23} />
-                    </div>
-                  )}
-                </>
-              )}
-
-              {tab.loading && <Spinner className='mx-4' />}
-
-              <p className='mx-4' title={tab.title}>
-                {tab.title}
-              </p>
-
-              <div
-                className='btn btn-close p-0'
-                title='Close Tab'
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  handleCloseTab(i);
-                }}
-                onDoubleClick={onPreventDoubleClick}>
-                <IconClose fill='#ffffff' />
-              </div>
-            </div>
-          );
-        })}
+        {tabs.map((tab, i) => (
+          <Tab key={`tab=${i}`} index={i} />
+        ))}
       </div>
 
-      <div className='btn btn-add mx-4' title='New Tab' onClick={handleAddNewTab} onDoubleClick={onPreventDoubleClick}>
+      <div
+        className='btn btn-add mx-4'
+        title='New Tab'
+        onClick={handleAddNewTab}
+        onDoubleClick={handlePreventDoubleClick}>
         <IconAdd fill='#ffffff' />
       </div>
     </div>
   );
 };
+
+const TabBar = () => (
+  <DndProvider backend={HTML5Backend}>
+    <TabBarView />
+  </DndProvider>
+);
 
 export default memo(TabBar);

@@ -112,7 +112,19 @@ const useToolbarState = () => {
 
       if (!selectedTab) return;
 
-      setTabs((his) => [...his].filter((tab) => tab.id !== selectedTab.id));
+      setTabs((his) =>
+        his
+          .map((tab) => {
+            if (selectedTab.id === tab.id && tab.active) {
+              handleTabChange(i + 1);
+
+              return tab;
+            }
+
+            return tab;
+          })
+          .filter((tab) => tab.id !== selectedTab.id),
+      );
 
       ipcRenderer.send(CLOSE_TAB, { id: selectedTab.id });
     }
@@ -140,6 +152,14 @@ const useToolbarState = () => {
     ipcRenderer.send(NEW_TAB);
   }, []);
 
+  const handlePreventDoubleClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    [tabs],
+  );
+
   const handleUrlChange = useCallback((e) => {
     setUrl(e.target.value);
   }, []);
@@ -148,9 +168,11 @@ const useToolbarState = () => {
     url,
     handleUrlChange,
     tabs,
+    setTabs,
     handleTabChange,
     handleCloseTab,
     handleAddNewTab,
+    handlePreventDoubleClick,
   };
 };
 

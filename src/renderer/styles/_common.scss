@@ -71,3 +71,10 @@ $items: start, end, center, baseline, stretch;
     align-items: $item;
   }
 }
+
+$positions: static, fixed, absolute, relative, sticky;
+@each $position in $positions {
+  .#{$position} {
+    position: $position;
+  }
+}
