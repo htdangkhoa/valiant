@@ -1,6 +1,7 @@
-import React, { memo, useEffect, useRef, useCallback } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
+import { ipcRenderer } from 'electron';
 
 import Spinner from 'root/renderer/components/Spinner';
 import IconClose from 'root/renderer/assets/svg/icon-close.svg';
@@ -92,6 +93,31 @@ const Tab = ({ index }) => {
   }, []);
 
   drag(drop(ref));
+
+  useEffect(() => {
+    const listener = (e) => {
+      e.preventDefault();
+
+      ipcRenderer.send('contextmenu');
+    };
+
+    ref.current.addEventListener('contextmenu', listener);
+    return () => ref.current?.removeEventListener?.('contextmenu', listener);
+  }, [drag, drop]);
+
+  useEffect(() => {
+    const ele = document.querySelector('.btn-close');
+
+    if (!ele) return;
+
+    const listener = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    ele.addEventListener('contextmenu', listener);
+    return () => ele.removeEventListener('contextmenu', listener);
+  }, []);
 
   return (
     <div

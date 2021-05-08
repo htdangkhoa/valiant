@@ -7,13 +7,19 @@ import AddressBar from 'root/renderer/components/AddressBar';
 
 import ToolbarState from './state';
 
-const ToolbarView = () => (
-  <div id='toolbar'>
-    <TabBar />
+const ToolbarView = () => {
+  const { windowId } = ToolbarState.useContainer();
 
-    <AddressBar />
-  </div>
-);
+  if (!windowId) return null;
+
+  return (
+    <div id='toolbar'>
+      <TabBar />
+
+      <AddressBar />
+    </div>
+  );
+};
 
 const Toolbar = () => (
   <ToolbarState.Provider>

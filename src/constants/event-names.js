@@ -1,15 +1,19 @@
 export const FETCH_BROWSER_VIEWS = 'fetch_browser_views';
 
-export const NEW_TAB = 'NEW_TAB';
+// window events
+export const WINDOW_EVENTS = {
+  BASE: 'WINDOW_EVENTS',
+  RENDERER: 'RENDERER',
+  CREATED: 'CREATED',
+  CLOSE: 'CLOSE',
+  NEW_TAB: 'NEW_TAB',
+  SWITCH_TAB: 'SWITCH_TAB',
+  CLOSE_TAB: 'CLOSE_TAB',
+};
 
-export const SWITCH_TAB = 'SWITCH_TAB';
-
-export const CLOSE_TAB = 'CLOSE_TAB';
-
-export const CLOSE_WINDOW = 'CLOSE_WINDOW';
-
-// tab events
-export const TAB_EVENTS = 'TAB_EVENTS';
-export const UPDATE_TITLE = 'UPDATE_TITLE';
-export const UPDATE_FAVICON = 'UPDATE_FAVICON';
-export const UPDATE_LOADING = 'UPDATE_LOADING';
+export const TAB_EVENTS = {
+  RENDERER: 'RENDERER',
+  UPDATE_TITLE: 'UPDATE_TITLE',
+  UPDATE_FAVICON: 'UPDATE_FAVICON',
+  UPDATE_LOADING: 'UPDATE_LOADING',
+};

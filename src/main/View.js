@@ -1,6 +1,6 @@
 import { BrowserView, Menu, clipboard } from 'electron';
 import { isURL } from 'root/common';
-import { TAB_EVENTS, UPDATE_FAVICON, UPDATE_TITLE, UPDATE_LOADING } from 'root/constants/event-names';
+import { TAB_EVENTS } from 'root/constants/event-names';
 import { v4 as uuid } from 'uuid';
 
 class View {
@@ -10,6 +10,8 @@ class View {
     this.appWindow = appWindow;
 
     this.win = appWindow.win;
+
+    this.windowId = appWindow.id;
 
     this.browserView = new BrowserView({
       webPreferences: {
@@ -35,23 +37,23 @@ class View {
 
       this.appWindow.updateTitle();
 
-      this.emit(UPDATE_TITLE, { id: this.browserView.id, title });
+      this.emit(TAB_EVENTS.UPDATE_TITLE, { id: this.browserView.id, title });
     });
     this.webContents.on('page-favicon-updated', (e, favicons) => {
       const [favicon] = favicons;
       this.browserView.favicon = favicon;
 
-      this.emit(UPDATE_FAVICON, { id: this.browserView.id, favicon });
+      this.emit(TAB_EVENTS.UPDATE_FAVICON, { id: this.browserView.id, favicon });
     });
     this.webContents.on('did-start-loading', () => {
       this.browserView.loading = true;
 
-      this.emit(UPDATE_LOADING, { id: this.browserView.id, loading: true });
+      this.emit(TAB_EVENTS.UPDATE_LOADING, { id: this.browserView.id, loading: true });
     });
     this.webContents.on('did-stop-loading', () => {
       this.browserView.loading = false;
 
-      this.emit(UPDATE_LOADING, { id: this.browserView.id, loading: false });
+      this.emit(TAB_EVENTS.UPDATE_LOADING, { id: this.browserView.id, loading: false });
     });
     this.webContents.on('did-navigate', (e, url) => {
       this.emit('did-navigate', { id: this.id, url });
@@ -228,7 +230,7 @@ class View {
   }
 
   emit(event, ...args) {
-    this.win.webContents.send(TAB_EVENTS, event, ...args);
+    this.win.webContents.send(TAB_EVENTS.RENDERER, event, ...args);
   }
 }
 

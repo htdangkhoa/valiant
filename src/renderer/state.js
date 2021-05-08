@@ -2,18 +2,23 @@ import { useEffect, useCallback, useState } from 'react';
 import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
 
-import {
-  CLOSE_TAB,
-  CLOSE_WINDOW,
-  NEW_TAB,
-  SWITCH_TAB,
-  TAB_EVENTS,
-  UPDATE_FAVICON,
-  UPDATE_LOADING,
-  UPDATE_TITLE,
-} from 'root/constants/event-names';
+import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 
 const useToolbarState = () => {
+  const [windowId, setWindowId] = useState(null);
+
+  useEffect(() => {
+    const listener = (e, windowEvent, message) => {
+      console.log(windowEvent, message);
+      if (windowEvent === WINDOW_EVENTS.CREATED) {
+        setWindowId(message);
+      }
+    };
+
+    ipcRenderer.addListener(WINDOW_EVENTS.RENDERER, listener);
+    return () => ipcRenderer.removeListener(WINDOW_EVENTS.RENDERER, listener);
+  }, []);
+
   const [tabs, setTabs] = useState([]);
 
   const [url, setUrl] = useState('');
@@ -34,7 +39,7 @@ const useToolbarState = () => {
         );
       }
 
-      if (tabEvent === UPDATE_TITLE) {
+      if (tabEvent === TAB_EVENTS.UPDATE_TITLE) {
         const { id, title } = message;
 
         setTabs((his) =>
@@ -48,7 +53,7 @@ const useToolbarState = () => {
         );
       }
 
-      if (tabEvent === UPDATE_FAVICON) {
+      if (tabEvent === TAB_EVENTS.UPDATE_FAVICON) {
         const { id, favicon } = message;
 
         setTabs((his) =>
@@ -62,7 +67,7 @@ const useToolbarState = () => {
         );
       }
 
-      if (tabEvent === UPDATE_LOADING) {
+      if (tabEvent === TAB_EVENTS.UPDATE_LOADING) {
         const { id, loading } = message;
 
         setTabs((his) =>
@@ -81,9 +86,9 @@ const useToolbarState = () => {
       }
     }
 
-    ipcRenderer.on(TAB_EVENTS, listener);
+    ipcRenderer.on(TAB_EVENTS.RENDERER, listener);
 
-    return () => ipcRenderer.removeListener(TAB_EVENTS, listener);
+    return () => ipcRenderer.removeListener(TAB_EVENTS.RENDERER, listener);
   }, []);
 
   const handleTabChange = (i) => {
@@ -103,7 +108,7 @@ const useToolbarState = () => {
       }),
     );
 
-    ipcRenderer.send(SWITCH_TAB, { id: selectedTab.id });
+    ipcRenderer.send(windowId, WINDOW_EVENTS.SWITCH_TAB, { id: selectedTab.id });
   };
 
   const handleCloseTab = (i) => {
@@ -126,14 +131,14 @@ const useToolbarState = () => {
           .filter((tab) => tab.id !== selectedTab.id),
       );
 
-      ipcRenderer.send(CLOSE_TAB, { id: selectedTab.id });
+      ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
     }
 
     if (i === tabs.length - 1) {
       const previous = i - 1;
 
       if (previous < 0) {
-        ipcRenderer.send(CLOSE_WINDOW);
+        ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE);
 
         return;
       }
@@ -149,8 +154,8 @@ const useToolbarState = () => {
   };
 
   const handleAddNewTab = useCallback(() => {
-    ipcRenderer.send(NEW_TAB);
-  }, []);
+    ipcRenderer.send(windowId, WINDOW_EVENTS.NEW_TAB);
+  }, [windowId]);
 
   const handlePreventDoubleClick = useCallback(
     (e) => {
@@ -165,6 +170,7 @@ const useToolbarState = () => {
   }, []);
 
   return {
+    windowId,
     url,
     handleUrlChange,
     tabs,
