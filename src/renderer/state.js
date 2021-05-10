@@ -2,30 +2,28 @@ import { useEffect, useCallback, useState } from 'react';
 import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
 
-import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
+import { WINDOW_EVENTS } from 'root/constants/event-names';
 
 const useToolbarState = () => {
-  const [windowId, setWindowId] = useState(null);
+  // eslint-disable-next-line no-underscore-dangle
+  const __DATA__ = window.process.argv.reduce((obj, s) => {
+    const [key, value] = s.split('=');
 
-  useEffect(() => {
-    const listener = (e, windowEvent, message) => {
-      console.log(windowEvent, message);
-      if (windowEvent === WINDOW_EVENTS.CREATED) {
-        setWindowId(message);
-      }
-    };
+    obj[key] = value;
 
-    ipcRenderer.addListener(WINDOW_EVENTS.RENDERER, listener);
-    return () => ipcRenderer.removeListener(WINDOW_EVENTS.RENDERER, listener);
-  }, []);
+    return obj;
+  }, {});
 
   const [tabs, setTabs] = useState([]);
 
   const [url, setUrl] = useState('');
 
   useEffect(() => {
-    function listener(e, tabEvent, message) {
-      if (tabEvent === 'create-tab') {
+    const listener = (e, eventName, message) => {
+      console.log(eventName, message);
+
+      // window events
+      if (eventName === WINDOW_EVENTS.TAB_CREATED) {
         setTabs((his) =>
           [...his]
             .map((tab) => ({ ...tab, active: false }))
@@ -38,57 +36,10 @@ const useToolbarState = () => {
             }),
         );
       }
+    };
 
-      if (tabEvent === TAB_EVENTS.UPDATE_TITLE) {
-        const { id, title } = message;
-
-        setTabs((his) =>
-          [...his].map((tab) => {
-            if (tab.id === id) {
-              tab.title = title;
-            }
-
-            return tab;
-          }),
-        );
-      }
-
-      if (tabEvent === TAB_EVENTS.UPDATE_FAVICON) {
-        const { id, favicon } = message;
-
-        setTabs((his) =>
-          [...his].map((tab) => {
-            if (tab.id === id) {
-              tab.favicon = favicon;
-            }
-
-            return tab;
-          }),
-        );
-      }
-
-      if (tabEvent === TAB_EVENTS.UPDATE_LOADING) {
-        const { id, loading } = message;
-
-        setTabs((his) =>
-          [...his].map((tab) => {
-            if (tab.id === id) {
-              tab.loading = loading;
-            }
-
-            return tab;
-          }),
-        );
-      }
-
-      if (tabEvent === 'did-navigate') {
-        console.log(message);
-      }
-    }
-
-    ipcRenderer.on(TAB_EVENTS.RENDERER, listener);
-
-    return () => ipcRenderer.removeListener(TAB_EVENTS.RENDERER, listener);
+    ipcRenderer.addListener(__DATA__.windowId, listener);
+    return () => ipcRenderer.removeListener(__DATA__.windowId, listener);
   }, []);
 
   const handleTabChange = (i) => {
@@ -108,7 +59,7 @@ const useToolbarState = () => {
       }),
     );
 
-    ipcRenderer.send(windowId, WINDOW_EVENTS.SWITCH_TAB, { id: selectedTab.id });
+    ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.SWITCH_TAB, { id: selectedTab.id });
   };
 
   const handleCloseTab = (i) => {
@@ -131,14 +82,14 @@ const useToolbarState = () => {
           .filter((tab) => tab.id !== selectedTab.id),
       );
 
-      ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
+      ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
     }
 
     if (i === tabs.length - 1) {
       const previous = i - 1;
 
       if (previous < 0) {
-        ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE);
+        ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE);
 
         return;
       }
@@ -154,8 +105,8 @@ const useToolbarState = () => {
   };
 
   const handleAddNewTab = useCallback(() => {
-    ipcRenderer.send(windowId, WINDOW_EVENTS.NEW_TAB);
-  }, [windowId]);
+    ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.NEW_TAB);
+  }, []);
 
   const handlePreventDoubleClick = useCallback(
     (e) => {
@@ -169,8 +120,41 @@ const useToolbarState = () => {
     setUrl(e.target.value);
   }, []);
 
+  // new api
+  const handleTitleChange = useCallback((id, title) => {
+    setTabs((his) =>
+      [...his].map(($tab) => {
+        if ($tab.id === id) {
+          $tab.title = title;
+        }
+        return $tab;
+      }),
+    );
+  }, []);
+
+  const handleFaviconChange = useCallback((id, favicon) => {
+    setTabs((his) =>
+      [...his].map((tab) => {
+        if (tab.id === id) {
+          tab.favicon = favicon;
+        }
+        return tab;
+      }),
+    );
+  }, []);
+
+  const handleLoadingChange = useCallback((id, loading) => {
+    setTabs((his) =>
+      [...his].map((tab) => {
+        if (tab.id === id) {
+          tab.loading = loading;
+        }
+        return tab;
+      }),
+    );
+  }, []);
+
   return {
-    windowId,
     url,
     handleUrlChange,
     tabs,
@@ -179,6 +163,9 @@ const useToolbarState = () => {
     handleCloseTab,
     handleAddNewTab,
     handlePreventDoubleClick,
+    handleTitleChange,
+    handleFaviconChange,
+    handleLoadingChange,
   };
 };
 

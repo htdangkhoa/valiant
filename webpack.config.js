@@ -1,6 +1,7 @@
 const path = require('path');
 const { spawn, execSync } = require('child_process');
 const TerserPlugin = require('terser-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -17,13 +18,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js?$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
       },
     ],
   },
   plugins: [
+    new ESLintPlugin(),
     isDev && {
       apply(compiler) {
         compiler.hooks.afterEmit.tap('AfterEmitPlugin', () => {
@@ -64,5 +66,8 @@ module.exports = {
   resolve: {
     modules: ['node_modules'],
     extensions: ['.js', '.json'],
+  },
+  stats: {
+    errorDetails: isDev,
   },
 };

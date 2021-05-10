@@ -9,6 +9,7 @@ import IconEarth from 'root/renderer/assets/svg/icon-earth.svg';
 
 import { classnames } from 'root/renderer/utils';
 import ToolbarState from 'root/renderer/state';
+import { TAB_EVENTS } from 'root/constants/event-names';
 
 const moveItemNextTo = (source, from, to) => {
   const arr = [].concat(source);
@@ -19,15 +20,43 @@ const moveItemNextTo = (source, from, to) => {
 };
 
 const Tab = ({ index }) => {
-  const { tabs, setTabs, handleTabChange, handleCloseTab, handlePreventDoubleClick } = ToolbarState.useContainer();
+  const {
+    handleTitleChange,
+    handleFaviconChange,
+    handleLoadingChange,
+    tabs,
+    setTabs,
+    handleTabChange,
+    handleCloseTab,
+    handlePreventDoubleClick,
+  } = ToolbarState.useContainer();
 
   const tab = tabs[index];
 
   const hasFavicon = !!tab.favicon && typeof tab.favicon === 'string' && tab.favicon.startsWith('http');
 
+  useEffect(() => {
+    const listener = (e, event, message) => {
+      if (event === TAB_EVENTS.UPDATE_TITLE) {
+        handleTitleChange(tab.id, message);
+      }
+
+      if (event === TAB_EVENTS.UPDATE_FAVICON) {
+        handleFaviconChange(tab.id, message);
+      }
+
+      if (event === TAB_EVENTS.UPDATE_LOADING) {
+        handleLoadingChange(tab.id, message);
+      }
+    };
+
+    ipcRenderer.addListener(tab.id, listener);
+    return () => ipcRenderer.removeListener(tab.id, listener);
+  }, []);
+
   const ref = useRef();
 
-  const [{ isDragging, handlerId }, drag] = useDrag({
+  const [{ handlerId }, drag] = useDrag({
     type: 'tab',
     item: { tab, index },
     collect: (monitor) => ({
@@ -38,7 +67,7 @@ const Tab = ({ index }) => {
 
   const [, drop] = useDrop({
     accept: 'tab',
-    hover: (item, monitor) => {
+    hover: (item, _monitor) => {
       if (!ref.current) {
         return;
       }
