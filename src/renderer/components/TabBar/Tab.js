@@ -29,6 +29,7 @@ const Tab = ({ index }) => {
     handleTabChange,
     handleCloseTab,
     handlePreventDoubleClick,
+    onContextMenu,
   } = ToolbarState.useContainer();
 
   const tab = tabs[index];
@@ -52,7 +53,7 @@ const Tab = ({ index }) => {
 
     ipcRenderer.addListener(tab.id, listener);
     return () => ipcRenderer.removeListener(tab.id, listener);
-  }, []);
+  }, [tabs]);
 
   const ref = useRef();
 
@@ -134,27 +135,14 @@ const Tab = ({ index }) => {
     return () => ref.current?.removeEventListener?.('contextmenu', listener);
   }, [drag, drop]);
 
-  useEffect(() => {
-    const ele = document.querySelector('.btn-close');
-
-    if (!ele) return;
-
-    const listener = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-
-    ele.addEventListener('contextmenu', listener);
-    return () => ele.removeEventListener('contextmenu', listener);
-  }, []);
-
   return (
     <div
       ref={ref}
       data-handler-id={handlerId}
       className={classnames('tab flex items-center', tab.active && 'active')}
-      onClick={() => handleTabChange(index)}
-      onDoubleClick={handlePreventDoubleClick}>
+      onClick={handleTabChange(index)}
+      onDoubleClick={handlePreventDoubleClick}
+      onContextMenu={onContextMenu(index)}>
       {!tab.loading && (
         <>
           {hasFavicon && <img className='favicon mx-4' src={tab.favicon} width={16} height={16} />}
@@ -174,11 +162,8 @@ const Tab = ({ index }) => {
       <div
         className='btn btn-close p-0'
         title='Close Tab'
-        onClick={(e) => {
-          e.stopPropagation();
-
-          handleCloseTab(index);
-        }}
+        onClick={handleCloseTab(index)}
+        onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
         <IconClose fill='#ffffff' />
       </div>

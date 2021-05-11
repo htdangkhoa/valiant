@@ -5,7 +5,7 @@ import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 
 class View {
-  constructor(options = { url: 'about:blank', active: false }) {
+  constructor(options = { url: 'about:blank', active: false, appendToLast: false }) {
     this.opts = Object.assign({}, options);
 
     this.id = uuid();
@@ -51,14 +51,14 @@ class View {
           this.webContents.loadURL(url);
         } else if (frameName === '_blank') {
           e.preventDefault();
-          AppInstance.getInstance().viewManager.create({ url });
+          this.window.viewManager.create({ url });
         }
       } else if (disposition === 'foreground-tab') {
         e.preventDefault();
-        AppInstance.getInstance().viewManager.create({ url });
+        this.window.viewManager.create({ url });
       } else if (disposition === 'background-tab') {
         e.preventDefault();
-        AppInstance.getInstance().viewManager.create({ url });
+        this.window.viewManager.create({ url });
       }
     });
     this.webContents.on('context-menu', (e, params) => {
@@ -68,7 +68,7 @@ class View {
       menu.popup();
     });
 
-    this.update({ create: true });
+    this.update({ appendToLast: this.opts.appendToLast });
 
     this.webContents.loadURL(this.opts.url);
   }
@@ -120,7 +120,7 @@ class View {
     });
   }
 
-  update(options = { create: false }) {
+  update(options = { appendToLast: false }) {
     const opts = Object.assign({}, options);
 
     this.window.win.setBrowserView(this.browserView);
@@ -129,11 +129,12 @@ class View {
     this.fixBounds();
     this.setBoundsListener();
 
-    if (opts.create) {
+    if (opts.appendToLast) {
       this.window.emit(WINDOW_EVENTS.TAB_CREATED, this.id);
-      this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);
-      this.emit(TAB_EVENTS.UPDATE_FAVICON, this.favicon);
     }
+
+    this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);
+    this.emit(TAB_EVENTS.UPDATE_FAVICON, this.favicon);
   }
 
   destroy() {

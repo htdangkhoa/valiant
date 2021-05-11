@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from 'react';
 import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
+import * as remote from '@electron/remote';
 
 import { WINDOW_EVENTS } from 'root/constants/event-names';
 
@@ -36,91 +37,117 @@ const useToolbarState = () => {
             }),
         );
       }
+
+      if (eventName === WINDOW_EVENTS.NEW_TAB_TO_THE_RIGHT) {
+        const { id, nextIndex } = message;
+        setTabs((his) => {
+          const a = [...his].map((tab) => ({ ...tab, active: false }));
+          a.splice(nextIndex, 0, { id, active: true, title: 'Untitled', favicon: null, loading: false });
+
+          return a;
+        });
+      }
     };
 
     ipcRenderer.addListener(__DATA__.windowId, listener);
     return () => ipcRenderer.removeListener(__DATA__.windowId, listener);
   }, []);
 
-  const handleTabChange = (i) => {
-    const selectedTab = tabs[i];
-
-    if (!selectedTab) return;
-
-    setTabs((his) =>
-      [...his].map((tab) => {
-        tab.active = false;
-
-        if (tab.id === selectedTab.id) {
-          tab.active = true;
-        }
-
-        return tab;
-      }),
-    );
-
-    ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.SWITCH_TAB, { id: selectedTab.id });
-  };
-
-  const handleCloseTab = (i) => {
-    function requestCloseTab() {
+  const handleTabChange = useCallback(
+    (i) => () => {
       const selectedTab = tabs[i];
 
       if (!selectedTab) return;
 
       setTabs((his) =>
-        his
-          .map((tab) => {
-            if (selectedTab.id === tab.id && tab.active) {
-              handleTabChange(i + 1);
+        [...his].map((tab) => {
+          tab.active = false;
 
-              return tab;
-            }
+          if (tab.id === selectedTab.id) {
+            tab.active = true;
+          }
 
-            return tab;
-          })
-          .filter((tab) => tab.id !== selectedTab.id),
+          return tab;
+        }),
       );
 
-      ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
-    }
+      ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.SWITCH_TAB, { id: selectedTab.id });
+    },
+    [tabs],
+  );
 
-    if (i === tabs.length - 1) {
-      const previous = i - 1;
+  const handleCloseTab = useCallback(
+    (i) => (e) => {
+      if (e) {
+        e.stopPropagation();
+      }
 
-      if (previous < 0) {
-        ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE);
+      function requestCloseTab() {
+        const selectedTab = tabs[i];
+
+        if (!selectedTab) return;
+
+        setTabs((his) =>
+          his
+            .map((tab) => {
+              if (selectedTab.id === tab.id && tab.active) {
+                handleTabChange(i + 1)();
+
+                return tab;
+              }
+
+              return tab;
+            })
+            .filter((tab) => tab.id !== selectedTab.id),
+        );
+
+        ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
+      }
+
+      if (i === tabs.length - 1) {
+        const previous = i - 1;
+
+        if (previous < 0) {
+          ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE);
+
+          return;
+        }
+
+        handleTabChange(previous)();
+
+        requestCloseTab();
 
         return;
       }
 
-      handleTabChange(previous);
-
       requestCloseTab();
-
-      return;
-    }
-
-    requestCloseTab();
-  };
-
-  const handleAddNewTab = useCallback(() => {
-    ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.NEW_TAB);
-  }, []);
-
-  const handlePreventDoubleClick = useCallback(
-    (e) => {
-      e.preventDefault();
-      e.stopPropagation();
     },
     [tabs],
   );
+
+  const handleAddNewTab = useCallback(
+    (nextTo) => {
+      const args = [__DATA__.windowId, WINDOW_EVENTS.NEW_TAB];
+
+      if (typeof nextTo === 'number') {
+        args.push(nextTo);
+      }
+
+      ipcRenderer.send(...args);
+    },
+    [tabs],
+  );
+
+  const handlePreventDoubleClick = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
 
   const handleUrlChange = useCallback((e) => {
     setUrl(e.target.value);
   }, []);
 
-  // new api
+  // browser view handler
   const handleTitleChange = useCallback((id, title) => {
     setTabs((his) =>
       [...his].map(($tab) => {
@@ -154,6 +181,50 @@ const useToolbarState = () => {
     );
   }, []);
 
+  const onContextMenu = useCallback(
+    (index) => () => {
+      const tab = tabs[index];
+
+      const menu = remote.Menu.buildFromTemplate([
+        {
+          label: 'New Tab',
+          click: () => handleAddNewTab(index + 1),
+        },
+        {
+          label: 'Move Tab to New Window',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Reload',
+        },
+        {
+          label: 'Duplicate',
+        },
+        {
+          label: 'Pin',
+        },
+        {
+          label: 'Mute Site',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Close',
+          click: () => handleCloseTab(index)(),
+        },
+        {
+          label: 'Close Other Tabs',
+        },
+      ]);
+
+      menu.popup();
+    },
+    [handleAddNewTab],
+  );
+
   return {
     url,
     handleUrlChange,
@@ -166,6 +237,7 @@ const useToolbarState = () => {
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
+    onContextMenu,
   };
 };
 

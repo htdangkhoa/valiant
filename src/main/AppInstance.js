@@ -33,27 +33,8 @@ class AppInstance {
 
     this.windows.set(window.id, window);
 
-    // this.viewManager.create();
-
     window.win.on('focus', () => {
       this.focusedWindow = window;
-    });
-
-    const menu = Menu.buildFromTemplate([
-      {
-        label: 'Move to New Window',
-        click: () => {
-          // const message = JSON.stringify(Array.from(this.viewManager.views.values()));
-          // dialog.showMessageBox(this.focusedWindow.win, { message });
-          const view = Array.from(this.viewManager.views.values())[0];
-          this.createWindow({ view });
-        },
-      },
-    ]);
-    window.webContents.on('context-menu', (e) => {
-      e.preventDefault();
-
-      menu.popup(window.webContents);
     });
 
     return window;

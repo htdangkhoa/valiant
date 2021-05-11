@@ -3,7 +3,7 @@ import { isURL } from 'root/common';
 import AppInstance from '../AppInstance';
 
 const contextMenu = (params, webContents) => {
-  const { viewManager } = AppInstance.getInstance();
+  const { viewManager } = AppInstance.getInstance().focusedWindow;
 
   let menuItems = [];
 

@@ -6,6 +6,7 @@ import path from 'path';
 import { WINDOW_EVENTS } from 'root/constants/event-names';
 
 import AppInstance from './AppInstance';
+import ViewManager from './ViewManager';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -14,6 +15,8 @@ class Window {
     this.id = uuid();
 
     this.opts = Object.assign({}, options);
+
+    this.viewManager = new ViewManager(this);
 
     // create the new browser window from electron
     this.win = new BrowserWindow({
@@ -52,26 +55,34 @@ class Window {
       }
 
       if (!this.opts.view) {
-        AppInstance.getInstance().viewManager.create({ url: 'https://github.com' });
+        this.viewManager.create({ url: 'https://github.com', appendToLast: true });
       } else {
-        this.opts.view.update({ create: true });
+        this.opts.view.update({ appendToLast: true });
       }
 
-      ipcMain.on(this.id, (e, event, message) => {
+      ipcMain.on(this.id, async (e, event, message) => {
         if (event === WINDOW_EVENTS.NEW_TAB) {
-          return AppInstance.getInstance().viewManager.create({ url: 'http://google.com' });
+          const appendToLast = typeof message !== 'number';
+
+          const view = await this.viewManager.create({ url: 'view-source:http://google.com', appendToLast });
+
+          if (!appendToLast) {
+            this.emit(WINDOW_EVENTS.NEW_TAB_TO_THE_RIGHT, { id: view.id, nextIndex: message });
+          }
+
+          return;
         }
 
         if (event === WINDOW_EVENTS.SWITCH_TAB) {
           const { id } = message;
 
-          return AppInstance.getInstance().viewManager.selectView(id);
+          return this.viewManager.selectView(id);
         }
 
         if (event === WINDOW_EVENTS.CLOSE_TAB) {
           const { id } = message;
 
-          return AppInstance.getInstance().viewManager.destroyView(id);
+          return this.viewManager.destroyView(id);
         }
       });
     })();

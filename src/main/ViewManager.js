@@ -1,17 +1,19 @@
 import View from './View';
 
 class ViewManager {
-  constructor(appInstance) {
+  constructor(window) {
     this.views = new Map();
 
-    this.appInstance = appInstance;
+    this.window = window;
   }
 
-  create(options = { url: 'about:blank' }) {
+  create(options = { url: 'about:blank', appendToLast: false }) {
     const opts = Object.assign({}, options);
 
-    const view = new View({ url: opts.url, active: true });
+    const view = new View({ url: opts.url, appendToLast: opts.appendToLast });
     this.views.set(view.id, view);
+
+    return view;
   }
 
   selectView(id) {
