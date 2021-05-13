@@ -5,7 +5,7 @@ import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 
 class View {
-  constructor(options = { url: 'about:blank', active: false, appendToLast: false }) {
+  constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
     this.opts = Object.assign({}, options);
 
     this.id = uuid();
@@ -68,7 +68,7 @@ class View {
       menu.popup();
     });
 
-    this.update({ appendToLast: this.opts.appendToLast });
+    this.update(this.opts);
 
     this.webContents.loadURL(this.opts.url);
   }
@@ -120,7 +120,7 @@ class View {
     });
   }
 
-  update(options = { appendToLast: false }) {
+  update(options = { nextTo: null, active: false }) {
     const opts = Object.assign({}, options);
 
     this.window.win.setBrowserView(this.browserView);
@@ -129,8 +129,11 @@ class View {
     this.fixBounds();
     this.setBoundsListener();
 
-    if (opts.appendToLast) {
-      this.window.emit(WINDOW_EVENTS.TAB_CREATED, this.id);
+    if (typeof opts.nextTo === 'number') {
+      this.window.emit(WINDOW_EVENTS.TAB_CREATED, {
+        id: this.id,
+        nextTo: opts.nextTo,
+      });
     }
 
     this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);

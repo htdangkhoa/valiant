@@ -3,7 +3,8 @@ import { isURL } from 'root/common';
 import AppInstance from '../AppInstance';
 
 const contextMenu = (params, webContents) => {
-  const { viewManager } = AppInstance.getInstance().focusedWindow;
+  const { focusedWindow: window } = AppInstance.getInstance();
+  const { viewManager } = window;
 
   let menuItems = [];
 
@@ -11,7 +12,11 @@ const contextMenu = (params, webContents) => {
     menuItems = menuItems.concat([
       {
         label: 'Open Link in New Tab',
-        click: () => viewManager.create({ url: params.linkURL }),
+        click: () => {
+          const index = viewManager.ids.indexOf(viewManager.selected);
+
+          viewManager.create({ url: params.linkURL, nextTo: index + 1 });
+        },
       },
       { label: 'Open Link in Incognito Window' },
       { type: 'separator' },

@@ -25,17 +25,28 @@ const useToolbarState = () => {
 
       // window events
       if (eventName === WINDOW_EVENTS.TAB_CREATED) {
-        setTabs((his) =>
-          [...his]
-            .map((tab) => ({ ...tab, active: false }))
-            .concat({
-              id: message,
-              active: true,
-              title: 'Untitled',
-              favicon: null,
-              loading: false,
-            }),
-        );
+        const { id, nextTo } = message;
+
+        if (typeof nextTo === 'number') {
+          setTabs((his) => {
+            const arr = [...his].map((tab) => ({ ...tab, active: false }));
+            arr.splice(nextTo, 0, { id, active: true, title: 'Untitled', favicon: null, loading: false });
+
+            return arr;
+          });
+        } else {
+          setTabs((his) =>
+            [...his]
+              .map((tab) => ({ ...tab, active: false }))
+              .concat({
+                id,
+                active: true,
+                title: 'Untitled',
+                favicon: null,
+                loading: false,
+              }),
+          );
+        }
       }
 
       if (eventName === WINDOW_EVENTS.NEW_TAB_TO_THE_RIGHT) {

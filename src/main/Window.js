@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { BrowserWindow, ipcMain } from 'electron';
+import { dialog, BrowserWindow, ipcMain } from 'electron';
 import { format } from 'url';
 import path from 'path';
 
@@ -55,20 +55,16 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://github.com', appendToLast: true });
+        this.viewManager.create({ url: 'https://github.com' });
       } else {
-        this.opts.view.update({ appendToLast: true });
+        // this.opts.view.update({ appendToLast: true });
       }
 
       ipcMain.on(this.id, async (e, event, message) => {
         if (event === WINDOW_EVENTS.NEW_TAB) {
-          const appendToLast = typeof message !== 'number';
+          const hasNextTo = typeof message === 'number';
 
-          const view = await this.viewManager.create({ url: 'view-source:http://google.com', appendToLast });
-
-          if (!appendToLast) {
-            this.emit(WINDOW_EVENTS.NEW_TAB_TO_THE_RIGHT, { id: view.id, nextIndex: message });
-          }
+          await this.viewManager.create({ url: 'http://google.com', nextTo: hasNextTo && message });
 
           return;
         }

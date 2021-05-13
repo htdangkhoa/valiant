@@ -5,24 +5,44 @@ class ViewManager {
     this.views = new Map();
 
     this.window = window;
+
+    this.selected = null;
   }
 
-  create(options = { url: 'about:blank', appendToLast: false }) {
+  get ids() {
+    return Array.from(this.views.keys());
+  }
+
+  create(options = { url: 'about:blank', nextTo: undefined }) {
     const opts = Object.assign({}, options);
 
-    const view = new View({ url: opts.url, appendToLast: opts.appendToLast });
-    this.views.set(view.id, view);
+    const hasNextTo = typeof opts.nextTo === 'number';
+
+    const view = new View({ url: opts.url, nextTo: hasNextTo ? opts.nextTo : this.views.size });
+
+    if (hasNextTo) {
+      const entries = Array.from(this.views.entries());
+
+      entries.splice(opts.nextTo, 0, [view.id, view]);
+
+      this.views = entries.reduce((map, [k, v]) => {
+        map.set(k, v);
+
+        return map;
+      }, new Map());
+    } else {
+      this.views.set(view.id, view);
+    }
+
+    this.selected = view.id;
 
     return view;
   }
 
   selectView(id) {
     const view = this.views.get(id);
+    this.selected = view.id;
     view.update();
-
-    Array.from(this.views.values()).forEach((v) => {
-      v.active = v.id === id;
-    });
   }
 
   destroyView(id) {
@@ -30,6 +50,7 @@ class ViewManager {
 
     view.destroy();
     this.views.delete(id);
+    this.selected = null;
   }
 }
 
