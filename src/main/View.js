@@ -51,14 +51,26 @@ class View {
           this.webContents.loadURL(url);
         } else if (frameName === '_blank') {
           e.preventDefault();
-          this.window.viewManager.create({ url });
+          const { viewManager } = this.window;
+
+          const index = viewManager.ids.indexOf(viewManager.selected);
+
+          viewManager.create({ url, nextTo: index + 1, active: true });
         }
       } else if (disposition === 'foreground-tab') {
         e.preventDefault();
-        this.window.viewManager.create({ url });
+        const { viewManager } = this.window;
+
+        const index = viewManager.ids.indexOf(viewManager.selected);
+
+        viewManager.create({ url, nextTo: index + 1, active: true });
       } else if (disposition === 'background-tab') {
         e.preventDefault();
-        this.window.viewManager.create({ url });
+        const { viewManager } = this.window;
+
+        const index = viewManager.ids.indexOf(viewManager.selected);
+
+        viewManager.create({ url, nextTo: index + 1 });
       }
     });
     this.webContents.on('context-menu', (e, params) => {
@@ -123,8 +135,10 @@ class View {
   update(options = { nextTo: null, active: false }) {
     const opts = Object.assign({}, options);
 
-    this.window.win.setBrowserView(this.browserView);
-    this.webContents.focus();
+    if (opts.active) {
+      this.window.win.setBrowserView(this.browserView);
+      this.webContents.focus();
+    }
 
     this.fixBounds();
     this.setBoundsListener();
@@ -133,6 +147,7 @@ class View {
       this.window.emit(WINDOW_EVENTS.TAB_CREATED, {
         id: this.id,
         nextTo: opts.nextTo,
+        active: opts.active,
       });
     }
 

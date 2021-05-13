@@ -55,16 +55,18 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://github.com' });
+        this.viewManager.create({ url: 'https://github.com', active: true });
       } else {
         // this.opts.view.update({ appendToLast: true });
       }
 
       ipcMain.on(this.id, async (e, event, message) => {
         if (event === WINDOW_EVENTS.NEW_TAB) {
-          const hasNextTo = typeof message === 'number';
+          const { nextTo, active } = message || {};
 
-          await this.viewManager.create({ url: 'http://google.com', nextTo: hasNextTo && message });
+          const hasNextTo = typeof nextTo === 'number';
+
+          await this.viewManager.create({ url: 'http://google.com', nextTo: hasNextTo && nextTo, active });
 
           return;
         }

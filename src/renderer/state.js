@@ -25,37 +25,27 @@ const useToolbarState = () => {
 
       // window events
       if (eventName === WINDOW_EVENTS.TAB_CREATED) {
-        const { id, nextTo } = message;
+        const { id, nextTo, active } = message;
 
-        if (typeof nextTo === 'number') {
-          setTabs((his) => {
-            const arr = [...his].map((tab) => ({ ...tab, active: false }));
-            arr.splice(nextTo, 0, { id, active: true, title: 'Untitled', favicon: null, loading: false });
-
-            return arr;
-          });
-        } else {
-          setTabs((his) =>
-            [...his]
-              .map((tab) => ({ ...tab, active: false }))
-              .concat({
-                id,
-                active: true,
-                title: 'Untitled',
-                favicon: null,
-                loading: false,
-              }),
-          );
-        }
-      }
-
-      if (eventName === WINDOW_EVENTS.NEW_TAB_TO_THE_RIGHT) {
-        const { id, nextIndex } = message;
         setTabs((his) => {
-          const a = [...his].map((tab) => ({ ...tab, active: false }));
-          a.splice(nextIndex, 0, { id, active: true, title: 'Untitled', favicon: null, loading: false });
+          let arr = [...his];
+          if (active) {
+            arr = arr.map((tab) => ({ ...tab, active: false }));
+          }
 
-          return a;
+          if (typeof nextTo === 'number') {
+            arr.splice(nextTo, 0, { id, active, title: 'Untitled', favicon: null, loading: false });
+          } else {
+            arr = arr.concat({
+              id,
+              active,
+              title: 'Untitled',
+              favicon: null,
+              loading: false,
+            });
+          }
+
+          return arr;
         });
       }
     };
@@ -137,15 +127,14 @@ const useToolbarState = () => {
   );
 
   const handleAddNewTab = useCallback(
-    (nextTo) => {
-      const args = [__DATA__.windowId, WINDOW_EVENTS.NEW_TAB];
+    (options = { nextTo: null, active: false }) =>
+      () => {
+        const opts = Object.assign({}, options);
 
-      if (typeof nextTo === 'number') {
-        args.push(nextTo);
-      }
+        const args = [__DATA__.windowId, WINDOW_EVENTS.NEW_TAB, opts];
 
-      ipcRenderer.send(...args);
-    },
+        ipcRenderer.send(...args);
+      },
     [tabs],
   );
 
@@ -199,7 +188,7 @@ const useToolbarState = () => {
       const menu = remote.Menu.buildFromTemplate([
         {
           label: 'New Tab',
-          click: () => handleAddNewTab(index + 1),
+          click: () => handleAddNewTab({ nextTo: index + 1 })(),
         },
         {
           label: 'Move Tab to New Window',

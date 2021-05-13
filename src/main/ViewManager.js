@@ -13,12 +13,16 @@ class ViewManager {
     return Array.from(this.views.keys());
   }
 
-  create(options = { url: 'about:blank', nextTo: undefined }) {
+  create(options = { url: 'about:blank', nextTo: undefined, active: false }) {
     const opts = Object.assign({}, options);
 
     const hasNextTo = typeof opts.nextTo === 'number';
 
-    const view = new View({ url: opts.url, nextTo: hasNextTo ? opts.nextTo : this.views.size });
+    const view = new View({
+      url: opts.url,
+      nextTo: hasNextTo ? opts.nextTo : this.views.size,
+      active: opts.active,
+    });
 
     if (hasNextTo) {
       const entries = Array.from(this.views.entries());
@@ -34,7 +38,9 @@ class ViewManager {
       this.views.set(view.id, view);
     }
 
-    this.selected = view.id;
+    if (opts.active) {
+      this.selected = view.id;
+    }
 
     return view;
   }
@@ -42,7 +48,7 @@ class ViewManager {
   selectView(id) {
     const view = this.views.get(id);
     this.selected = view.id;
-    view.update();
+    view.update({ active: true });
   }
 
   destroyView(id) {

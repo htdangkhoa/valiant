@@ -57,7 +57,7 @@ const TabBarView = () => {
       <div
         className='btn btn-add mx-4'
         title='New Tab'
-        onClick={handleAddNewTab}
+        onClick={handleAddNewTab({ active: true })}
         onDoubleClick={handlePreventDoubleClick}>
         <IconAdd fill='#ffffff' />
       </div>
