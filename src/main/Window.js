@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { nanoid } from 'nanoid';
 import { dialog, BrowserWindow, ipcMain } from 'electron';
 import { format } from 'url';
 import path from 'path';
@@ -12,7 +12,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 class Window {
   constructor(options = { incognito: false, view: null }) {
-    this.id = uuid();
+    this.id = nanoid();
 
     this.opts = Object.assign({}, options);
 

@@ -1,6 +1,6 @@
 import { BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
-import { v4 as uuid } from 'uuid';
+import { nanoid } from 'nanoid';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 
@@ -8,7 +8,7 @@ class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
     this.opts = Object.assign({}, options);
 
-    this.id = uuid();
+    this.id = nanoid();
     this.browserView = new BrowserView({
       webPreferences: {
         nodeIntegration: false,
