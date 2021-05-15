@@ -47,6 +47,8 @@ class ViewManager {
 
   selectView(id) {
     const view = this.views.get(id);
+    if (!view) return;
+    this.window.win.removeBrowserView(view.browserView);
     this.selected = view.id;
     view.update({ active: true });
   }

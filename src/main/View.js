@@ -136,8 +136,7 @@ class View {
     const opts = Object.assign({}, options);
 
     if (opts.active) {
-      this.window.win.setBrowserView(this.browserView);
-      this.webContents.focus();
+      this.window.win.addBrowserView(this.browserView);
     }
 
     this.fixBounds();
