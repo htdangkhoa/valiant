@@ -3,7 +3,8 @@ import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 
-import { WINDOW_EVENTS } from 'root/constants/event-names';
+import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
+import { first } from 'root/common';
 
 const useToolbarState = () => {
   // eslint-disable-next-line no-underscore-dangle
@@ -14,6 +15,8 @@ const useToolbarState = () => {
 
     return obj;
   }, {});
+
+  const { windowId } = __DATA__;
 
   const [tabs, setTabs] = useState([]);
 
@@ -50,8 +53,8 @@ const useToolbarState = () => {
       }
     };
 
-    ipcRenderer.addListener(__DATA__.windowId, listener);
-    return () => ipcRenderer.removeListener(__DATA__.windowId, listener);
+    ipcRenderer.addListener(windowId, listener);
+    return () => ipcRenderer.removeListener(windowId, listener);
   }, []);
 
   const handleTabChange = useCallback(
@@ -72,7 +75,7 @@ const useToolbarState = () => {
         }),
       );
 
-      ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.SWITCH_TAB, { id: selectedTab.id });
+      ipcRenderer.send(windowId, WINDOW_EVENTS.SWITCH_TAB, { id: selectedTab.id });
     },
     [tabs],
   );
@@ -102,14 +105,14 @@ const useToolbarState = () => {
             .filter((tab) => tab.id !== selectedTab.id),
         );
 
-        ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
+        ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
       }
 
       if (i === tabs.length - 1) {
         const previous = i - 1;
 
         if (previous < 0) {
-          ipcRenderer.send(__DATA__.windowId, WINDOW_EVENTS.CLOSE);
+          ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE);
 
           return;
         }
@@ -131,7 +134,7 @@ const useToolbarState = () => {
       () => {
         const opts = Object.assign({}, options);
 
-        const args = [__DATA__.windowId, WINDOW_EVENTS.NEW_TAB, opts];
+        const args = [windowId, WINDOW_EVENTS.NEW_TAB, opts];
 
         ipcRenderer.send(...args);
       },
@@ -141,10 +144,6 @@ const useToolbarState = () => {
   const handlePreventDoubleClick = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
-  }, []);
-
-  const handleUrlChange = useCallback((e) => {
-    setUrl(e.target.value);
   }, []);
 
   // browser view handler
@@ -181,6 +180,22 @@ const useToolbarState = () => {
     );
   }, []);
 
+  // address bar handler
+  const onFetchSuggest = useCallback(
+    async ({ value }) => {
+      const tab = first(tabs.filter((t) => !!t.active));
+
+      if (!tab) return;
+
+      ipcRenderer.send(`${ADDRESS_BAR_EVENTS.REQUEST_SUGGEST}-${windowId}`, value);
+    },
+    [tabs],
+  );
+
+  const handleUrlChange = useCallback((e) => {
+    setUrl(e.target.value);
+  }, []);
+
   const onContextMenu = useCallback(
     (index) => () => {
       const tab = tabs[index];
@@ -215,9 +230,10 @@ const useToolbarState = () => {
           label: 'Close',
           click: () => handleCloseTab(index)(),
         },
-        {
-          label: 'Close Other Tabs',
-        },
+        // {
+        //   label: 'Close Other Tabs',
+        //   enabled: tabs.length > 1,
+        // },
       ]);
 
       menu.popup();
@@ -226,8 +242,8 @@ const useToolbarState = () => {
   );
 
   return {
+    windowId,
     url,
-    handleUrlChange,
     tabs,
     setTabs,
     handleTabChange,
@@ -237,6 +253,8 @@ const useToolbarState = () => {
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
+    handleUrlChange,
+    onFetchSuggest,
     onContextMenu,
   };
 };

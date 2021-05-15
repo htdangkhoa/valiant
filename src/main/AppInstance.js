@@ -1,4 +1,3 @@
-import { Menu, dialog } from 'electron';
 import ViewManager from './ViewManager';
 import Window from './Window';
 

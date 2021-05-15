@@ -124,17 +124,6 @@ const Tab = ({ index }) => {
 
   drag(drop(ref));
 
-  useEffect(() => {
-    const listener = (e) => {
-      e.preventDefault();
-
-      ipcRenderer.send('contextmenu');
-    };
-
-    ref.current.addEventListener('contextmenu', listener);
-    return () => ref.current?.removeEventListener?.('contextmenu', listener);
-  }, [drag, drop]);
-
   return (
     <div
       ref={ref}

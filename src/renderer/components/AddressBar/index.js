@@ -1,7 +1,5 @@
 import React, { memo, useCallback } from 'react';
 
-import './style.scss';
-
 import IconBack from 'root/renderer/assets/svg/icon-back.svg';
 import IconForward from 'root/renderer/assets/svg/icon-forward.svg';
 import IconRefresh from 'root/renderer/assets/svg/icon-refresh.svg';
@@ -10,6 +8,8 @@ import IconStar from 'root/renderer/assets/svg/icon-start.svg';
 import IconMenu from 'root/renderer/assets/svg/icon-menu.svg';
 
 import ToolbarState from 'root/renderer/state';
+
+import './style.scss';
 
 const AddressBard = () => {
   const { url, handleUrlChange, tabs } = ToolbarState.useContainer();

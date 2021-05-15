@@ -3,10 +3,11 @@ import { dialog, BrowserWindow, ipcMain } from 'electron';
 import { format } from 'url';
 import path from 'path';
 
-import { WINDOW_EVENTS } from 'root/constants/event-names';
+import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 
 import AppInstance from './AppInstance';
 import ViewManager from './ViewManager';
+import request from './request';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -83,6 +84,16 @@ class Window {
           return this.viewManager.destroyView(id);
         }
       });
+
+      // const suggestionEvent = `${ADDRESS_BAR_EVENTS.REQUEST_SUGGEST}-${this.id}`;
+      // ipcMain.on(suggestionEvent, async (e, message) => {
+      //   try {
+      //     const res = await request(`http://google.com/complete/search?client=chrome&q=${encodeURIComponent(message)}`);
+      //     this.webContents.send(suggestionEvent, { input: message, ...res });
+      //   } catch (error) {
+      //     this.webContents.send(suggestionEvent, { input: message, error });
+      //   }
+      // });
     })();
   }
 
