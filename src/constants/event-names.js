@@ -6,6 +6,7 @@ export const WINDOW_EVENTS = {
   NEW_TAB: 'NEW_TAB',
   SWITCH_TAB: 'SWITCH_TAB',
   CLOSE_TAB: 'CLOSE_TAB',
+  SWAP_TAB: 'SWAP_TAB',
 };
 
 export const TAB_EVENTS = {

@@ -58,6 +58,22 @@ class ViewManager {
     this.views.delete(id);
     this.selected = null;
   }
+
+  swapView(from, to) {
+    const entries = Array.from(this.views.entries());
+
+    if (typeof from !== 'number' || from < 0) return;
+
+    const [valueFromIndex] = entries.splice(from, 1);
+
+    entries.splice(to, 0, valueFromIndex);
+
+    this.views = entries.reduce((map, [k, v]) => {
+      map.set(k, v);
+
+      return map;
+    }, new Map());
+  }
 }
 
 export default ViewManager;

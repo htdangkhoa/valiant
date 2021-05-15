@@ -146,6 +146,11 @@ const useToolbarState = () => {
     e.stopPropagation();
   }, []);
 
+  const handleDragEnd = useCallback((from, to) => {
+    console.log('🚀 ~ file: state.js ~ line 150 ~ handleDragEnd ~ from, to', from, to);
+    ipcRenderer.send(windowId, WINDOW_EVENTS.SWAP_TAB, { from, to });
+  }, []);
+
   // browser view handler
   const handleTitleChange = useCallback((id, title) => {
     setTabs((his) =>
@@ -250,6 +255,7 @@ const useToolbarState = () => {
     handleCloseTab,
     handleAddNewTab,
     handlePreventDoubleClick,
+    handleDragEnd,
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,

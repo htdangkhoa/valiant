@@ -83,6 +83,11 @@ class Window {
 
           return this.viewManager.destroyView(id);
         }
+
+        if (event === WINDOW_EVENTS.SWAP_TAB) {
+          const { from, to } = message;
+          this.viewManager.swapView(from, to);
+        }
       });
 
       // const suggestionEvent = `${ADDRESS_BAR_EVENTS.REQUEST_SUGGEST}-${this.id}`;

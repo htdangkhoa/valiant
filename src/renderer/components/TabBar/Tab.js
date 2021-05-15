@@ -29,6 +29,7 @@ const Tab = ({ index }) => {
     handleTabChange,
     handleCloseTab,
     handlePreventDoubleClick,
+    handleDragEnd,
     onContextMenu,
   } = ToolbarState.useContainer();
 
@@ -64,6 +65,12 @@ const Tab = ({ index }) => {
       handlerId: monitor.getHandlerId(),
       isDragging: monitor.isDragging(),
     }),
+    end: (item, monitor) => {
+      const from = index;
+      const to = item.index;
+
+      handleDragEnd(from, to);
+    },
   });
 
   const [, drop] = useDrop({
