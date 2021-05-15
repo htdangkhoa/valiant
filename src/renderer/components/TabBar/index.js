@@ -4,13 +4,13 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import IconAdd from 'root/renderer/assets/svg/icon-add.svg';
-import ToolbarState from 'root/renderer/state';
 import Tab from './Tab';
+import TabBarState from './state';
 
 import './style.scss';
 
 const TabBarView = () => {
-  const { tabs, handleAddNewTab, handlePreventDoubleClick } = ToolbarState.useContainer();
+  const { tabs, handleAddNewTab, handlePreventDoubleClick } = TabBarState.useContainer();
 
   const win = ElectronRemote.getCurrentWindow();
 

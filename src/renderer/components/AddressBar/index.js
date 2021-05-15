@@ -7,16 +7,10 @@ import IconLock from 'root/renderer/assets/svg/icon-lock.svg';
 import IconStar from 'root/renderer/assets/svg/icon-start.svg';
 import IconMenu from 'root/renderer/assets/svg/icon-menu.svg';
 
-import ToolbarState from 'root/renderer/state';
-
 import './style.scss';
 
 const AddressBard = () => {
-  const { url, handleUrlChange, tabs } = ToolbarState.useContainer();
-
-  const onRefresh = useCallback(() => {
-    console.log(tabs);
-  }, [tabs]);
+  const onRefresh = useCallback(() => {}, []);
 
   return (
     <div className='address-bar flex items-center'>
@@ -37,7 +31,11 @@ const AddressBard = () => {
           <IconLock fill='#ffffff' />
         </div>
 
-        <input type='text' value={url} onChange={handleUrlChange} />
+        <input
+          type='text'
+          // value={url}
+          // onChange={handleUrlChange}
+        />
 
         <div className='btn w-24 h-24'>
           <IconStar fill='#ffffff' />

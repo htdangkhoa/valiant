@@ -8,8 +8,8 @@ import IconClose from 'root/renderer/assets/svg/icon-close.svg';
 import IconEarth from 'root/renderer/assets/svg/icon-earth.svg';
 
 import { classnames } from 'root/renderer/utils';
-import ToolbarState from 'root/renderer/state';
 import { TAB_EVENTS } from 'root/constants/event-names';
+import TabBarState from './state';
 
 const moveItemNextTo = (source, from, to) => {
   const arr = [].concat(source);
@@ -31,7 +31,7 @@ const Tab = ({ index }) => {
     handlePreventDoubleClick,
     handleDragEnd,
     onContextMenu,
-  } = ToolbarState.useContainer();
+  } = TabBarState.useContainer();
 
   const tab = tabs[index];
 
@@ -65,7 +65,7 @@ const Tab = ({ index }) => {
       handlerId: monitor.getHandlerId(),
       isDragging: monitor.isDragging(),
     }),
-    end: (item, monitor) => {
+    end: (item) => {
       const from = index;
       const to = item.index;
 

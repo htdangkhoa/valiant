@@ -6,7 +6,7 @@ import * as remote from '@electron/remote';
 import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 import { first } from 'root/common';
 
-const useToolbarState = () => {
+const useTabBarState = () => {
   // eslint-disable-next-line no-underscore-dangle
   const __DATA__ = window.process.argv.reduce((obj, s) => {
     const [key, value] = s.split('=');
@@ -265,6 +265,6 @@ const useToolbarState = () => {
   };
 };
 
-const ToolbarState = createContainer(useToolbarState);
+const TabBarState = createContainer(useTabBarState);
 
-export default ToolbarState;
+export default TabBarState;

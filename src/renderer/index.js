@@ -5,7 +5,8 @@ import ReactDOM from 'react-dom';
 import TabBar from 'root/renderer/components/TabBar';
 import AddressBar from 'root/renderer/components/AddressBar';
 
-import ToolbarState from './state';
+import TabBarState from 'root/renderer/components/TabBar/state';
+import AddressBarState from 'root/renderer/components/AddressBar/state';
 
 const ToolbarView = () => (
   <div id='toolbar'>
@@ -16,9 +17,11 @@ const ToolbarView = () => (
 );
 
 const Toolbar = () => (
-  <ToolbarState.Provider>
-    <ToolbarView />
-  </ToolbarState.Provider>
+  <TabBarState.Provider>
+    <AddressBarState.Provider>
+      <ToolbarView />
+    </AddressBarState.Provider>
+  </TabBarState.Provider>
 );
 
 ReactDOM.render(<Toolbar />, document.getElementById('app'));
