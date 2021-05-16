@@ -16,11 +16,39 @@
       border-radius: 0;
     }
 
-    input {
-      width: 100%;
-      outline: none;
-      padding: 0 4px;
-      border: none;
+    .input-container {
+      position: relative;
+      display: flex;
+      flex: 1;
+
+      input {
+        outline: none;
+        border: none;
+        width: 100%;
+        height: auto;
+        padding: 0 4px;
+
+        font-family: inherit;
+        word-spacing: inherit;
+        font-size: 14px;
+      }
+
+      .text {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+
+        overflow: hidden;
+        white-space: nowrap;
+        pointer-events: none;
+        padding: 0 4px;
+
+        font-family: inherit;
+        word-spacing: inherit;
+        font-size: 14px;
+      }
     }
   }
 }

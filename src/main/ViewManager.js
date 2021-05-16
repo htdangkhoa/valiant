@@ -50,7 +50,7 @@ class ViewManager {
     if (!view) return;
     this.window.win.removeBrowserView(view.browserView);
     this.selected = view.id;
-    view.update({ active: true });
+    view.render({ active: true });
   }
 
   destroyView(id) {

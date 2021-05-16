@@ -5,11 +5,15 @@
   border-radius: $radius;
   padding: 4px;
 
-  &:hover {
+  &.disable {
+    opacity: 0.5;
+  }
+
+  &:hover:not(.disable) {
     background-color: rgba($color: #ffffff, $alpha: 0.5);
   }
 
-  &:active {
+  &:active:not(.disable) {
     background-color: rgba($color: #ffffff, $alpha: 0.25);
   }
 }

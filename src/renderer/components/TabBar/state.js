@@ -20,8 +20,6 @@ const useTabBarState = () => {
 
   const [tabs, setTabs] = useState([]);
 
-  const [url, setUrl] = useState('');
-
   useEffect(() => {
     const listener = (e, eventName, message) => {
       console.log(eventName, message);
@@ -36,16 +34,21 @@ const useTabBarState = () => {
             arr = arr.map((tab) => ({ ...tab, active: false }));
           }
 
+          const tab = {
+            id,
+            active,
+            title: 'Untitled',
+            favicon: null,
+            loading: false,
+            canGoBack: false,
+            canGoForward: false,
+            url: 'about:blank',
+          };
+
           if (typeof nextTo === 'number') {
-            arr.splice(nextTo, 0, { id, active, title: 'Untitled', favicon: null, loading: false });
+            arr.splice(nextTo, 0, tab);
           } else {
-            arr = arr.concat({
-              id,
-              active,
-              title: 'Untitled',
-              favicon: null,
-              loading: false,
-            });
+            arr = arr.concat(tab);
           }
 
           return arr;
@@ -185,6 +188,29 @@ const useTabBarState = () => {
     );
   }, []);
 
+  const handleNavigationStateChange = useCallback((id, navigationState) => {
+    setTabs((his) =>
+      [...his].map((tab) => {
+        if (tab.id === id) {
+          tab.canGoBack = navigationState.canGoBack;
+          tab.canGoForward = navigationState.canGoForward;
+        }
+        return tab;
+      }),
+    );
+  }, []);
+
+  const handleUrlChange = useCallback((id, url) => {
+    setTabs((his) =>
+      [...his].map((tab) => {
+        if (tab.id === id) {
+          tab.url = url;
+        }
+        return tab;
+      }),
+    );
+  }, []);
+
   // address bar handler
   const onFetchSuggest = useCallback(
     async ({ value }) => {
@@ -197,9 +223,9 @@ const useTabBarState = () => {
     [tabs],
   );
 
-  const handleUrlChange = useCallback((e) => {
-    setUrl(e.target.value);
-  }, []);
+  // const handleUrlChange = useCallback((e) => {
+  //   setUrl(e.target.value);
+  // }, []);
 
   const onContextMenu = useCallback(
     (index) => () => {
@@ -248,7 +274,6 @@ const useTabBarState = () => {
 
   return {
     windowId,
-    url,
     tabs,
     setTabs,
     handleTabChange,
@@ -259,6 +284,7 @@ const useTabBarState = () => {
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
+    handleNavigationStateChange,
     handleUrlChange,
     onFetchSuggest,
     onContextMenu,

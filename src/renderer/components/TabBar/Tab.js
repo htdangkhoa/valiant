@@ -24,6 +24,8 @@ const Tab = ({ index }) => {
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
+    handleNavigationStateChange,
+    handleUrlChange,
     tabs,
     setTabs,
     handleTabChange,
@@ -39,6 +41,7 @@ const Tab = ({ index }) => {
 
   useEffect(() => {
     const listener = (e, event, message) => {
+      console.log('🚀 ~ file: Tab.js ~ line 44 ~ listener ~ event, message', event, message);
       if (event === TAB_EVENTS.UPDATE_TITLE) {
         handleTitleChange(tab.id, message);
       }
@@ -49,6 +52,14 @@ const Tab = ({ index }) => {
 
       if (event === TAB_EVENTS.UPDATE_LOADING) {
         handleLoadingChange(tab.id, message);
+      }
+
+      if (event === TAB_EVENTS.UPDATE_NAVIGATION_STATE) {
+        handleNavigationStateChange(tab.id, message);
+      }
+
+      if (event === TAB_EVENTS.UPDATE_URL) {
+        handleUrlChange(tab.id, message);
       }
     };
 

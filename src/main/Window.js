@@ -1,13 +1,12 @@
-import { nanoid } from 'nanoid';
+import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 import { dialog, BrowserWindow, ipcMain } from 'electron';
 import { format } from 'url';
+import { nanoid } from 'nanoid';
 import path from 'path';
 
-import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
-
 import AppInstance from './AppInstance';
-import ViewManager from './ViewManager';
 import request from './request';
+import ViewManager from './ViewManager';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -58,7 +57,7 @@ class Window {
       if (!this.opts.view) {
         this.viewManager.create({ url: 'https://github.com', active: true });
       } else {
-        // this.opts.view.update({ appendToLast: true });
+        // this.opts.view.render({ appendToLast: true });
       }
 
       ipcMain.on(this.id, async (e, event, message) => {

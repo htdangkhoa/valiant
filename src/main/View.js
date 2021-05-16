@@ -1,5 +1,5 @@
 import { BrowserView } from 'electron';
-import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
+import { NAVIGATION_EVENT, TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 import { nanoid } from 'nanoid';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
@@ -37,12 +37,24 @@ class View {
     this.webContents.on('did-start-loading', () => {
       this.loading = true;
 
+      this.updateNavigationState();
+
       this.emit(TAB_EVENTS.UPDATE_LOADING, true);
     });
     this.webContents.on('did-stop-loading', () => {
       this.loading = false;
 
+      this.updateNavigationState();
+
       this.emit(TAB_EVENTS.UPDATE_LOADING, false);
+    });
+    this.webContents.on('did-start-navigation', () => {
+      this.updateNavigationState();
+    });
+    this.webContents.on('did-navigate', (e, url) => {
+      this.lastUrl = url;
+
+      this.emit(TAB_EVENTS.UPDATE_URL, url);
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {
       if (disposition === 'new-window') {
@@ -80,7 +92,7 @@ class View {
       menu.popup();
     });
 
-    this.update(this.opts);
+    this.render(this.opts);
 
     this.webContents.loadURL(this.opts.url);
   }
@@ -132,7 +144,7 @@ class View {
     });
   }
 
-  update(options = { nextTo: null, active: false }) {
+  render(options = { nextTo: null, active: false }) {
     const opts = Object.assign({}, options);
 
     if (opts.active) {
@@ -158,6 +170,15 @@ class View {
     this.window.win.removeBrowserView(this.browserView);
     this.webContents.destroy();
     this.browserView = null;
+  }
+
+  updateNavigationState() {
+    if (this.webContents.isDestroyed()) return;
+
+    this.emit(TAB_EVENTS.UPDATE_NAVIGATION_STATE, {
+      canGoBack: this.webContents.canGoBack(),
+      canGoForward: this.webContents.canGoForward(),
+    });
   }
 
   emit(event, ...args) {
