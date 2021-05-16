@@ -1,3 +1,4 @@
 # Valiant
 
-<img width="1392" alt="image" src="https://user-images.githubusercontent.com/15341301/117741497-d8c49880-b22c-11eb-8120-7430f70321dc.png">
+![Screenshot](https://user-images.githubusercontent.com/15341301/118408829-654ddb80-b6b1-11eb-83dd-5dbd48d44619.png)
+
