@@ -18,7 +18,7 @@ import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
 
 const AddressBard = () => {
-  // const { windowId } = TabBarState.useContainer();
+  const { onGoBack, onGoForward, onReload, onStop } = TabBarState.useContainer();
   const { activeTab, isSearchBarFocused, handleSearchBarFocusChange, url, handleUrlChange, urlSegments } =
     AddressBarState.useContainer();
 
@@ -30,10 +30,6 @@ const AddressBard = () => {
   //   ipcRenderer.on(windowId, listener);
   //   return () => ipcRenderer.removeListener(windowId, listener);
   // }, []);
-
-  const onGoBack = useCallback(() => ipcRenderer.send('goBack'), []);
-  const onGoForward = useCallback(() => ipcRenderer.send('goForward'), []);
-  const onReload = useCallback(() => ipcRenderer.send('reload'), []);
 
   const onFocus = useCallback((e) => {
     handleSearchBarFocusChange(true)();
@@ -50,15 +46,17 @@ const AddressBard = () => {
 
   return (
     <div className='address-bar flex items-center'>
-      <Button disable={!activeTab?.canGoBack} onClick={onGoBack}>
+      <Button disable={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
         <IconBack fill='#ffffff' />
       </Button>
 
-      <Button disable={!activeTab?.canGoForward} onClick={onGoForward}>
+      <Button disable={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
         <IconForward fill='#ffffff' />
       </Button>
 
-      <Button className={classnames(!!activeTab?.loading && 'p-0')} onClick={onReload}>
+      <Button
+        className={classnames(!!activeTab?.loading && 'p-0')}
+        onClick={activeTab?.loading ? onStop(activeTab?.id) : onReload(activeTab?.id)}>
         {!activeTab?.loading && <IconRefresh fill='#ffffff' />}
 
         {!!activeTab?.loading && <IconClose fill='#ffffff' />}
@@ -80,9 +78,15 @@ const AddressBard = () => {
           />
 
           <Text visible={!isSearchBarFocused}>
-            {urlSegments.protocol && <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}//`}</div>}
-            <div>{urlSegments.hostname}</div>
-            {urlSegments.pathname && <div style={{ opacity: 0.5 }}>{urlSegments.pathname}</div>}
+            {urlSegments instanceof URL && (
+              <>
+                <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}//`}</div>
+                <div>{urlSegments.hostname}</div>
+                <div style={{ opacity: 0.5 }}>{urlSegments.href.replace(urlSegments.origin, '')}</div>
+              </>
+            )}
+
+            {!(urlSegments instanceof URL) && <div>{urlSegments.toString()}</div>}
           </Text>
         </InputContainer>
 

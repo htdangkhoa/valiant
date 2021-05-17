@@ -3,7 +3,6 @@ import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 import { nanoid } from 'nanoid';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
-import logger from 'root/common/logger';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -143,7 +142,7 @@ class View {
         this.fixBounds();
       }
 
-      if (typeof this.webContents[message] === 'function') {
+      if (typeof this.webContents[message] === 'function' && args[0] === this.id) {
         this.webContents[message](...args);
       }
     });

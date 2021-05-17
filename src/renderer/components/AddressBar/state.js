@@ -49,7 +49,7 @@ const useAddressBarState = () => {
       try {
         return new URL(url);
       } catch (error) {
-        return { protocol: '', hostname: url, pathname: '' };
+        return url;
       }
     },
   };
