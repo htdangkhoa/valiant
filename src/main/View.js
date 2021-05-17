@@ -1,8 +1,9 @@
 import { BrowserView } from 'electron';
-import { NAVIGATION_EVENT, TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
+import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 import { nanoid } from 'nanoid';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
+import logger from 'root/common/logger';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -137,9 +138,13 @@ class View {
       resizeObserver.observe(toolbar);
     `);
 
-    window.webContents.on('ipc-message', (e, message) => {
+    window.webContents.on('ipc-message', (e, message, ...args) => {
       if (message === 'resize-height') {
         this.fixBounds();
+      }
+
+      if (typeof this.webContents[message] === 'function') {
+        this.webContents[message](...args);
       }
     });
   }

@@ -36,14 +36,11 @@ class Window {
       },
     });
 
-    if (isDev) {
-      this.webContents.openDevTools({ mode: 'detach' });
-    }
-
     (async () => {
       if (isDev) {
-        this.win.webContents.openDevTools({ mode: 'detach' });
         await this.win.loadURL('http://localhost:8080');
+
+        this.win.webContents.openDevTools({ mode: 'detach' });
       } else {
         await this.win.loadURL(
           format({

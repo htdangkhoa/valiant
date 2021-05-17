@@ -9,12 +9,13 @@ import IconLock from 'root/renderer/assets/svg/icon-lock.svg';
 import IconStar from 'root/renderer/assets/svg/icon-start.svg';
 import IconMenu from 'root/renderer/assets/svg/icon-menu.svg';
 
+import { classnames } from 'root/renderer/utils';
+import Button from '../Button';
 import { InputContainer, Input, Text } from './style';
 
 import './style.scss';
 import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
-import { classnames } from 'root/renderer/utils';
 
 const AddressBard = () => {
   // const { windowId } = TabBarState.useContainer();
@@ -29,6 +30,10 @@ const AddressBard = () => {
   //   ipcRenderer.on(windowId, listener);
   //   return () => ipcRenderer.removeListener(windowId, listener);
   // }, []);
+
+  const onGoBack = useCallback(() => ipcRenderer.send('goBack'), []);
+  const onGoForward = useCallback(() => ipcRenderer.send('goForward'), []);
+  const onReload = useCallback(() => ipcRenderer.send('reload'), []);
 
   const onFocus = useCallback((e) => {
     handleSearchBarFocusChange(true)();
@@ -45,19 +50,19 @@ const AddressBard = () => {
 
   return (
     <div className='address-bar flex items-center'>
-      <div className={classnames('btn w-24 h-24', !activeTab?.canGoBack && 'disable')}>
+      <Button disable={!activeTab?.canGoBack} onClick={onGoBack}>
         <IconBack fill='#ffffff' />
-      </div>
+      </Button>
 
-      <div className={classnames('btn w-24 h-24', !activeTab?.canGoForward && 'disable')}>
+      <Button disable={!activeTab?.canGoForward} onClick={onGoForward}>
         <IconForward fill='#ffffff' />
-      </div>
+      </Button>
 
-      <div className={classnames('btn w-24 h-24', !!activeTab?.loading && 'p-0')}>
+      <Button className={classnames(!!activeTab?.loading && 'p-0')} onClick={onReload}>
         {!activeTab?.loading && <IconRefresh fill='#ffffff' />}
 
         {!!activeTab?.loading && <IconClose fill='#ffffff' />}
-      </div>
+      </Button>
 
       <div className='search-field flex'>
         <div className='btn w-24 h-24'>
@@ -86,9 +91,9 @@ const AddressBard = () => {
         </div>
       </div>
 
-      <div className='btn w-24 h-24'>
+      <Button>
         <IconMenu fill='#ffffff' />
-      </div>
+      </Button>
     </div>
   );
 };
