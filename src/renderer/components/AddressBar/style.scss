@@ -1,0 +1,54 @@
+@import '../../styles/vars';
+
+.address-bar {
+  background-color: $dark;
+  padding: 4px 6px;
+  gap: 0.5rem;
+
+  .search-field {
+    border-radius: $radius;
+    border: 1px solid white;
+    width: 100%;
+    max-width: 70%;
+    margin: auto;
+
+    .btn {
+      border-radius: 0;
+    }
+
+    .input-container {
+      position: relative;
+      display: flex;
+      flex: 1;
+
+      input {
+        outline: none;
+        border: none;
+        width: 100%;
+        height: auto;
+        padding: 0 4px;
+
+        font-family: inherit;
+        word-spacing: inherit;
+        font-size: 14px;
+      }
+
+      .text {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+
+        overflow: hidden;
+        white-space: nowrap;
+        pointer-events: none;
+        padding: 0 4px;
+
+        font-family: inherit;
+        word-spacing: inherit;
+        font-size: 14px;
+      }
+    }
+  }
+}

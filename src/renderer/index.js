@@ -1,20 +1,27 @@
+import 'root/renderer/styles/index.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Img from './assets/image.jpg';
-import Svg from './assets/vi_get.svg';
+import TabBar from 'root/renderer/components/TabBar';
+import AddressBar from 'root/renderer/components/AddressBar';
 
-import './style.scss';
+import TabBarState from 'root/renderer/components/TabBar/state';
+import AddressBarState from 'root/renderer/components/AddressBar/state';
 
-const App = () => (
-  <div>
-    <p id='test'>Hello world!</p>
+const ToolbarView = () => (
+  <div id='toolbar'>
+    <TabBar />
 
-    <img src='assets/image.jpg' alt='1' />
-    <img src={Img} alt='2' />
-
-    <Svg />
+    <AddressBar />
   </div>
 );
 
-ReactDOM.render(<App />, document.getElementById('app'));
+const Toolbar = () => (
+  <TabBarState.Provider>
+    <AddressBarState.Provider>
+      <ToolbarView />
+    </AddressBarState.Provider>
+  </TabBarState.Provider>
+);
+
+ReactDOM.render(<Toolbar />, document.getElementById('app'));

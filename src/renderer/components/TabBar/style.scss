@@ -1,0 +1,96 @@
+// *,
+// *::after,
+// *::before {
+//   -webkit-user-select: none;
+//   -webkit-user-drag: none;
+//   -webkit-app-region: no-drag;
+//   cursor: default;
+// }
+
+@import '../../styles/_vars';
+
+* {
+  margin: unset;
+}
+
+.tabs-container {
+  display: flex;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 7.5rem;
+  padding-right: 5.5rem;
+  -webkit-app-region: drag;
+  background-color: $title-dark;
+
+  * {
+    -webkit-app-region: no-drag;
+  }
+
+  .tabs {
+    // width: 100%;
+    display: flex;
+    overflow-y: hidden;
+    // overflow-x: hidden;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    &::-webkit-scrollbar {
+      width: 0px;
+      height: 0;
+      background: transparent; /* make scrollbar transparent */
+    }
+
+    gap: 4px;
+
+    .tab {
+      border-radius: 4px;
+      min-width: 100px;
+      padding: 4px;
+      max-width: 180px;
+      width: 100vw;
+      font-size: 0.75rem;
+
+      * {
+        color: white;
+      }
+
+      .favicon {
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+
+      p {
+        user-select: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+      }
+
+      .btn-close {
+        min-width: 20px;
+        min-height: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      &.active {
+        background-color: rgba(255, 255, 255, 0.25);
+      }
+
+      &:hover:not(.active) {
+        background-color: rgba(255, 255, 255, 0.15);
+      }
+    }
+  }
+
+  .btn-add {
+    min-width: 28px;
+    min-height: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}

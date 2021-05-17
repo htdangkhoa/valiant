@@ -1,79 +1,77 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { spawn, execSync } = require('child_process');
+const TerserPlugin = require('terser-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+
+const isDev = process.env.NODE_ENV === 'development';
+
+let electronProcess;
 
 module.exports = {
-  mode: 'development',
+  mode: isDev ? 'development' : 'production',
+  target: 'electron-main',
+  devtool: isDev ? 'source-map' : false,
+  watch: isDev,
   entry: {
-    renderer: path.resolve(process.cwd(), 'src/renderer/index.js'),
-  },
-  output: {
-    path: path.resolve(process.cwd(), 'dist'),
-    publicPath: '/',
-    filename: '[name].[fullhash].js',
-    chunkFilename: '[id].[contenthash].js',
+    main: path.resolve(process.cwd(), 'src/main/index.js'),
   },
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-      },
-      {
-        test: /\.(jpe?g|png|gif)$/i,
-        loader: 'file-loader',
-        options: {
-          name: '[name].[hash:8].[ext]',
-          outputPath: 'assets',
-        },
-      },
-      {
-        test: /\.(sa|sc|c)ss$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              url: false,
-            },
-          },
-          {
-            loader: 'sass-loader',
-          },
-        ],
-      },
-      {
-        test: /\.svg$/,
-        use: ['@svgr/webpack'],
       },
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].[contenthash:8].css',
-      chunkFilename: '[id].[contenthash:8].css',
-    }),
-    new HtmlWebpackPlugin({
-      template: 'static/index.html',
-      hash: true,
-    }),
-    new CopyWebpackPlugin({
-      patterns: [{ from: 'src/renderer/assets', to: 'assets' }],
-    }),
-  ],
-  resolve: {
-    extensions: ['.js', '.json', '.jsx'],
+    new ESLintPlugin(),
+    isDev && {
+      apply(compiler) {
+        compiler.hooks.afterEmit.tap('AfterEmitPlugin', () => {
+          if (electronProcess) {
+            try {
+              if (process.platform === 'win32') {
+                execSync(`taskkill /pid ${electronProcess.pid} /f /t`);
+              } else {
+                electronProcess.kill();
+              }
+
+              electronProcess = null;
+            } catch (e) {
+              console.log(e);
+            }
+          }
+
+          electronProcess = spawn('npm', ['start'], {
+            shell: true,
+            env: process.env,
+            stdio: 'inherit',
+          });
+        });
+      },
+    },
+  ].filter(Boolean),
+  optimization: {
+    minimizer: [
+      !isDev &&
+        new TerserPlugin({
+          extractComments: true,
+          terserOptions: {
+            ecma: 8,
+            output: {
+              comments: false,
+            },
+          },
+          parallel: true,
+        }),
+    ].filter(Boolean),
   },
-  devServer: {
-    disableHostCheck: true,
-    historyApiFallback: true,
-    contentBase: 'dist',
-    contentBasePublicPath: '/',
-    // writeToDisk: true,
-    // host: '0.0.0.0',
+  resolve: {
+    modules: ['node_modules'],
+    extensions: ['.js', '.json'],
+  },
+  stats: {
+    errorDetails: isDev,
   },
 };
