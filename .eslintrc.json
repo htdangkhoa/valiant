@@ -4,7 +4,7 @@
     "es2021": true,
     "node": true
   },
-  "extends": ["plugin:react/recommended", "airbnb-base", "prettier"],
+  "extends": ["eslint:recommended", "plugin:react/recommended", "airbnb-base", "prettier"],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -16,6 +16,9 @@
   "settings": {
     "import/resolver": {
       "babel-module": {}
+    },
+    "react": {
+      "version": "detect"
     }
   },
   "plugins": ["react"],

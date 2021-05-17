@@ -43,7 +43,11 @@ module.exports = {
             }
           }
 
-          electronProcess = spawn('npm', ['start']);
+          electronProcess = spawn('npm', ['start'], {
+            shell: true,
+            env: process.env,
+            stdio: 'inherit',
+          });
         });
       },
     },
