@@ -143,7 +143,7 @@ class View {
       }
 
       if (typeof this.webContents[message] === 'function' && args[0] === this.id) {
-        this.webContents[message](...args);
+        this.webContents[message](...args.splice(1));
       }
     });
   }

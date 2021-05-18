@@ -43,7 +43,8 @@ const useTabBarState = () => {
             loading: false,
             canGoBack: false,
             canGoForward: false,
-            url: 'about:blank',
+            originalUrl: '',
+            url: '',
           };
 
           if (typeof nextTo === 'number') {
@@ -201,21 +202,23 @@ const useTabBarState = () => {
     );
   }, []);
 
-  const onGoBack = useCallback((id) => () => ipcRenderer.send('goBack', id), []);
-  const onGoForward = useCallback((id) => () => ipcRenderer.send('goForward', id), []);
-  const onReload = useCallback((id) => () => ipcRenderer.send('reload', id), []);
-  const onStop = useCallback((id) => () => ipcRenderer.send('stop', id), []);
-
   const handleUrlChange = useCallback((id, url) => {
     setTabs((his) =>
       [...his].map((tab) => {
         if (tab.id === id) {
           tab.url = url;
+          tab.originalUrl = url;
         }
         return tab;
       }),
     );
   }, []);
+
+  const onGoBack = useCallback((id) => () => ipcRenderer.send('goBack', id), []);
+  const onGoForward = useCallback((id) => () => ipcRenderer.send('goForward', id), []);
+  const onReload = useCallback((id) => () => ipcRenderer.send('reload', id), []);
+  const onStop = useCallback((id) => () => ipcRenderer.send('stop', id), []);
+  const onLoadURL = useCallback((id, url) => () => ipcRenderer.send('loadURL', id, url), []);
 
   // address bar handler
   const onFetchSuggest = useCallback(
@@ -228,10 +231,6 @@ const useTabBarState = () => {
     },
     [tabs],
   );
-
-  // const handleUrlChange = useCallback((e) => {
-  //   setUrl(e.target.value);
-  // }, []);
 
   const onContextMenu = useCallback(
     (index) => () => {
@@ -292,11 +291,12 @@ const useTabBarState = () => {
     handleFaviconChange,
     handleLoadingChange,
     handleNavigationStateChange,
+    handleUrlChange,
     onGoBack,
     onGoForward,
     onReload,
     onStop,
-    handleUrlChange,
+    onLoadURL,
     onFetchSuggest,
     onContextMenu,
   };

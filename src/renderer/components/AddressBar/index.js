@@ -16,11 +16,19 @@ import { InputContainer, Input, Text } from './style';
 import './style.scss';
 import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
+import logger from 'root/common/logger';
+import { isURL } from 'root/common';
 
 const AddressBard = () => {
-  const { onGoBack, onGoForward, onReload, onStop } = TabBarState.useContainer();
-  const { activeTab, isSearchBarFocused, handleSearchBarFocusChange, url, handleUrlChange, urlSegments } =
-    AddressBarState.useContainer();
+  const { onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
+  const {
+    activeTab,
+    isSearchBarFocused,
+    handleSearchBarFocusChange,
+    url: inputValue,
+    handleInputValueChange,
+    urlSegments,
+  } = AddressBarState.useContainer();
 
   // useEffect(() => {
   //   const listener = (e, event, message) => {
@@ -69,12 +77,39 @@ const AddressBard = () => {
 
         <InputContainer>
           <Input
+            spellCheck={false}
             visible={isSearchBarFocused}
-            value={url}
-            onChange={handleUrlChange}
+            value={inputValue}
+            onChange={handleInputValueChange}
             onFocus={onFocus}
             onBlur={onBlur}
-            spellCheck={false}
+            onKeyDown={async (e) => {
+              const target = e.currentTarget;
+
+              if (e.key === 'Escape') {
+                await handleUrlChange(activeTab?.id, activeTab?.originalUrl);
+
+                requestAnimationFrame(() => target.select());
+
+                return;
+              }
+
+              if (e.key === 'Enter') {
+                e.currentTarget.blur();
+
+                const { value } = e.currentTarget;
+
+                let url = value;
+
+                if (isURL(value)) {
+                  url = value.indexOf('://') === -1 ? `http://${value}` : value;
+                } else {
+                  url = `https://google.com/search?q=${value}`;
+                }
+
+                onLoadURL(activeTab?.id, url)();
+              }
+            }}
           />
 
           <Text visible={!isSearchBarFocused}>

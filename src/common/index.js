@@ -1,9 +1,11 @@
-export const isURL = (url) => {
-  const expression = /\b((http|https):\/\/?)[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/?))/g;
+export const isURL = (s) => {
+  const pattern = /^(?:\w+:)?\/\/([^\s.]+\.\S{2}|localhost[:?\d]*)\S*$/;
 
-  const regex = new RegExp(expression);
+  if (pattern.test(s)) {
+    return true;
+  }
 
-  return !!url.match(regex);
+  return pattern.test(`http://${s}`);
 };
 
 export const first = (input) => {
