@@ -1,10 +1,28 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import { dark, radius } from 'root/constants/theme';
 
 const font = () => css`
   font-family: inherit;
   word-spacing: inherit;
   font-size: 14px;
+`;
+
+export const AddressBarContainer = styled.div`
+  background-color: ${dark};
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+export const AddressBar = styled.div`
+  display: flex;
+  border-radius: ${radius};
+  border: 1px solid white;
+  width: 100%;
+  max-width: 70%;
+  margin: auto;
 `;
 
 export const InputContainer = styled.div`
