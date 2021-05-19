@@ -17,13 +17,13 @@ const useAddressBarState = () => {
     [],
   );
 
-  const [url, setUrl] = useState('about:blank');
+  const [url, setUrl] = useState('');
 
   useEffect(() => {
-    setUrl(activeTab?.url || 'about:blank');
+    setUrl(activeTab?.url || '');
   }, [activeTab?.url]);
 
-  const handleUrlChange = useCallback(
+  const handleInputValueChange = useCallback(
     (e) => {
       setTabs((his) =>
         [...his].map((tab) => {
@@ -44,12 +44,12 @@ const useAddressBarState = () => {
     isSearchBarFocused,
     handleSearchBarFocusChange,
     url,
-    handleUrlChange,
+    handleInputValueChange,
     get urlSegments() {
       try {
         return new URL(url);
       } catch (error) {
-        return { protocol: '', hostname: url, pathname: '' };
+        return url;
       }
     },
   };

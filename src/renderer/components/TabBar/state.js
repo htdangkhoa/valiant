@@ -5,6 +5,7 @@ import * as remote from '@electron/remote';
 
 import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
 import { first } from 'root/common';
+import logger from 'root/common/logger';
 
 const useTabBarState = () => {
   // eslint-disable-next-line no-underscore-dangle
@@ -42,7 +43,8 @@ const useTabBarState = () => {
             loading: false,
             canGoBack: false,
             canGoForward: false,
-            url: 'about:blank',
+            originalUrl: '',
+            url: '',
           };
 
           if (typeof nextTo === 'number') {
@@ -89,16 +91,18 @@ const useTabBarState = () => {
         e.stopPropagation();
       }
 
-      function requestCloseTab() {
+      function requestCloseTab(hook) {
         const selectedTab = tabs[i];
+
+        logger.log('selectedTab', selectedTab);
 
         if (!selectedTab) return;
 
         setTabs((his) =>
-          his
+          [...his]
             .map((tab) => {
               if (selectedTab.id === tab.id && tab.active) {
-                handleTabChange(i + 1)();
+                hook();
 
                 return tab;
               }
@@ -108,7 +112,7 @@ const useTabBarState = () => {
             .filter((tab) => tab.id !== selectedTab.id),
         );
 
-        ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
+        // ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
       }
 
       if (i === tabs.length - 1) {
@@ -120,14 +124,12 @@ const useTabBarState = () => {
           return;
         }
 
-        handleTabChange(previous)();
-
-        requestCloseTab();
+        requestCloseTab(handleTabChange(previous));
 
         return;
       }
 
-      requestCloseTab();
+      requestCloseTab(handleTabChange(i + 1));
     },
     [tabs],
   );
@@ -205,11 +207,18 @@ const useTabBarState = () => {
       [...his].map((tab) => {
         if (tab.id === id) {
           tab.url = url;
+          tab.originalUrl = url;
         }
         return tab;
       }),
     );
   }, []);
+
+  const onGoBack = useCallback((id) => () => ipcRenderer.send('goBack', id), []);
+  const onGoForward = useCallback((id) => () => ipcRenderer.send('goForward', id), []);
+  const onReload = useCallback((id) => () => ipcRenderer.send('reload', id), []);
+  const onStop = useCallback((id) => () => ipcRenderer.send('stop', id), []);
+  const onLoadURL = useCallback((id, url) => () => ipcRenderer.send('loadURL', id, url), []);
 
   // address bar handler
   const onFetchSuggest = useCallback(
@@ -222,10 +231,6 @@ const useTabBarState = () => {
     },
     [tabs],
   );
-
-  // const handleUrlChange = useCallback((e) => {
-  //   setUrl(e.target.value);
-  // }, []);
 
   const onContextMenu = useCallback(
     (index) => () => {
@@ -244,6 +249,7 @@ const useTabBarState = () => {
         },
         {
           label: 'Reload',
+          click: onReload(tab.id),
         },
         {
           label: 'Duplicate',
@@ -286,6 +292,11 @@ const useTabBarState = () => {
     handleLoadingChange,
     handleNavigationStateChange,
     handleUrlChange,
+    onGoBack,
+    onGoForward,
+    onReload,
+    onStop,
+    onLoadURL,
     onFetchSuggest,
     onContextMenu,
   };
