@@ -16,11 +16,19 @@ import { InputContainer, Input, Text } from './style';
 import './style.scss';
 import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
+import logger from 'root/common/logger';
+import { isURL } from 'root/common';
 
 const AddressBard = () => {
-  // const { windowId } = TabBarState.useContainer();
-  const { activeTab, isSearchBarFocused, handleSearchBarFocusChange, url, handleUrlChange, urlSegments } =
-    AddressBarState.useContainer();
+  const { onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
+  const {
+    activeTab,
+    isSearchBarFocused,
+    handleSearchBarFocusChange,
+    url: inputValue,
+    handleInputValueChange,
+    urlSegments,
+  } = AddressBarState.useContainer();
 
   // useEffect(() => {
   //   const listener = (e, event, message) => {
@@ -30,10 +38,6 @@ const AddressBard = () => {
   //   ipcRenderer.on(windowId, listener);
   //   return () => ipcRenderer.removeListener(windowId, listener);
   // }, []);
-
-  const onGoBack = useCallback(() => ipcRenderer.send('goBack'), []);
-  const onGoForward = useCallback(() => ipcRenderer.send('goForward'), []);
-  const onReload = useCallback(() => ipcRenderer.send('reload'), []);
 
   const onFocus = useCallback((e) => {
     handleSearchBarFocusChange(true)();
@@ -50,15 +54,17 @@ const AddressBard = () => {
 
   return (
     <div className='address-bar flex items-center'>
-      <Button disable={!activeTab?.canGoBack} onClick={onGoBack}>
+      <Button disable={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
         <IconBack fill='#ffffff' />
       </Button>
 
-      <Button disable={!activeTab?.canGoForward} onClick={onGoForward}>
+      <Button disable={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
         <IconForward fill='#ffffff' />
       </Button>
 
-      <Button className={classnames(!!activeTab?.loading && 'p-0')} onClick={onReload}>
+      <Button
+        className={classnames(!!activeTab?.loading && 'p-0')}
+        onClick={activeTab?.loading ? onStop(activeTab?.id) : onReload(activeTab?.id)}>
         {!activeTab?.loading && <IconRefresh fill='#ffffff' />}
 
         {!!activeTab?.loading && <IconClose fill='#ffffff' />}
@@ -71,18 +77,51 @@ const AddressBard = () => {
 
         <InputContainer>
           <Input
+            spellCheck={false}
             visible={isSearchBarFocused}
-            value={url}
-            onChange={handleUrlChange}
+            value={inputValue}
+            onChange={handleInputValueChange}
             onFocus={onFocus}
             onBlur={onBlur}
-            spellCheck={false}
+            onKeyDown={async (e) => {
+              const target = e.currentTarget;
+
+              if (e.key === 'Escape') {
+                await handleUrlChange(activeTab?.id, activeTab?.originalUrl);
+
+                requestAnimationFrame(() => target.select());
+
+                return;
+              }
+
+              if (e.key === 'Enter') {
+                e.currentTarget.blur();
+
+                const { value } = e.currentTarget;
+
+                let url = value;
+
+                if (isURL(value)) {
+                  url = value.indexOf('://') === -1 ? `http://${value}` : value;
+                } else {
+                  url = `https://google.com/search?q=${value}`;
+                }
+
+                onLoadURL(activeTab?.id, url)();
+              }
+            }}
           />
 
           <Text visible={!isSearchBarFocused}>
-            {urlSegments.protocol && <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}//`}</div>}
-            <div>{urlSegments.hostname}</div>
-            {urlSegments.pathname && <div style={{ opacity: 0.5 }}>{urlSegments.pathname}</div>}
+            {urlSegments instanceof URL && (
+              <>
+                <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}//`}</div>
+                <div>{urlSegments.hostname}</div>
+                <div style={{ opacity: 0.5 }}>{urlSegments.href.replace(urlSegments.origin, '')}</div>
+              </>
+            )}
+
+            {!(urlSegments instanceof URL) && <div>{urlSegments.toString()}</div>}
           </Text>
         </InputContainer>
 
