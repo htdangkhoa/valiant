@@ -1,8 +1,10 @@
 import { BrowserView } from 'electron';
-import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
+import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { nanoid } from 'nanoid';
+
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
+import { History, insert, update } from './database';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -26,11 +28,15 @@ class View {
     this.webContents.on('page-title-updated', (e, title) => {
       this.title = title;
 
+      this.updateStorage();
+
       this.emit(TAB_EVENTS.UPDATE_TITLE, title);
     });
     this.webContents.on('page-favicon-updated', (e, favicons) => {
       const [favicon] = favicons;
       this.favicon = favicon;
+
+      this.updateStorage();
 
       this.emit(TAB_EVENTS.UPDATE_FAVICON, favicon);
     });
@@ -51,10 +57,17 @@ class View {
     this.webContents.on('did-start-navigation', () => {
       this.updateNavigationState();
     });
-    this.webContents.on('did-navigate', (e, url) => {
+    this.webContents.on('did-navigate', async (e, url) => {
+      this.addHistory(url);
+
       this.lastUrl = url;
 
       this.emit(TAB_EVENTS.UPDATE_URL, url);
+    });
+    this.webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
+      if (isMainFrame) {
+        this.addHistory(url, true);
+      }
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {
       if (disposition === 'new-window') {
@@ -187,6 +200,35 @@ class View {
 
   emit(event, ...args) {
     this.window.webContents.send(this.id, event, ...args);
+  }
+
+  async addHistory(url, inPage) {
+    if (this.lastUrl !== url) {
+      const history = await insert(History, {
+        title: this.title,
+        url,
+        favicon: this.favicon,
+        date: new Date().getTime(),
+      });
+
+      this.lastHistoryId = history._id;
+    } else if (!inPage) {
+      this.lastHistoryId = '';
+    }
+  }
+
+  async updateStorage() {
+    if (this.lastHistoryId) {
+      const { title, favicon } = this;
+
+      await update(
+        History,
+        {
+          _id: this.lastHistoryId,
+        },
+        { $set: { title, favicon } },
+      );
+    }
   }
 }
 

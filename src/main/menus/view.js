@@ -1,5 +1,5 @@
 import { Menu, clipboard, MenuItem, ContextMenuParams, WebContents } from 'electron';
-import { isURL } from 'root/common';
+import { isURL } from 'common';
 import AppInstance from '../AppInstance';
 
 const contextMenu = (params, webContents) => {

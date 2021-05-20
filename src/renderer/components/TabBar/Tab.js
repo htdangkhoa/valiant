@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import { ipcRenderer } from 'electron';
 
-import Spinner from 'root/renderer/components/Spinner';
-import IconClose from 'root/renderer/assets/svg/icon-close.svg';
-import IconEarth from 'root/renderer/assets/svg/icon-earth.svg';
+import Spinner from 'renderer/components/Spinner';
+import IconClose from 'renderer/assets/svg/icon-close.svg';
+import IconEarth from 'renderer/assets/svg/icon-earth.svg';
 
-import { classnames } from 'root/renderer/utils';
-import { TAB_EVENTS } from 'root/constants/event-names';
+import { classnames } from 'renderer/utils';
+import { TAB_EVENTS } from 'constants/event-names';
 import TabBarState from './state';
 
 const moveItemNextTo = (source, from, to) => {

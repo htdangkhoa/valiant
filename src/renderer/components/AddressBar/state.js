@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createContainer } from 'unstated-next';
 
-import { first } from 'root/common';
+import { first } from 'common';
 import TabBarState from '../TabBar/state';
 
 const useAddressBarState = () => {

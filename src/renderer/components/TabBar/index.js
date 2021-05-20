@@ -3,7 +3,7 @@ import * as ElectronRemote from '@electron/remote';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import IconAdd from 'root/renderer/assets/svg/icon-add.svg';
+import IconAdd from 'renderer/assets/svg/icon-add.svg';
 import Tab from './Tab';
 import TabBarState from './state';
 

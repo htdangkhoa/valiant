@@ -1,5 +1,5 @@
-import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
-import { dialog, BrowserWindow, ipcMain } from 'electron';
+import { WINDOW_EVENTS } from 'constants/event-names';
+import { BrowserWindow, ipcMain } from 'electron';
 import { format } from 'url';
 import { nanoid } from 'nanoid';
 import path from 'path';
@@ -12,6 +12,8 @@ const isDev = process.env.NODE_ENV === 'development';
 
 class Window {
   constructor(options = { incognito: false, view: null }) {
+    this.instance = AppInstance.getInstance();
+
     this.id = nanoid();
 
     this.opts = Object.assign({}, options);
@@ -41,6 +43,12 @@ class Window {
         await this.win.loadURL('http://localhost:8080');
 
         this.win.webContents.openDevTools({ mode: 'detach' });
+
+        this.win.webContents.on('dom-ready', () => {
+          this.instance.closeWindow(this.id);
+
+          this.instance.createWindow();
+        });
       } else {
         await this.win.loadURL(
           format({
@@ -83,6 +91,10 @@ class Window {
         if (event === WINDOW_EVENTS.SWAP_TAB) {
           const { from, to } = message;
           this.viewManager.swapView(from, to);
+        }
+
+        if (event === WINDOW_EVENTS.CLOSE) {
+          this.instance.closeWindow(this.id);
         }
       });
 

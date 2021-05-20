@@ -38,6 +38,14 @@ class AppInstance {
 
     return window;
   }
+
+  closeWindow(id) {
+    const window = this.windows.get(id);
+    if (!window) return;
+    window.win.close();
+    window.win = null;
+    this.windows.delete(id);
+  }
 }
 
 export default AppInstance;

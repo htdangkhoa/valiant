@@ -3,6 +3,10 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import PropTypes from 'prop-types';
 
+function parseRadiusValue(value) {
+  return typeof value === 'number' ? `${value}px` : value;
+}
+
 const BaseButton = ({ className, children, ...props }) => (
   <div {...props} className={className}>
     {children}
@@ -15,12 +19,16 @@ BaseButton.propTypes = {
 
 const Button = styled(BaseButton)`
   display: inherit;
-  border-radius: 4px;
   padding: 4px;
+  border-radius: 4px;
 
-  ${({ disable, size }) => css`
+  ${({ disable, size, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius }) => css`
     width: ${size}px;
     height: ${size}px;
+    border-top-left-radius: ${parseRadiusValue(topLeftRadius)};
+    border-top-right-radius: ${parseRadiusValue(topRightRadius)};
+    border-bottom-left-radius: ${parseRadiusValue(bottomLeftRadius)};
+    border-bottom-right-radius: ${parseRadiusValue(bottomRightRadius)};
 
     pointer-events: ${disable ? 'none' : 'inherit'};
     opacity: ${disable ? '0.5' : '1'};
@@ -37,6 +45,10 @@ const Button = styled(BaseButton)`
 Button.propTypes = {
   disable: PropTypes.bool,
   size: PropTypes.number,
+  topLeftRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  topRightRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  bottomLeftRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  bottomRightRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 Button.defaultProps = {
