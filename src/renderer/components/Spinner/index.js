@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import { classnames } from 'root/renderer/utils';
+import { classnames } from 'renderer/utils';
 import './style.scss';
 
 const Spinner = ({ className }) => (

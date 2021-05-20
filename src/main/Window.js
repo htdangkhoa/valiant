@@ -1,4 +1,4 @@
-import { WINDOW_EVENTS } from 'root/constants/event-names';
+import { WINDOW_EVENTS } from 'constants/event-names';
 import { BrowserWindow, ipcMain } from 'electron';
 import { format } from 'url';
 import { nanoid } from 'nanoid';

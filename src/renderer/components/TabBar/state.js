@@ -3,9 +3,9 @@ import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 
-import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
-import { first } from 'root/common';
-import logger from 'root/common/logger';
+import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
+import { first } from 'common';
+import logger from 'common/logger';
 
 const useTabBarState = () => {
   // eslint-disable-next-line no-underscore-dangle

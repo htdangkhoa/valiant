@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import { dark, radius } from 'root/constants/theme';
+import { dark, radius } from 'constants/theme';
 
 const font = () => css`
   font-family: inherit;

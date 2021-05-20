@@ -1,12 +1,12 @@
-import 'root/renderer/styles/index.scss';
+import 'renderer/styles/index.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import TabBar from 'root/renderer/components/TabBar';
-import AddressBar from 'root/renderer/components/AddressBar';
+import TabBar from 'renderer/components/TabBar';
+import AddressBar from 'renderer/components/AddressBar';
 
-import TabBarState from 'root/renderer/components/TabBar/state';
-import AddressBarState from 'root/renderer/components/AddressBar/state';
+import TabBarState from 'renderer/components/TabBar/state';
+import AddressBarState from 'renderer/components/AddressBar/state';
 
 const ToolbarView = () => (
   <div id='toolbar'>

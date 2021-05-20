@@ -1,5 +1,5 @@
 import { BrowserView } from 'electron';
-import { TAB_EVENTS, WINDOW_EVENTS } from 'root/constants/event-names';
+import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { nanoid } from 'nanoid';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';

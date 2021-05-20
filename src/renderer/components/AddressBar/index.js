@@ -1,15 +1,15 @@
 import React, { memo, useCallback } from 'react';
 
-import IconBack from 'root/renderer/assets/svg/icon-back.svg';
-import IconForward from 'root/renderer/assets/svg/icon-forward.svg';
-import IconRefresh from 'root/renderer/assets/svg/icon-refresh.svg';
-import IconClose from 'root/renderer/assets/svg/icon-close.svg';
-import IconLock from 'root/renderer/assets/svg/icon-lock.svg';
-import IconStar from 'root/renderer/assets/svg/icon-start.svg';
-import IconMenu from 'root/renderer/assets/svg/icon-menu.svg';
+import IconBack from 'renderer/assets/svg/icon-back.svg';
+import IconForward from 'renderer/assets/svg/icon-forward.svg';
+import IconRefresh from 'renderer/assets/svg/icon-refresh.svg';
+import IconClose from 'renderer/assets/svg/icon-close.svg';
+import IconLock from 'renderer/assets/svg/icon-lock.svg';
+import IconStar from 'renderer/assets/svg/icon-start.svg';
+import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
-import { classnames } from 'root/renderer/utils';
-import { isURL } from 'root/common';
+import { classnames } from 'renderer/utils';
+import { isURL } from 'common';
 
 import Button from '../Button';
 import { AddressBarContainer, AddressBar, InputContainer, Input, Text } from './style';
