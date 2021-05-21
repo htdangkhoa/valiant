@@ -14,6 +14,13 @@ class ViewManager {
   }
 
   create(options = { url: 'about:blank', nextTo: undefined, active: false }) {
+    const latestView = this.views.get(this.selected);
+
+    if (latestView) {
+      this.window.win.removeBrowserView(latestView.browserView);
+      this.selected = null;
+    }
+
     const opts = Object.assign({}, options);
 
     const hasNextTo = typeof opts.nextTo === 'number';
@@ -46,6 +53,7 @@ class ViewManager {
   }
 
   selectView(id) {
+    if (this.selected === id) return;
     const view = this.views.get(id);
     if (!view) return;
     this.window.win.removeBrowserView(view.browserView);
