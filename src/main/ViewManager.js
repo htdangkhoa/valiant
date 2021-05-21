@@ -14,14 +14,16 @@ class ViewManager {
   }
 
   create(options = { url: 'about:blank', nextTo: undefined, active: false }) {
-    const latestView = this.views.get(this.selected);
-
-    if (latestView) {
-      this.window.win.removeBrowserView(latestView.browserView);
-      this.selected = null;
-    }
-
     const opts = Object.assign({}, options);
+
+    if (opts.active) {
+      const latestView = this.views.get(this.selected);
+
+      if (latestView) {
+        this.window.win.removeBrowserView(latestView.browserView);
+        this.selected = null;
+      }
+    }
 
     const hasNextTo = typeof opts.nextTo === 'number';
 

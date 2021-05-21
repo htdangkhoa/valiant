@@ -25,6 +25,8 @@ const Button = styled(BaseButton)`
   ${({ disable, size, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius }) => css`
     width: ${size}px;
     height: ${size}px;
+    min-width: ${size}px;
+    min-height: ${size}px;
     border-top-left-radius: ${parseRadiusValue(topLeftRadius)};
     border-top-right-radius: ${parseRadiusValue(topRightRadius)};
     border-bottom-left-radius: ${parseRadiusValue(bottomLeftRadius)};

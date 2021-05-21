@@ -4,10 +4,10 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import IconAdd from 'renderer/assets/svg/icon-add.svg';
-import Tab from './Tab';
-import TabBarState from './state';
 
-import './style.scss';
+import { TabContainer, Tabs, ButtonNewTab } from './style';
+import DraggableTab from './DraggableTab';
+import TabBarState from './state';
 
 const TabBarView = () => {
   const { tabs, handleAddNewTab, handlePreventDoubleClick } = TabBarState.useContainer();
@@ -47,21 +47,21 @@ const TabBarView = () => {
   }, []);
 
   return (
-    <div className='tabs-container' onDoubleClick={onDoubleClick}>
-      <div className='tabs' ref={ref}>
+    <TabContainer onDoubleClick={onDoubleClick}>
+      <Tabs ref={ref}>
         {tabs.map((tab, i) => (
-          <Tab key={`tab=${i}`} index={i} />
+          <DraggableTab key={`tab-${i}`} index={i} />
         ))}
-      </div>
+      </Tabs>
 
-      <div
-        className='btn btn-add mx-4'
+      <ButtonNewTab
+        size={28}
         title='New Tab'
         onClick={handleAddNewTab({ active: true })}
         onDoubleClick={handlePreventDoubleClick}>
         <IconAdd fill='#ffffff' />
-      </div>
-    </div>
+      </ButtonNewTab>
+    </TabContainer>
   );
 };
 

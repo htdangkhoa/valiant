@@ -7,9 +7,10 @@ import Spinner from 'renderer/components/Spinner';
 import IconClose from 'renderer/assets/svg/icon-close.svg';
 import IconEarth from 'renderer/assets/svg/icon-earth.svg';
 
-import { classnames } from 'renderer/utils';
 import { TAB_EVENTS } from 'constants/event-names';
 import TabBarState from './state';
+
+import { Tab, TabFavicon, TabTitle, ButtonClose } from './style';
 
 const moveItemNextTo = (source, from, to) => {
   const arr = [].concat(source);
@@ -19,7 +20,7 @@ const moveItemNextTo = (source, from, to) => {
   return arr;
 };
 
-const Tab = ({ index }) => {
+const DraggableTab = ({ index }) => {
   const {
     handleTitleChange,
     handleFaviconChange,
@@ -137,49 +138,52 @@ const Tab = ({ index }) => {
 
   // scroll to end
   useEffect(() => {
-    ref.current.scrollIntoView();
+    const handler = setTimeout(() => {
+      ref.current.scrollIntoView();
+    }, 300);
+    return () => clearTimeout(handler);
   }, []);
 
   drag(drop(ref));
 
   return (
-    <div
+    <Tab
       ref={ref}
       data-handler-id={handlerId}
-      className={classnames('tab flex items-center', tab.active && 'active')}
+      active={tab.active}
+      style={{ zIndex: tabs.length - index }}
       onClick={handleTabChange(index)}
       onDoubleClick={handlePreventDoubleClick}
-      onContextMenu={onContextMenu(index)}>
+      onContextMenu={onContextMenu(index)}
+      title={tab.title}>
       {!tab.loading && (
-        <>
-          {hasFavicon && <img className='favicon mx-4' src={tab.favicon} width={16} height={16} />}
-
-          {!hasFavicon && (
-            <div className='flex mx-4'>
-              <IconEarth fill='#ffffff' width={23} height={23} />
-            </div>
+        <TabFavicon>
+          {hasFavicon ? (
+            <img src={tab.favicon} width={16} height={16} />
+          ) : (
+            <IconEarth fill='#ffffff' width={23} height={23} />
           )}
-        </>
+        </TabFavicon>
       )}
 
       {tab.loading && <Spinner className='mx-4' />}
 
-      <p className='mx-4'>{tab.title}</p>
+      <TabTitle>{tab.title}</TabTitle>
 
-      <div
-        className='btn btn-close p-0'
+      <ButtonClose
+        size={20}
         title='Close Tab'
         onClick={handleCloseTab(index)}
         onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
         <IconClose fill='#ffffff' />
-      </div>
-    </div>
+      </ButtonClose>
+    </Tab>
   );
 };
 
-Tab.propTypes = {
+DraggableTab.propTypes = {
   index: PropTypes.number,
 };
 
-export default memo(Tab);
+export default memo(DraggableTab);
