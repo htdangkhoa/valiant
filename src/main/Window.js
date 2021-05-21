@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import path from 'path';
 
 import AppInstance from './AppInstance';
-import request from './request';
+// import request from './request';
 import ViewManager from './ViewManager';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -64,6 +64,8 @@ class Window {
       } else {
         // this.opts.view.render({ appendToLast: true });
       }
+
+      this.setBoundsListener();
 
       ipcMain.on(this.id, async (e, event, message) => {
         if (event === WINDOW_EVENTS.NEW_TAB) {
@@ -124,6 +126,57 @@ class Window {
 
   emit(event, ...args) {
     this.webContents.send(this.id, event, ...args);
+  }
+
+  async fixBounds() {
+    const { win, webContents } = this;
+
+    const { width, height } = win.getContentBounds();
+
+    const toolbarContentHeight = await webContents.executeJavaScript(`document.getElementById('toolbar').offsetHeight`);
+
+    const newBounds = {
+      x: 0,
+      y: toolbarContentHeight,
+      width,
+      height: height - toolbarContentHeight,
+    };
+
+    const view = this.viewManager.views.get(this.viewManager.selected);
+
+    if (!view) return;
+
+    if (newBounds !== view.browserView.getBounds()) {
+      view.browserView.setBounds(newBounds);
+    }
+  }
+
+  async setBoundsListener() {
+    this.webContents.executeJavaScript(`
+      const { ipcRenderer } = require('electron');
+      const resizeObserver = new ResizeObserver(([{ contentRect }]) => {
+        ipcRenderer.send('resize-height');
+      });
+      const toolbar = document.getElementById('toolbar');
+      resizeObserver.observe(toolbar);
+    `);
+
+    this.webContents.on('ipc-message', (e, message, ...args) => {
+      if (message === 'resize-height') {
+        this.fixBounds();
+      }
+
+      if (message === this.viewManager.selected) {
+        const view = this.viewManager.views.get(this.viewManager.selected);
+        if (!view) return;
+
+        const [method, ...params] = args;
+
+        if (typeof view.webContents[method] === 'function') {
+          view.webContents[method](...params);
+        }
+      }
+    });
   }
 }
 

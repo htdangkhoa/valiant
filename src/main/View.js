@@ -119,48 +119,6 @@ class View {
     return focusedWindow;
   }
 
-  async fixBounds() {
-    const { win, webContents } = this.window;
-
-    const { width, height } = win.getContentBounds();
-
-    const toolbarContentHeight = await webContents.executeJavaScript(`document.getElementById('toolbar').offsetHeight`);
-
-    const newBounds = {
-      x: 0,
-      y: toolbarContentHeight,
-      width,
-      height: height - toolbarContentHeight,
-    };
-
-    if (newBounds !== this.browserView.getBounds()) {
-      this.browserView.setBounds(newBounds);
-    }
-  }
-
-  setBoundsListener() {
-    const { focusedWindow: window } = AppInstance.getInstance();
-
-    window.webContents.executeJavaScript(`
-      var { ipcRenderer } = require('electron');
-      var resizeObserver = new ResizeObserver(([{ contentRect }]) => {
-        ipcRenderer.send('resize-height');
-      });
-      var toolbar = document.getElementById('toolbar');
-      resizeObserver.observe(toolbar);
-    `);
-
-    window.webContents.on('ipc-message', (e, message, ...args) => {
-      if (message === 'resize-height') {
-        this.fixBounds();
-      }
-
-      if (typeof this.webContents[message] === 'function' && args[0] === this.id) {
-        this.webContents[message](...args.splice(1));
-      }
-    });
-  }
-
   render(options = { nextTo: null, active: false }) {
     const opts = Object.assign({}, options);
 
@@ -168,8 +126,7 @@ class View {
       this.window.win.addBrowserView(this.browserView);
     }
 
-    this.fixBounds();
-    this.setBoundsListener();
+    this.window.fixBounds();
 
     if (typeof opts.nextTo === 'number') {
       this.window.emit(WINDOW_EVENTS.TAB_CREATED, {

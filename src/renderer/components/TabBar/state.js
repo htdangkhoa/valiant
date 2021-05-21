@@ -214,11 +214,11 @@ const useTabBarState = () => {
     );
   }, []);
 
-  const onGoBack = useCallback((id) => () => ipcRenderer.send('goBack', id), []);
-  const onGoForward = useCallback((id) => () => ipcRenderer.send('goForward', id), []);
-  const onReload = useCallback((id) => () => ipcRenderer.send('reload', id), []);
-  const onStop = useCallback((id) => () => ipcRenderer.send('stop', id), []);
-  const onLoadURL = useCallback((id, url) => () => ipcRenderer.send('loadURL', id, url), []);
+  const onGoBack = useCallback((id) => () => ipcRenderer.send(id, 'goBack'), []);
+  const onGoForward = useCallback((id) => () => ipcRenderer.send(id, 'goForward'), []);
+  const onReload = useCallback((id) => () => ipcRenderer.send(id, 'reload'), []);
+  const onStop = useCallback((id) => () => ipcRenderer.send(id, 'stop'), []);
+  const onLoadURL = useCallback((id, url) => () => ipcRenderer.send(id, 'loadURL', url), []);
 
   // address bar handler
   const onFetchSuggest = useCallback(
