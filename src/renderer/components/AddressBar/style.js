@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { dark, radius } from 'constants/theme';
+import Button from '../Button';
 
 const font = () => css`
   font-family: inherit;
@@ -10,10 +11,9 @@ const font = () => css`
 
 export const AddressBarContainer = styled.div`
   background-color: ${dark};
-  padding: 4px 6px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  padding: 0.5rem;
 `;
 
 export const AddressBar = styled.div`
@@ -21,8 +21,7 @@ export const AddressBar = styled.div`
   border-radius: ${radius};
   border: 1px solid white;
   width: 100%;
-  max-width: 70%;
-  margin: auto;
+  margin: auto 0.5rem;
 `;
 
 export const InputContainer = styled.div`
@@ -62,4 +61,13 @@ export const Text = styled.div`
   ${({ visible }) => css`
     display: ${visible ? 'flex' : 'none'};
   `}
+`;
+
+export const NavigationButton = styled(Button)`
+  &:not(:last-of-type) {
+    margin: auto 0.5rem;
+  }
+  &:first-of-type {
+    margin-left: 0;
+  }
 `;

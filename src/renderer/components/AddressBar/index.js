@@ -4,15 +4,15 @@ import IconBack from 'renderer/assets/svg/icon-back.svg';
 import IconForward from 'renderer/assets/svg/icon-forward.svg';
 import IconRefresh from 'renderer/assets/svg/icon-refresh.svg';
 import IconClose from 'renderer/assets/svg/icon-close.svg';
+import IconHome from 'renderer/assets/svg/icon-home.svg';
 import IconLock from 'renderer/assets/svg/icon-lock.svg';
-import IconStar from 'renderer/assets/svg/icon-start.svg';
+import IconStar from 'renderer/assets/svg/icon-star.svg';
 import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
-import { classnames } from 'renderer/utils';
 import { isURL } from 'common';
 
 import Button from '../Button';
-import { AddressBarContainer, AddressBar, InputContainer, Input, Text } from './style';
+import { AddressBarContainer, AddressBar, InputContainer, Input, Text, NavigationButton } from './style';
 
 import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
@@ -43,21 +43,23 @@ const AddressBard = () => {
 
   return (
     <AddressBarContainer>
-      <Button disable={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
-        <IconBack fill='#ffffff' />
-      </Button>
+      <NavigationButton disable={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
+        <IconBack color='#ffffff' />
+      </NavigationButton>
 
-      <Button disable={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
-        <IconForward fill='#ffffff' />
-      </Button>
+      <NavigationButton disable={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
+        <IconForward color='#ffffff' />
+      </NavigationButton>
 
-      <Button
-        className={classnames(!!activeTab?.loading && 'p-0')}
-        onClick={activeTab?.loading ? onStop(activeTab?.id) : onReload(activeTab?.id)}>
-        {!activeTab?.loading && <IconRefresh fill='#ffffff' />}
+      <NavigationButton onClick={activeTab?.loading ? onStop(activeTab?.id) : onReload(activeTab?.id)}>
+        {!activeTab?.loading && <IconRefresh color='#ffffff' />}
 
-        {!!activeTab?.loading && <IconClose fill='#ffffff' />}
-      </Button>
+        {!!activeTab?.loading && <IconClose color='#ffffff' />}
+      </NavigationButton>
+
+      <NavigationButton>
+        <IconHome color='#ffffff' />
+      </NavigationButton>
 
       <AddressBar>
         <Button topRightRadius={0} bottomRightRadius={0}>
@@ -115,13 +117,13 @@ const AddressBard = () => {
         </InputContainer>
 
         <Button topLeftRadius={0} bottomLeftRadius={0}>
-          <IconStar fill='#ffffff' />
+          <IconStar color='#ffffff' />
         </Button>
       </AddressBar>
 
-      <Button>
-        <IconMenu fill='#ffffff' />
-      </Button>
+      <NavigationButton>
+        <IconMenu color='#ffffff' />
+      </NavigationButton>
     </AddressBarContainer>
   );
 };

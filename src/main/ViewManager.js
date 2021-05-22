@@ -21,7 +21,6 @@ class ViewManager {
 
       if (latestView) {
         this.window.win.removeBrowserView(latestView.browserView);
-        this.selected = null;
       }
     }
 

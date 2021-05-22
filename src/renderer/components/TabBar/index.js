@@ -59,7 +59,7 @@ const TabBarView = () => {
         title='New Tab'
         onClick={handleAddNewTab({ active: true })}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconAdd fill='#ffffff' />
+        <IconAdd color='#ffffff' />
       </ButtonNewTab>
     </TabContainer>
   );

@@ -1,4 +1,4 @@
-import { Menu, clipboard, MenuItem, ContextMenuParams, WebContents } from 'electron';
+import { Menu, clipboard } from 'electron';
 import { isURL } from 'common';
 import AppInstance from '../AppInstance';
 
