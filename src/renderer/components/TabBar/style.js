@@ -41,7 +41,7 @@ export const Tab = styled.div`
     }
   }
 
-  animation: slide-in 0.25s;
+  animation: slide-in 0.2s;
 
   border-radius: 4px;
   min-width: 100px;
@@ -84,6 +84,8 @@ export const TabFavicon = styled.div`
   display: flex;
   margin-left: 4px;
   margin-right: 4px;
+  max-width: 16px;
+  max-height: 16px;
 
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -93,11 +95,12 @@ export const TabFavicon = styled.div`
   -webkit-user-drag: none;
 `;
 
-export const ButtonClose = styled(Button)`
-  padding: 0;
+export const ButtonCloseTab = styled(Button)`
+  padding: 4px;
 `;
 
 export const ButtonNewTab = styled(Button)`
   margin-left: 4px;
   margin-right: 4px;
+  padding: 4px;
 `;

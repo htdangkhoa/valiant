@@ -19,7 +19,7 @@ BaseButton.propTypes = {
 
 const Button = styled(BaseButton)`
   display: inherit;
-  padding: 4px;
+  padding: 2px;
   border-radius: 4px;
 
   ${({ disable, size, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius }) => css`

@@ -5,12 +5,12 @@ import { ipcRenderer } from 'electron';
 
 import Spinner from 'renderer/components/Spinner';
 import IconClose from 'renderer/assets/svg/icon-close.svg';
-import IconEarth from 'renderer/assets/svg/icon-earth.svg';
+import IconWorld from 'renderer/assets/svg/icon-world.svg';
 
 import { TAB_EVENTS } from 'constants/event-names';
 import TabBarState from './state';
 
-import { Tab, TabFavicon, TabTitle, ButtonClose } from './style';
+import { Tab, TabFavicon, TabTitle, ButtonCloseTab } from './style';
 
 const moveItemNextTo = (source, from, to) => {
   const arr = [].concat(source);
@@ -140,7 +140,7 @@ const DraggableTab = ({ index }) => {
   useEffect(() => {
     const handler = setTimeout(() => {
       ref.current.scrollIntoView();
-    }, 300);
+    }, 250);
     return () => clearTimeout(handler);
   }, []);
 
@@ -161,23 +161,23 @@ const DraggableTab = ({ index }) => {
           {hasFavicon ? (
             <img src={tab.favicon} width={16} height={16} />
           ) : (
-            <IconEarth fill='#ffffff' width={23} height={23} />
+            <IconWorld color='#ffffff' width={40} height={40} />
           )}
         </TabFavicon>
       )}
 
-      {tab.loading && <Spinner className='mx-4' />}
+      {tab.loading && <Spinner />}
 
       <TabTitle>{tab.title}</TabTitle>
 
-      <ButtonClose
+      <ButtonCloseTab
         size={20}
         title='Close Tab'
         onClick={handleCloseTab(index)}
         onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconClose fill='#ffffff' />
-      </ButtonClose>
+        <IconClose color='#ffffff' />
+      </ButtonCloseTab>
     </Tab>
   );
 };

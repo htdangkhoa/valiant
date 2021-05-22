@@ -1,7 +1,7 @@
 const path = require('path');
 const { spawn, execSync } = require('child_process');
-const TerserPlugin = require('terser-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 
