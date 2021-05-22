@@ -13,6 +13,10 @@ class ViewManager {
     return Array.from(this.views.keys());
   }
 
+  get selectedView() {
+    return this.views.get(this.selected);
+  }
+
   create(options = { url: 'about:blank', nextTo: undefined, active: false }) {
     const opts = Object.assign({}, options);
 

@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 import { History, insert, update } from './database';
+import { VIEW_SOURCE } from 'constants/protocol';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -30,7 +31,7 @@ class View {
 
       this.updateStorage();
 
-      this.emit(TAB_EVENTS.UPDATE_TITLE, title);
+      this.emit(TAB_EVENTS.UPDATE_TITLE, title || 'Untitled');
     });
     this.webContents.on('page-favicon-updated', (e, favicons) => {
       const [favicon] = favicons;
@@ -62,11 +63,19 @@ class View {
 
       this.lastUrl = url;
 
-      this.emit(TAB_EVENTS.UPDATE_URL, url);
+      this.emit(
+        TAB_EVENTS.UPDATE_TITLE,
+        this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.lastUrl || 'Untitled',
+      );
+      this.emit(TAB_EVENTS.UPDATE_URL, this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : url);
     });
     this.webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
       if (isMainFrame) {
         this.addHistory(url, true);
+
+        this.lastUrl = url;
+
+        this.emit(TAB_EVENTS.UPDATE_URL, url);
       }
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {

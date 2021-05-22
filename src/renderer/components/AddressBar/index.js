@@ -106,9 +106,13 @@ const AddressBard = () => {
           <Text visible={!isSearchBarFocused}>
             {urlSegments instanceof URL && (
               <>
-                <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}//`}</div>
+                <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}${
+                  ['file', 'http'].some((protocol) => urlSegments.href.startsWith(protocol)) ? '//' : ''
+                }`}</div>
                 <div>{urlSegments.hostname}</div>
-                <div style={{ opacity: 0.5 }}>{urlSegments.href.replace(urlSegments.origin, '')}</div>
+                <div style={{ opacity: 0.5 }}>
+                  {urlSegments.href.replace(urlSegments.origin, '').replace(urlSegments.protocol, '')}
+                </div>
               </>
             )}
 
