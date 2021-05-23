@@ -2,7 +2,6 @@ import { nanoid } from 'nanoid';
 import { BrowserView } from 'electron';
 
 import { getRendererPath } from 'common';
-import logger from 'common/logger';
 import { DIALOG_EVENTS } from 'constants/event-names';
 
 class BaseDialog {
@@ -18,43 +17,60 @@ class BaseDialog {
         nodeIntegration: true,
         contextIsolation: false,
         additionalArguments: [`dialogId=${this.id}`, `viewName=${viewName}`],
-        // enableRemoteModule: true,
-        // plugins: true,
-        // javascript: true,
-        // worldSafeExecuteJavaScript: true,
-        // preload: path.resolve(process.cwd(), 'src/main/preloads/dialog.js'),
       },
     });
-    this.browserView.setBackgroundColor('#ffffff');
     this.browserView.setAutoResize({ width: true, height: true, vertical: true });
-    this.browserView.webContents.on('ipc-message', (e, event, message) => {
-      if (event === DIALOG_EVENTS.HIDE_DIALOG && message === this.id) {
-        logger.log('BaseDialog', event, message);
+    this.webContents.on('ipc-message', async (e, event, message) => {
+      if (event === 'resize-height') {
+        const height = await this.webContents.executeJavaScript(`document.body.offsetHeight`);
 
-        setTimeout(() => {
-          this.hide();
-        }, 200);
+        const bounds = this.browserView.getBounds();
+
+        this.browserView.setBounds({ ...bounds, height: height + 16 });
+      }
+
+      if (event === DIALOG_EVENTS.HIDE_DIALOG && message === this.id) {
+        this.hide();
+        // setTimeout(() => {
+        // }, 200);
       }
     });
+
+    this.browserView.webContents.loadURL(getRendererPath());
+  }
+
+  get webContents() {
+    return this.browserView.webContents;
   }
 
   show(rect) {
-    logger.log('.....', rect);
-
+    this.window.win.removeBrowserView(this.browserView);
     this.window.win.addBrowserView(this.browserView);
     // const { width } = this.window.win.getContentBounds();
-    this.browserView.setBounds({ x: rect.right - 320, y: rect.bottom, width: 320, height: 600 });
 
-    this.browserView.webContents.loadURL(getRendererPath());
-    // this.browserView.webContents.openDevTools({ mode: 'detach' });
+    // this.browserView.webContents.loadURL(getRendererPath());
+
+    this.webContents.executeJavaScript(`
+      var { ipcRenderer } = require('electron');
+      var resizeObserver = new ResizeObserver(([{ contentRect }]) => {
+        ipcRenderer.send('resize-height');
+      });
+      resizeObserver.observe(document.body);
+    `);
+
+    this.browserView.setBounds({ x: rect.right - 312, y: rect.bottom - 2, width: 320, height: 0 });
+
+    // if (is.dev) {
+    //   this.browserView.webContents.openDevTools({ mode: 'detach' });
+    // }
 
     this.browserView.webContents.focus();
   }
 
   hide() {
     this.window.win.removeBrowserView(this.browserView);
-    this.browserView.webContents.destroy();
-    this.browserView = null;
+    // this.browserView.webContents.destroy();
+    // this.browserView = null;
   }
 }
 

@@ -44,7 +44,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new ESLintPlugin(),
+    // new ESLintPlugin(),
     new HtmlWebpackPlugin({
       template: 'static/index.html',
       hash: true,

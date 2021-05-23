@@ -27,6 +27,7 @@ class Window {
       width: 1280,
       height: 720,
       titleBarStyle: 'hiddenInset',
+      frame: false,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -57,10 +58,12 @@ class Window {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });
         this.viewManager.views.set(view.id, view);
+        this.viewManager.selectView(view.id);
       }
 
       this.setBoundsListener();
 
+      const d = new BaseDialog(this, 'settings');
       ipcMain.on(this.id, async (e, event, message) => {
         if (event === WINDOW_EVENTS.NEW_TAB) {
           const { nextTo, active } = message || {};
@@ -102,7 +105,6 @@ class Window {
         }
 
         if (event === WINDOW_EVENTS.OPEN_QUICK_MENU) {
-          const d = new BaseDialog(this, 'settings');
           d.show(message);
         }
       });

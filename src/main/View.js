@@ -25,7 +25,7 @@ class View {
       },
     });
     this.browserView.setBackgroundColor('#ffffff');
-    this.browserView.setAutoResize({ width: true });
+    this.browserView.setAutoResize({ width: true, height: true, vertical: true, horizontal: true });
     this.webContents.on('page-title-updated', (e, title) => {
       this.title = title;
 
