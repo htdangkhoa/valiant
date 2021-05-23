@@ -1,4 +1,5 @@
 import React, { memo, useCallback } from 'react';
+import { ipcRenderer } from 'electron';
 
 import IconBack from 'renderer/assets/svg/icon-back.svg';
 import IconForward from 'renderer/assets/svg/icon-forward.svg';
@@ -16,9 +17,10 @@ import { AddressBarContainer, AddressBar, InputContainer, Input, Text, Navigatio
 
 import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
+import { WINDOW_EVENTS } from 'constants/event-names';
 
 const AddressBard = () => {
-  const { onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
+  const { windowId, onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
   const {
     activeTab,
     isSearchBarFocused,
@@ -125,7 +127,12 @@ const AddressBard = () => {
         </Button>
       </AddressBar>
 
-      <NavigationButton>
+      <NavigationButton
+        onClick={(e) => {
+          const { right, bottom } = e.currentTarget.getBoundingClientRect();
+
+          ipcRenderer.send(windowId, WINDOW_EVENTS.OPEN_QUICK_MENU, { right, bottom });
+        }}>
         <IconMenu color='#ffffff' />
       </NavigationButton>
     </AddressBarContainer>

@@ -2,10 +2,10 @@ import { BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { nanoid } from 'nanoid';
 
+import { VIEW_SOURCE } from 'constants/protocol';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 import { History, insert, update } from './database';
-import { VIEW_SOURCE } from 'constants/protocol';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {

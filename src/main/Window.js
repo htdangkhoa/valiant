@@ -1,12 +1,13 @@
 import { WINDOW_EVENTS } from 'constants/event-names';
 import { BrowserWindow, ipcMain } from 'electron';
-import { format } from 'url';
 import { nanoid } from 'nanoid';
-import path from 'path';
 
+import { getRendererPath } from 'common';
+import logger from 'common/logger';
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
+import BaseDialog from './dialogs/BaseDialog';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -29,19 +30,19 @@ class Window {
       titleBarStyle: 'hiddenInset',
       webPreferences: {
         nodeIntegration: true,
-        enableRemoteModule: true,
         contextIsolation: false,
+        enableRemoteModule: true,
         plugins: true,
         javascript: true,
         worldSafeExecuteJavaScript: true,
-        additionalArguments: [`windowId=${this.id}`],
+        additionalArguments: [`windowId=${this.id}`, `viewName=toolbar`],
       },
     });
 
     (async () => {
-      if (isDev) {
-        await this.win.loadURL('http://localhost:8080');
+      await this.win.loadURL(getRendererPath());
 
+      if (isDev) {
         this.win.webContents.openDevTools({ mode: 'detach' });
 
         this.win.webContents.on('dom-ready', () => {
@@ -49,14 +50,6 @@ class Window {
 
           this.instance.createWindow();
         });
-      } else {
-        await this.win.loadURL(
-          format({
-            protocol: 'file',
-            slashes: true,
-            pathname: path.resolve(__dirname, 'index.html'),
-          }),
-        );
       }
 
       if (!this.opts.view) {
@@ -97,6 +90,11 @@ class Window {
 
         if (event === WINDOW_EVENTS.CLOSE) {
           this.instance.closeWindow(this.id);
+        }
+
+        if (event === WINDOW_EVENTS.OPEN_QUICK_MENU) {
+          const d = new BaseDialog(this, 'settings');
+          d.show(message);
         }
       });
 

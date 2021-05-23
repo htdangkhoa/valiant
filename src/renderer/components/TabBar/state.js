@@ -243,6 +243,9 @@ const useTabBarState = () => {
         },
         {
           label: 'Move Tab to New Window',
+          click: () => {
+            ipcRenderer.send('test');
+          },
         },
         {
           type: 'separator',

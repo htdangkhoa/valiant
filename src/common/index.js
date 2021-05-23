@@ -1,3 +1,6 @@
+import url from 'url';
+import path from 'path';
+
 export const isURL = (s) => {
   const pattern = /^(?:\w+:)?\/\/([^\s.]+\.\S{2}|localhost[:?\d]*)\S*$/;
 
@@ -14,4 +17,28 @@ export const first = (input) => {
   }
 
   return [...input].splice(0, 1)[0];
+};
+
+export const is = {
+  get dev() {
+    return process.env.NODE_ENV === 'development';
+  },
+  get main() {
+    return process.type === 'browser';
+  },
+  get renderer() {
+    return process.type === 'renderer';
+  },
+};
+
+export const getRendererPath = () => {
+  if (is.dev) {
+    return 'http://localhost:8080';
+  }
+
+  return url.format({
+    protocol: 'file',
+    slashes: true,
+    pathname: path.resolve(__dirname, 'index.html'),
+  });
 };
