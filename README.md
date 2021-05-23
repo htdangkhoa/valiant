@@ -1,4 +1,16 @@
 # Valiant
 
-![Screenshot](https://user-images.githubusercontent.com/15341301/118408829-654ddb80-b6b1-11eb-83dd-5dbd48d44619.png)
+![image](https://user-images.githubusercontent.com/15341301/119271964-16aebd00-bc2e-11eb-8085-69fc8c997eed.png)
 
+## Features
+
+- [x] Multiple tabs
+- [x] Scrollable tabs
+- [ ] Pin tab
+- [ ] Tab groups
+- [x] Move Tab to New Window
+- [ ] Search engine with suggestions
+- [ ] Incognito
+- [ ] Adblock
+- [ ] Chrome Extensions
+- [ ] Import bookmarks
