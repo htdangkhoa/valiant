@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import PropTypes from 'prop-types';
@@ -7,17 +6,7 @@ function parseRadiusValue(value) {
   return typeof value === 'number' ? `${value}px` : value;
 }
 
-const BaseButton = ({ className, children, ...props }) => (
-  <div {...props} className={className}>
-    {children}
-  </div>
-);
-BaseButton.propTypes = {
-  className: PropTypes.string,
-  children: PropTypes.node,
-};
-
-const Button = styled(BaseButton)`
+const Button = styled.div`
   display: inherit;
   padding: 2px;
   border-radius: 4px;

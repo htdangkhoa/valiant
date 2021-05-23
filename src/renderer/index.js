@@ -17,6 +17,7 @@ styleElement.textContent = `
     }
   }
 
+  html,
   body {
     margin: 0;
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans',
@@ -24,10 +25,17 @@ styleElement.textContent = `
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #212529;
-    background-color: #fff;
     -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
+  }
+
+  ul {
+    padding: unset;
+    margin: unset;
+  }
+
+  ul li {
+    list-style: none;
   }
 
   svg {

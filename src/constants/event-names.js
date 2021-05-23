@@ -1,12 +1,14 @@
 // window events
 export const WINDOW_EVENTS = {
   CLOSE: 'CLOSE',
+  OPEN_QUICK_MENU: 'OPEN_QUICK_MENU',
 
   TAB_CREATED: 'TAB_CREATED',
   NEW_TAB: 'NEW_TAB',
   SWITCH_TAB: 'SWITCH_TAB',
   CLOSE_TAB: 'CLOSE_TAB',
   SWAP_TAB: 'SWAP_TAB',
+  MOVE_TAB_TO_NEW_WINDOW: 'MOVE_TAB_TO_NEW_WINDOW',
 };
 
 export const TAB_EVENTS = {
@@ -19,4 +21,8 @@ export const TAB_EVENTS = {
 
 export const ADDRESS_BAR_EVENTS = {
   REQUEST_SUGGEST: 'REQUEST_SUGGEST',
+};
+
+export const DIALOG_EVENTS = {
+  HIDE_DIALOG: 'HIDE_DIALOG',
 };

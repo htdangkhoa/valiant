@@ -126,7 +126,18 @@ const contextMenu = (params, webContents) => {
       { label: 'Save As...' },
       { label: 'Print...' },
       { type: 'separator' },
-      { label: 'View Page Source' },
+      {
+        label: 'View Page Source',
+        click: () => {
+          const index = viewManager.ids.indexOf(viewManager.selected);
+
+          viewManager.create({
+            url: `view-source:${viewManager.selectedView.webContents.getURL()}`,
+            nextTo: index + 1,
+            active: true,
+          });
+        },
+      },
       { type: 'separator' },
     ]);
   }

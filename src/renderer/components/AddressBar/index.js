@@ -1,4 +1,5 @@
 import React, { memo, useCallback } from 'react';
+import { ipcRenderer } from 'electron';
 
 import IconBack from 'renderer/assets/svg/icon-back.svg';
 import IconForward from 'renderer/assets/svg/icon-forward.svg';
@@ -9,6 +10,7 @@ import IconLock from 'renderer/assets/svg/icon-lock.svg';
 import IconStar from 'renderer/assets/svg/icon-star.svg';
 import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
+import { WINDOW_EVENTS } from 'constants/event-names';
 import { isURL } from 'common';
 
 import Button from '../Button';
@@ -18,7 +20,7 @@ import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
 
 const AddressBard = () => {
-  const { onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
+  const { windowId, onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
   const {
     activeTab,
     isSearchBarFocused,
@@ -106,9 +108,13 @@ const AddressBard = () => {
           <Text visible={!isSearchBarFocused}>
             {urlSegments instanceof URL && (
               <>
-                <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}//`}</div>
+                <div style={{ opacity: 0.5 }}>{`${urlSegments.protocol}${
+                  ['file', 'http'].some((protocol) => urlSegments.href.startsWith(protocol)) ? '//' : ''
+                }`}</div>
                 <div>{urlSegments.hostname}</div>
-                <div style={{ opacity: 0.5 }}>{urlSegments.href.replace(urlSegments.origin, '')}</div>
+                <div style={{ opacity: 0.5 }}>
+                  {urlSegments.href.replace(urlSegments.origin, '').replace(urlSegments.protocol, '')}
+                </div>
               </>
             )}
 
@@ -121,7 +127,12 @@ const AddressBard = () => {
         </Button>
       </AddressBar>
 
-      <NavigationButton>
+      <NavigationButton
+        onClick={(e) => {
+          const { right, bottom } = e.currentTarget.getBoundingClientRect();
+
+          ipcRenderer.send(windowId, WINDOW_EVENTS.OPEN_QUICK_MENU, { right, bottom });
+        }}>
         <IconMenu color='#ffffff' />
       </NavigationButton>
     </AddressBarContainer>

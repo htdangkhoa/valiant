@@ -1,12 +1,12 @@
 import { WINDOW_EVENTS } from 'constants/event-names';
 import { BrowserWindow, ipcMain } from 'electron';
-import { format } from 'url';
 import { nanoid } from 'nanoid';
-import path from 'path';
 
+import { getRendererPath } from 'common';
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
+import BaseDialog from './dialogs/BaseDialog';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -26,22 +26,23 @@ class Window {
       minHeight: 600,
       width: 1280,
       height: 720,
-      titleBarStyle: 'hidden',
+      titleBarStyle: 'hiddenInset',
+      frame: false,
       webPreferences: {
         nodeIntegration: true,
-        enableRemoteModule: true,
         contextIsolation: false,
+        enableRemoteModule: true,
         plugins: true,
         javascript: true,
         worldSafeExecuteJavaScript: true,
-        additionalArguments: [`windowId=${this.id}`],
+        additionalArguments: [`windowId=${this.id}`, `viewName=toolbar`],
       },
     });
 
     (async () => {
-      if (isDev) {
-        await this.win.loadURL('http://localhost:8080');
+      await this.win.loadURL(getRendererPath());
 
+      if (isDev) {
         this.win.webContents.openDevTools({ mode: 'detach' });
 
         this.win.webContents.on('dom-ready', () => {
@@ -49,31 +50,25 @@ class Window {
 
           this.instance.createWindow();
         });
-      } else {
-        await this.win.loadURL(
-          format({
-            protocol: 'file',
-            slashes: true,
-            pathname: path.resolve(__dirname, 'index.html'),
-          }),
-        );
       }
 
       if (!this.opts.view) {
         this.viewManager.create({ url: 'https://github.com', active: true });
       } else {
-        // this.opts.view.render({ appendToLast: true });
+        const { view } = this.opts;
+        view.render({ nextTo: this.viewManager.views.size, active: true });
+        this.viewManager.views.set(view.id, view);
+        this.viewManager.selectView(view.id);
       }
 
       this.setBoundsListener();
 
+      const d = new BaseDialog(this, 'settings');
       ipcMain.on(this.id, async (e, event, message) => {
         if (event === WINDOW_EVENTS.NEW_TAB) {
           const { nextTo, active } = message || {};
 
-          const hasNextTo = typeof nextTo === 'number';
-
-          await this.viewManager.create({ url: 'http://google.com', nextTo: hasNextTo && nextTo, active });
+          await this.viewManager.create({ url: 'http://google.com', nextTo, active });
 
           return;
         }
@@ -97,6 +92,20 @@ class Window {
 
         if (event === WINDOW_EVENTS.CLOSE) {
           this.instance.closeWindow(this.id);
+        }
+
+        if (event === WINDOW_EVENTS.MOVE_TAB_TO_NEW_WINDOW) {
+          const view = this.viewManager.views.get(message);
+
+          if (!view) return;
+
+          this.viewManager.views.delete(view.id);
+
+          this.instance.createWindow({ view });
+        }
+
+        if (event === WINDOW_EVENTS.OPEN_QUICK_MENU) {
+          d.show(message);
         }
       });
 

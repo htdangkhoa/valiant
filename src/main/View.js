@@ -2,6 +2,7 @@ import { BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { nanoid } from 'nanoid';
 
+import { VIEW_SOURCE } from 'constants/protocol';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 import { History, insert, update } from './database';
@@ -24,13 +25,13 @@ class View {
       },
     });
     this.browserView.setBackgroundColor('#ffffff');
-    this.browserView.setAutoResize({ width: true });
+    this.browserView.setAutoResize({ width: true, height: true, vertical: true, horizontal: true });
     this.webContents.on('page-title-updated', (e, title) => {
       this.title = title;
 
       this.updateStorage();
 
-      this.emit(TAB_EVENTS.UPDATE_TITLE, title);
+      this.emit(TAB_EVENTS.UPDATE_TITLE, title || 'Untitled');
     });
     this.webContents.on('page-favicon-updated', (e, favicons) => {
       const [favicon] = favicons;
@@ -62,11 +63,19 @@ class View {
 
       this.lastUrl = url;
 
-      this.emit(TAB_EVENTS.UPDATE_URL, url);
+      this.emit(
+        TAB_EVENTS.UPDATE_TITLE,
+        this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.lastUrl || 'Untitled',
+      );
+      this.emit(TAB_EVENTS.UPDATE_URL, this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : url);
     });
     this.webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
       if (isMainFrame) {
         this.addHistory(url, true);
+
+        this.lastUrl = url;
+
+        this.emit(TAB_EVENTS.UPDATE_URL, url);
       }
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {
@@ -138,6 +147,7 @@ class View {
 
     this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);
     this.emit(TAB_EVENTS.UPDATE_FAVICON, this.favicon);
+    this.emit(TAB_EVENTS.UPDATE_URL, this.lastUrl);
   }
 
   destroy() {
