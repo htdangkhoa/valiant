@@ -8,7 +8,6 @@ import { first } from 'common';
 import logger from 'common/logger';
 
 const useTabBarState = () => {
-  // eslint-disable-next-line no-underscore-dangle
   const __DATA__ = window.process.argv.reduce((obj, s) => {
     const [key, value] = s.split('=');
 
@@ -86,7 +85,7 @@ const useTabBarState = () => {
   );
 
   const handleCloseTab = useCallback(
-    (i) => (e) => {
+    (i, isMove) => (e) => {
       if (e) {
         e.stopPropagation();
       }
@@ -104,6 +103,10 @@ const useTabBarState = () => {
               if (selectedTab.id === tab.id && tab.active) {
                 hook();
 
+                if (!isMove) {
+                  ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: tab.id });
+                }
+
                 return tab;
               }
 
@@ -111,8 +114,6 @@ const useTabBarState = () => {
             })
             .filter((tab) => tab.id !== selectedTab.id),
         );
-
-        // ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: selectedTab.id });
       }
 
       if (i === tabs.length - 1) {
@@ -244,7 +245,9 @@ const useTabBarState = () => {
         {
           label: 'Move Tab to New Window',
           click: () => {
-            ipcRenderer.send('test');
+            handleCloseTab(index, true)();
+
+            ipcRenderer.send(windowId, WINDOW_EVENTS.MOVE_TAB_TO_NEW_WINDOW, tab.id);
           },
         },
         {

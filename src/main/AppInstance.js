@@ -1,4 +1,3 @@
-import { ipcMain } from 'electron';
 import ViewManager from './ViewManager';
 import Window from './Window';
 
@@ -24,10 +23,6 @@ class AppInstance {
     this.focusedWindow = null;
 
     this.viewManager = new ViewManager(this);
-
-    ipcMain.on('test', () => {
-      this.createWindow();
-    });
   }
 
   createWindow(options = { incognito: false, view: null }) {

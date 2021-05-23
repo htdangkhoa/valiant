@@ -10,6 +10,7 @@ import IconLock from 'renderer/assets/svg/icon-lock.svg';
 import IconStar from 'renderer/assets/svg/icon-star.svg';
 import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
+import { WINDOW_EVENTS } from 'constants/event-names';
 import { isURL } from 'common';
 
 import Button from '../Button';
@@ -17,7 +18,6 @@ import { AddressBarContainer, AddressBar, InputContainer, Input, Text, Navigatio
 
 import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
-import { WINDOW_EVENTS } from 'constants/event-names';
 
 const AddressBard = () => {
   const { windowId, onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();

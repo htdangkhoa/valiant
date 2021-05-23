@@ -147,6 +147,7 @@ class View {
 
     this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);
     this.emit(TAB_EVENTS.UPDATE_FAVICON, this.favicon);
+    this.emit(TAB_EVENTS.UPDATE_URL, this.lastUrl);
   }
 
   destroy() {

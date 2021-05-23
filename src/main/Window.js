@@ -3,7 +3,6 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { nanoid } from 'nanoid';
 
 import { getRendererPath } from 'common';
-import logger from 'common/logger';
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
@@ -55,7 +54,9 @@ class Window {
       if (!this.opts.view) {
         this.viewManager.create({ url: 'https://github.com', active: true });
       } else {
-        // this.opts.view.render({ appendToLast: true });
+        const { view } = this.opts;
+        view.render({ nextTo: this.viewManager.views.size, active: true });
+        this.viewManager.views.set(view.id, view);
       }
 
       this.setBoundsListener();
@@ -64,9 +65,7 @@ class Window {
         if (event === WINDOW_EVENTS.NEW_TAB) {
           const { nextTo, active } = message || {};
 
-          const hasNextTo = typeof nextTo === 'number';
-
-          await this.viewManager.create({ url: 'http://google.com', nextTo: hasNextTo && nextTo, active });
+          await this.viewManager.create({ url: 'http://google.com', nextTo, active });
 
           return;
         }
@@ -90,6 +89,16 @@ class Window {
 
         if (event === WINDOW_EVENTS.CLOSE) {
           this.instance.closeWindow(this.id);
+        }
+
+        if (event === WINDOW_EVENTS.MOVE_TAB_TO_NEW_WINDOW) {
+          const view = this.viewManager.views.get(message);
+
+          if (!view) return;
+
+          this.viewManager.views.delete(view.id);
+
+          this.instance.createWindow({ view });
         }
 
         if (event === WINDOW_EVENTS.OPEN_QUICK_MENU) {
