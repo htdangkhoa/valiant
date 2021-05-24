@@ -128,6 +128,7 @@ const AddressBard = () => {
       </AddressBar>
 
       <NavigationButton
+        id='btn-quick-menu'
         onClick={(e) => {
           const { right, bottom } = e.currentTarget.getBoundingClientRect();
 

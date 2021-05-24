@@ -39,6 +39,14 @@ class Window {
       },
     });
 
+    this.dialogs = {
+      settings: new BaseDialog(this, 'settings'),
+    };
+
+    this.win.on('resize', () => {
+      setTimeout(() => this.dialogs.settings.fixBounds(), 200);
+    });
+
     (async () => {
       await this.win.loadURL(getRendererPath());
 
@@ -63,7 +71,6 @@ class Window {
 
       this.setBoundsListener();
 
-      const d = new BaseDialog(this, 'settings');
       ipcMain.on(this.id, async (e, event, message) => {
         if (event === WINDOW_EVENTS.NEW_TAB) {
           const { nextTo, active } = message || {};
@@ -105,7 +112,7 @@ class Window {
         }
 
         if (event === WINDOW_EVENTS.OPEN_QUICK_MENU) {
-          d.show(message);
+          this.dialogs.settings.show(message);
         }
       });
 
