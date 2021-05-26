@@ -150,7 +150,9 @@ const DraggableTab = ({ index }) => {
     <Tab
       ref={ref}
       data-handler-id={handlerId}
+      id={`tab-${index}`}
       active={tab.active}
+      animation={tab.anim}
       style={{ zIndex: tabs.length - index }}
       onClick={handleTabChange(index)}
       onDoubleClick={handlePreventDoubleClick}

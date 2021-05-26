@@ -116,21 +116,47 @@ const useTabBarState = () => {
         );
       }
 
-      if (i === tabs.length - 1) {
-        const previous = i - 1;
+      const tabElement = document.getElementById(`tab-${i}`);
+      const rect = tabElement.getBoundingClientRect();
 
-        if (previous < 0) {
-          ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE);
+      const style = document.createElement('style');
+      style.id = `tab-style-${i}`;
+      style.textContent = `
+        @keyframes slide-out {
+          0% {
+            left: 0;
+            opacity: 1;
+          }
+          100% {
+            left: ${rect.width * -1}px;
+            opacity: 0;
+          }
+        }
+      `;
+
+      document.head.appendChild(style);
+
+      tabElement.style.animation = 'slide-out 0.2s';
+
+      setTimeout(() => {
+        document.getElementById(`tab-style-${i}`).remove();
+
+        if (i === tabs.length - 1) {
+          const previous = i - 1;
+
+          if (previous < 0) {
+            ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE);
+
+            return;
+          }
+
+          requestCloseTab(handleTabChange(previous));
 
           return;
         }
 
-        requestCloseTab(handleTabChange(previous));
-
-        return;
-      }
-
-      requestCloseTab(handleTabChange(i + 1));
+        requestCloseTab(handleTabChange(i + 1));
+      }, 100);
     },
     [tabs],
   );
