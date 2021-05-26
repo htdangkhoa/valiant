@@ -1,5 +1,5 @@
 import React, { memo, useRef, useEffect, useCallback } from 'react';
-import * as ElectronRemote from '@electron/remote';
+import { getCurrentWindow, systemPreferences } from '@electron/remote';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -12,7 +12,7 @@ import TabBarState from './state';
 const TabBarView = () => {
   const { tabs, handleAddNewTab, handlePreventDoubleClick } = TabBarState.useContainer();
 
-  const win = ElectronRemote.getCurrentWindow();
+  const win = getCurrentWindow();
 
   const ref = useRef();
 
@@ -37,13 +37,17 @@ const TabBarView = () => {
   }, []);
 
   const onDoubleClick = useCallback(() => {
-    if (win.isMaximized()) {
-      win.unmaximize();
+    const doubleClickAction = systemPreferences.getUserDefault('AppleActionOnDoubleClick', 'string');
 
-      return;
+    if (doubleClickAction === 'Minimize') {
+      win.minimize();
+    } else if (doubleClickAction === 'Maximize') {
+      if (!win.isMaximized()) {
+        win.maximize();
+      } else {
+        win.unmaximize();
+      }
     }
-
-    win.maximize();
   }, []);
 
   return (
