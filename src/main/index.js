@@ -1,7 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import path from 'path';
+import { app, protocol, ipcMain, BrowserWindow } from 'electron';
 import { initialize as initializeRemoteModule } from '@electron/remote/main';
 import unhandled from 'electron-unhandled';
 import AppInstance from './AppInstance';
+import logger from 'common/logger';
+import { getRendererPath } from 'common';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -16,6 +19,16 @@ if (isDev) {
 app
   .whenReady()
   .then(() => {
+    protocol.registerFileProtocol('valiant', (request, callback) => {
+      const url = new URL(request.url);
+
+      logger.log(url.toJSON());
+
+      if (url.hostname === 'network-error') {
+        return callback({ path: path.join(__dirname, '../static', 'network-error.html') });
+      }
+    });
+
     const appInstance = AppInstance.initialize();
 
     appInstance.createWindow();
@@ -36,4 +49,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+ipcMain.on('get-webcontents-id', (e) => {
+  e.returnValue = e.sender.id;
 });

@@ -1,5 +1,6 @@
 import url from 'url';
 import path from 'path';
+import { app, remote } from 'electron';
 
 export const isURL = (s) => {
   const pattern = /^(?:\w+:)?\/\/([^\s.]+\.\S{2}|localhost[:?\d]*)\S*$/;
@@ -31,14 +32,17 @@ export const is = {
   },
 };
 
-export const getRendererPath = () => {
+export const getRendererPath = (...paths) => {
   if (is.dev) {
-    return 'http://localhost:8080';
+    return `http://localhost:8080/${paths.join('/')}`;
   }
 
   return url.format({
     protocol: 'file',
     slashes: true,
-    pathname: path.resolve(__dirname, 'index.html'),
+    pathname: path.resolve(__dirname, ...paths),
   });
 };
+
+export const getPreload = (name) =>
+  `${is.main ? app.getAppPath() : remote.app.getAppPath()}/dist/${name}-preload.bundle.js`;

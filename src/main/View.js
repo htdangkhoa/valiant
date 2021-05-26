@@ -1,4 +1,6 @@
-import { BrowserView } from 'electron';
+import { format } from 'url';
+import path from 'path';
+import { app, BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { nanoid } from 'nanoid';
 
@@ -6,6 +8,8 @@ import { VIEW_SOURCE } from 'constants/protocol';
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 import { History, insert, update } from './database';
+import logger from 'common/logger';
+import { getPreload, getRendererPath } from 'common';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -14,6 +18,7 @@ class View {
     this.id = nanoid();
     this.browserView = new BrowserView({
       webPreferences: {
+        preload: getPreload('view'),
         nodeIntegration: false,
         contextIsolation: true,
         plugins: true,
@@ -25,13 +30,13 @@ class View {
       },
     });
     this.browserView.setBackgroundColor('#ffffff');
-    this.browserView.setAutoResize({ width: true, height: true, vertical: true, horizontal: true });
+    this.browserView.setAutoResize({ width: true });
     this.webContents.on('page-title-updated', (e, title) => {
       this.title = title;
 
       this.updateStorage();
 
-      this.emit(TAB_EVENTS.UPDATE_TITLE, title || 'Untitled');
+      this.emit(TAB_EVENTS.UPDATE_TITLE, this.title || 'Untitled');
     });
     this.webContents.on('page-favicon-updated', (e, favicons) => {
       const [favicon] = favicons;
@@ -65,9 +70,12 @@ class View {
 
       this.emit(
         TAB_EVENTS.UPDATE_TITLE,
-        this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.lastUrl || 'Untitled',
+        this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.title || 'Untitled',
       );
-      this.emit(TAB_EVENTS.UPDATE_URL, this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : url);
+      this.emit(
+        TAB_EVENTS.UPDATE_URL,
+        this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.errorUrl || this.lastUrl,
+      );
     });
     this.webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
       if (isMainFrame) {
@@ -76,6 +84,15 @@ class View {
         this.lastUrl = url;
 
         this.emit(TAB_EVENTS.UPDATE_URL, url);
+      }
+    });
+    this.webContents.on('did-fail-load', async (e, errorCode, errorDescription, validateUrl, isMainFrame) => {
+      if (isMainFrame) {
+        this.errorUrl = validateUrl;
+
+        this.title = validateUrl;
+
+        this.webContents.loadURL(`valiant://network-error/${errorCode}`);
       }
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {

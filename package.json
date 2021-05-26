@@ -8,7 +8,7 @@
     "email": "huynhtran.dangkhoa@gmail.com",
     "url": "https://github.com/htdangkhoa"
   },
-  "main": "dist/main.js",
+  "main": "dist/main.bundle.js",
   "scripts": {
     "start": "electron .",
     "dev:main": "env-cmd -f .env webpack",
@@ -71,7 +71,8 @@
     "terser-webpack-plugin": "^5.1.1",
     "webpack": "^5.36.2",
     "webpack-cli": "^4.7.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.7.3"
   },
   "productName": "Valiant"
 }

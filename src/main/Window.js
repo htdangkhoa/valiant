@@ -7,6 +7,7 @@ import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
 import BaseDialog from './dialogs/BaseDialog';
+import SettingsDialog from './dialogs/SettingsDialog';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -40,15 +41,18 @@ class Window {
     });
 
     this.dialogs = {
-      settings: new BaseDialog(this, 'settings'),
+      settings: new SettingsDialog(this),
     };
 
     this.win.on('resize', () => {
-      setTimeout(() => this.dialogs.settings.fixBounds(), 200);
+      setTimeout(() => {
+        this.dialogs.settings.fixBounds();
+        this.dialogs.settings.webContents.focus();
+      }, 200);
     });
 
     (async () => {
-      await this.win.loadURL(getRendererPath());
+      await this.win.loadURL(getRendererPath('index.html'));
 
       if (isDev) {
         this.win.webContents.openDevTools({ mode: 'detach' });

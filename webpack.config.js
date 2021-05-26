@@ -1,31 +1,17 @@
 const path = require('path');
 const { spawn, execSync } = require('child_process');
-const ESLintPlugin = require('eslint-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-
-const isDev = process.env.NODE_ENV === 'development';
+const { getConfig, isDev, outputBundleConfig } = require('./webpack.config.base');
 
 let electronProcess;
 
-module.exports = {
-  mode: isDev ? 'development' : 'production',
+const mainConfig = getConfig({
   target: 'electron-main',
-  devtool: isDev ? 'source-map' : false,
   watch: isDev,
   entry: {
     main: path.resolve(process.cwd(), 'src/main/index.js'),
   },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-      },
-    ],
-  },
+  output: outputBundleConfig,
   plugins: [
-    new ESLintPlugin(),
     isDev && {
       apply(compiler) {
         compiler.hooks.afterEmit.tap('AfterEmitPlugin', () => {
@@ -39,7 +25,7 @@ module.exports = {
 
               electronProcess = null;
             } catch (e) {
-              console.log(e);
+              console.error(e);
             }
           }
 
@@ -52,26 +38,16 @@ module.exports = {
       },
     },
   ].filter(Boolean),
-  optimization: {
-    minimizer: [
-      !isDev &&
-        new TerserPlugin({
-          extractComments: true,
-          terserOptions: {
-            ecma: 8,
-            output: {
-              comments: false,
-            },
-          },
-          parallel: true,
-        }),
-    ].filter(Boolean),
+});
+
+const preloadConfig = getConfig({
+  target: 'electron-renderer',
+  watch: isDev,
+  entry: {
+    'view-preload': './src/preloads/view.js',
+    'dialog-preload': './src/preloads/dialog.js',
   },
-  resolve: {
-    modules: ['node_modules'],
-    extensions: ['.js', '.json'],
-  },
-  stats: {
-    errorDetails: isDev,
-  },
-};
+  output: outputBundleConfig,
+});
+
+module.exports = [mainConfig, preloadConfig];
