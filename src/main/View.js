@@ -1,21 +1,17 @@
-import { format } from 'url';
-import path from 'path';
-import { app, BrowserView } from 'electron';
+import { ipcMain, BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
-import { nanoid } from 'nanoid';
 
 import { VIEW_SOURCE } from 'constants/protocol';
+import { getPreload } from 'common';
+
 import AppInstance from './AppInstance';
 import contextMenu from './menus/view';
 import { History, insert, update } from './database';
-import logger from 'common/logger';
-import { getPreload, getRendererPath } from 'common';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
     this.opts = Object.assign({}, options);
 
-    this.id = nanoid();
     this.browserView = new BrowserView({
       webPreferences: {
         preload: getPreload('view'),
@@ -25,8 +21,9 @@ class View {
         nativeWindowOpen: true,
         webSecurity: true,
         javascript: true,
-        worldSafeExecuteJavaScript: true,
+        worldSafeExecuteJavaScript: false,
         sandbox: true,
+        enableRemoteModule: false,
       },
     });
     this.browserView.setBackgroundColor('#ffffff');
@@ -131,9 +128,15 @@ class View {
       menu.popup();
     });
 
+    ipcMain.handle(`get-error-url-${this.id}`, () => this.errorUrl);
+
     this.render(this.opts);
 
     this.webContents.loadURL(this.opts.url);
+  }
+
+  get id() {
+    return this.webContents.id;
   }
 
   get webContents() {
@@ -183,7 +186,7 @@ class View {
   }
 
   emit(event, ...args) {
-    this.window.webContents.send(this.id, event, ...args);
+    this.window.webContents.send(String(this.id), event, ...args);
   }
 
   async addHistory(url, inPage) {

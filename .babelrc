@@ -1,5 +1,5 @@
 {
-  "presets": ["@babel/env", "@babel/react"],
+  "presets": [["@babel/env", { "shippedProposals": true }], "@babel/react"],
   "plugins": [
     "@babel/transform-runtime",
     [

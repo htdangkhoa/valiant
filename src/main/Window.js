@@ -6,7 +6,6 @@ import { getRendererPath } from 'common';
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
-import BaseDialog from './dialogs/BaseDialog';
 import SettingsDialog from './dialogs/SettingsDialog';
 
 const isDev = process.env.NODE_ENV === 'development';

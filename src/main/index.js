@@ -3,8 +3,6 @@ import { app, protocol, ipcMain, BrowserWindow } from 'electron';
 import { initialize as initializeRemoteModule } from '@electron/remote/main';
 import unhandled from 'electron-unhandled';
 import AppInstance from './AppInstance';
-import logger from 'common/logger';
-import { getRendererPath } from 'common';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -21,8 +19,6 @@ app
   .then(() => {
     protocol.registerFileProtocol('valiant', (request, callback) => {
       const url = new URL(request.url);
-
-      logger.log(url.toJSON());
 
       if (url.hostname === 'network-error') {
         return callback({ path: path.join(__dirname, '../static', 'network-error.html') });
