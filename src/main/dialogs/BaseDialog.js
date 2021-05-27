@@ -1,14 +1,11 @@
-import { nanoid } from 'nanoid';
-import { BrowserView } from 'electron';
+import { BrowserView, ipcMain } from 'electron';
 
-import { getPreload, getRendererPath, is } from 'common';
+import { getPreload, getRendererPath } from 'common';
 import { DIALOG_EVENTS } from 'constants/event-names';
 
 class BaseDialog {
   constructor(window, viewName, targetElement, options) {
     this.opts = Object.assign({}, options);
-
-    this.id = nanoid();
 
     this.window = window;
 
@@ -19,7 +16,7 @@ class BaseDialog {
         preload: getPreload('dialog'),
         nodeIntegration: true,
         contextIsolation: false,
-        additionalArguments: [`dialogId=${this.id}`, `viewName=${viewName}`],
+        additionalArguments: [`viewName=${viewName}`],
       },
     });
 
@@ -34,10 +31,16 @@ class BaseDialog {
     });
 
     this.webContents.loadURL(getRendererPath('index.html'));
+
+    ipcMain.handle('get-dialog-id', async () => this.id);
   }
 
   get webContents() {
     return this.browserView.webContents;
+  }
+
+  get id() {
+    return this.webContents.id;
   }
 
   async fixBounds() {
@@ -78,9 +81,9 @@ class BaseDialog {
       resizeObserver.observe(document.body);
     `);
 
-      if (is.dev) {
-        this.browserView.webContents.openDevTools({ mode: 'detach' });
-      }
+      // if (is.dev) {
+      //   this.browserView.webContents.openDevTools({ mode: 'detach' });
+      // }
 
       this.browserView.webContents.focus();
     }, 50);
@@ -88,8 +91,6 @@ class BaseDialog {
 
   hide() {
     this.window.win.removeBrowserView(this.browserView);
-    // this.browserView.webContents.destroy();
-    // this.browserView = null;
   }
 }
 

@@ -1,6 +1,10 @@
-// import { DIALOG_EVENTS } from 'constants/event-names';
-// import { ipcRenderer } from 'electron';
+import { DIALOG_EVENTS } from 'constants/event-names';
+import { ipcRenderer } from 'electron';
 
-// window.addEventListener('blur', () => {
-//   ipcRenderer.send(DIALOG_EVENTS.HIDE_DIALOG);
-// });
+(async () => {
+  const dialogId = await ipcRenderer.invoke('get-dialog-id');
+
+  window.addEventListener('blur', () => {
+    ipcRenderer.send(DIALOG_EVENTS.HIDE_DIALOG, dialogId);
+  });
+})();
