@@ -150,12 +150,12 @@ const useTabBarState = () => {
             return;
           }
 
-          requestCloseTab(handleTabChange(previous));
+          requestCloseTab(() => process.nextTick(handleTabChange(previous)));
 
           return;
         }
 
-        requestCloseTab(handleTabChange(i + 1));
+        requestCloseTab(() => process.nextTick(handleTabChange(i + 1)));
       }, 100);
     },
     [tabs],
