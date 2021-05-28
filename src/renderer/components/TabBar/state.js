@@ -6,17 +6,11 @@ import * as remote from '@electron/remote';
 import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { first } from 'common';
 import logger from 'common/logger';
+import { getCurrentWindow } from 'renderer/utils/window';
+import { callWebContentsMethod } from 'renderer/utils/view';
 
 const useTabBarState = () => {
-  const __DATA__ = window.process.argv.reduce((obj, s) => {
-    const [key, value] = s.split('=');
-
-    obj[key] = value;
-
-    return obj;
-  }, {});
-
-  const { windowId } = __DATA__;
+  const windowId = getCurrentWindow().id.toString();
 
   const [tabs, setTabs] = useState([]);
 
@@ -241,11 +235,11 @@ const useTabBarState = () => {
     );
   }, []);
 
-  const onGoBack = useCallback((id) => () => ipcRenderer.send(id, 'goBack'), []);
-  const onGoForward = useCallback((id) => () => ipcRenderer.send(id, 'goForward'), []);
-  const onReload = useCallback((id) => () => ipcRenderer.send(id, 'reload'), []);
-  const onStop = useCallback((id) => () => ipcRenderer.send(id, 'stop'), []);
-  const onLoadURL = useCallback((id, url) => () => ipcRenderer.send(id, 'loadURL', url), []);
+  const onGoBack = useCallback((id) => () => callWebContentsMethod(id, 'goBack'), []);
+  const onGoForward = useCallback((id) => () => callWebContentsMethod(id, 'goForward'), []);
+  const onReload = useCallback((id) => () => callWebContentsMethod(id, 'reload'), []);
+  const onStop = useCallback((id) => () => callWebContentsMethod(id, 'stop'), []);
+  const onLoadURL = useCallback((id, url) => () => callWebContentsMethod(id, 'loadURL', url), []);
 
   // address bar handler
   const onFetchSuggest = useCallback(

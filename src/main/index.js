@@ -1,5 +1,5 @@
 import path from 'path';
-import { app, protocol, ipcMain, BrowserWindow } from 'electron';
+import { app, protocol, ipcMain, BrowserWindow, webContents } from 'electron';
 import { initialize as initializeRemoteModule } from '@electron/remote/main';
 import unhandled from 'electron-unhandled';
 import AppInstance from './AppInstance';
@@ -49,4 +49,20 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('get-webcontents-id', (e) => {
   e.returnValue = e.sender.id;
+});
+
+ipcMain.handle('web-contents-call', async (e, { webContentsId, method, args }) => {
+  const wc = webContents.fromId(webContentsId);
+  if (!wc) return;
+
+  const result = wc[method](...args);
+
+  if (result) {
+    if (result instanceof Promise) {
+      const value = await result;
+      return value;
+    }
+
+    return result;
+  }
 });

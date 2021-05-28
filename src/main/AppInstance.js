@@ -1,4 +1,3 @@
-import ViewManager from './ViewManager';
 import Window from './Window';
 
 // singleton
@@ -21,8 +20,6 @@ class AppInstance {
     this.windows = new Map();
 
     this.focusedWindow = null;
-
-    this.viewManager = new ViewManager(this);
   }
 
   createWindow(options = { incognito: false, view: null }) {

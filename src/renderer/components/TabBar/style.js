@@ -46,7 +46,7 @@ export const Tab = styled.div`
   border-radius: 4px;
   min-width: 100px;
   padding: 4px;
-  max-width: 180px;
+  max-width: 18em;
   width: 100vw;
   font-size: 0.75rem;
   position: relative;

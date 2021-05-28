@@ -1,6 +1,5 @@
 import { WINDOW_EVENTS } from 'constants/event-names';
 import { BrowserWindow, ipcMain } from 'electron';
-import { nanoid } from 'nanoid';
 
 import { getRendererPath } from 'common';
 import AppInstance from './AppInstance';
@@ -13,8 +12,6 @@ const isDev = process.env.NODE_ENV === 'development';
 class Window {
   constructor(options = { incognito: false, view: null }) {
     this.instance = AppInstance.getInstance();
-
-    this.id = nanoid();
 
     this.opts = Object.assign({}, options);
 
@@ -35,7 +32,7 @@ class Window {
         plugins: true,
         javascript: true,
         worldSafeExecuteJavaScript: true,
-        additionalArguments: [`windowId=${this.id}`, `viewName=toolbar`],
+        additionalArguments: [`viewName=toolbar`],
       },
     });
 
@@ -129,6 +126,10 @@ class Window {
       //   }
       // });
     })();
+  }
+
+  get id() {
+    return this.win.id.toString();
   }
 
   get webContents() {

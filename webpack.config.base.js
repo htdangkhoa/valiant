@@ -34,19 +34,7 @@ const config = {
       },
     ],
   },
-  plugins: [
-    // new ESLintPlugin(),
-    // new HtmlWebpackPlugin({
-    //   template: 'static/index.html',
-    //   hash: true,
-    // }),
-    // new CopyWebpackPlugin({
-    //   patterns: [
-    //     { from: 'src/renderer/assets', to: 'assets' },
-    //     { from: 'static', to: 'static', globOptions: { ignore: ['**/index.html', '**/icons', '**/icon.png'] } },
-    //   ],
-    // }),
-  ],
+  plugins: [new ESLintPlugin()],
   resolve: {
     modules: ['node_modules'],
     extensions: ['.js', '.json', '.jsx'],
