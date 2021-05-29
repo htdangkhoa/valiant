@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { dark, radius } from 'constants/theme';
-import Button from '../Button';
+import Button from 'renderer/components/Button';
 
 const font = () => css`
   font-family: inherit;

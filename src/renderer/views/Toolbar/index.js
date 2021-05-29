@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-import TabBar from 'renderer/components/TabBar';
-import AddressBar from 'renderer/components/AddressBar';
+import TabBar from './TabBar';
+import AddressBar from './AddressBar';
 
-import TabBarState from 'renderer/components/TabBar/state';
-import AddressBarState from 'renderer/components/AddressBar/state';
+import TabBarState from './TabBar/state';
+import AddressBarState from './AddressBar/state';
 
 const ToolbarView = () => (
   <div id='toolbar'>
@@ -22,4 +22,4 @@ const Toolbar = () => (
   </TabBarState.Provider>
 );
 
-export default Toolbar;
+export default memo(Toolbar);

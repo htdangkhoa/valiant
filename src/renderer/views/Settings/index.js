@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { MenuItems, MenuItem } from './style';
 
 const Settings = () => (
@@ -20,4 +20,4 @@ const Settings = () => (
   </MenuItems>
 );
 
-export default Settings;
+export default memo(Settings);

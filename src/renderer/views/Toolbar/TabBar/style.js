@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { TITLE_BAR_COLOR } from 'constants/theme';
-import Button from '../Button';
+import Button from 'renderer/components/Button';
 
 export const TabContainer = styled.div`
   display: flex;

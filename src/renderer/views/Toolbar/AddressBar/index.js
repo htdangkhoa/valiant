@@ -13,7 +13,7 @@ import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 import { WINDOW_EVENTS } from 'constants/event-names';
 import { isURL } from 'common';
 
-import Button from '../Button';
+import Button from 'renderer/components/Button';
 import { AddressBarContainer, AddressBar, InputContainer, Input, Text, NavigationButton } from './style';
 
 import AddressBarState from './state';
