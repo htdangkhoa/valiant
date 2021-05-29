@@ -2,7 +2,7 @@ import { BrowserView, ipcMain } from 'electron';
 
 import { defer, getPreload, getRendererPath } from 'common';
 import { DIALOG_EVENTS } from 'constants/event-names';
-import AppInstance from 'main/AppInstance';
+import AppInstance from 'main/core/AppInstance';
 
 class BaseDialog {
   constructor(viewName, targetElement, options) {

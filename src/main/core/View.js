@@ -5,8 +5,8 @@ import { VIEW_SOURCE } from 'constants/protocol';
 import { getPreload } from 'common';
 
 import AppInstance from './AppInstance';
-import contextMenu from './menus/view';
-import { History, insert, update } from './database';
+import contextMenu from '../menus/view';
+import { History, insert, update } from '../database';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {

@@ -2,7 +2,7 @@ import path from 'path';
 import { app, protocol, ipcMain, BrowserWindow, webContents } from 'electron';
 import { initialize as initializeRemoteModule } from '@electron/remote/main';
 import unhandled from 'electron-unhandled';
-import AppInstance from './AppInstance';
+import AppInstance from './core/AppInstance';
 
 const isDev = process.env.NODE_ENV === 'development';
 

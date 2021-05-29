@@ -1,6 +1,6 @@
-import SettingsDialog from './dialogs/SettingsDialog';
+import SettingsDialog from '../dialogs/SettingsDialog';
 import Window from './Window';
-import { runAdblock } from './network/adblock';
+import { runAdblock } from '../network/adblock';
 
 // singleton
 let appInstance;

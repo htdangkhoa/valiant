@@ -1,6 +1,6 @@
 import { Menu, clipboard } from 'electron';
 import { isURL } from 'common';
-import AppInstance from '../AppInstance';
+import AppInstance from '../core/AppInstance';
 
 const contextMenu = (params, webContents) => {
   const { focusedWindow: window } = AppInstance.getInstance();
