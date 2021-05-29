@@ -3,6 +3,7 @@ import { app, protocol, ipcMain, BrowserWindow, webContents } from 'electron';
 import { initialize as initializeRemoteModule } from '@electron/remote/main';
 import unhandled from 'electron-unhandled';
 import AppInstance from './core/AppInstance';
+import logger from 'common/logger';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -52,10 +53,22 @@ ipcMain.on('get-webcontents-id', (e) => {
 });
 
 ipcMain.handle('web-contents-call', async (e, { webContentsId, method, args }) => {
-  const wc = webContents.fromId(webContentsId);
-  if (!wc) return;
+  const { focusedWindow: window } = AppInstance.getInstance();
 
-  const result = wc[method](...args);
+  const view = window.viewManager.views.get(webContentsId);
+
+  if (!view) return;
+
+  logger.log('web-contents-call', view.errorUrl);
+
+  if (method === 'reload' && view.errorUrl) {
+    view.webContents.loadURL(view.errorUrl);
+    view.errorUrl = null;
+
+    return;
+  }
+
+  const result = view.webContents[method](...args);
 
   if (result) {
     if (result instanceof Promise) {
