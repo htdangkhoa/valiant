@@ -95,7 +95,9 @@ const useTabBarState = () => {
           [...his]
             .map((tab) => {
               if (selectedTab.id === tab.id && tab.active) {
-                hook();
+                if (typeof hook === 'function') {
+                  hook();
+                }
 
                 if (!isMove) {
                   ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE_TAB, { id: tab.id });
@@ -110,6 +112,21 @@ const useTabBarState = () => {
         );
       }
 
+      if (i === tabs.length - 1) {
+        const previous = i - 1;
+
+        if (previous < 0) {
+          ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE);
+
+          return;
+        }
+
+        handleTabChange(previous)();
+      }
+
+      handleTabChange(i + 1)();
+
+      // handle tab animation
       const tabElement = document.getElementById(`tab-${i}`);
       const rect = tabElement.getBoundingClientRect();
 
@@ -132,25 +149,17 @@ const useTabBarState = () => {
 
       tabElement.style.animation = 'slide-out 0.2s';
 
-      setTimeout(() => {
+      function animationEndListener() {
         document.getElementById(`tab-style-${i}`).remove();
 
-        if (i === tabs.length - 1) {
-          const previous = i - 1;
+        requestCloseTab(() => {
+          tabElement.removeEventListener('animationend', this);
+          tabElement.removeEventListener('webkitAnimationEnd', this);
+        });
+      }
 
-          if (previous < 0) {
-            ipcRenderer.send(windowId, WINDOW_EVENTS.CLOSE);
-
-            return;
-          }
-
-          requestCloseTab(() => process.nextTick(handleTabChange(previous)));
-
-          return;
-        }
-
-        requestCloseTab(() => process.nextTick(handleTabChange(i + 1)));
-      }, 100);
+      tabElement.addEventListener('animationend', animationEndListener);
+      tabElement.addEventListener('webkitAnimationEnd', animationEndListener);
     },
     [tabs],
   );

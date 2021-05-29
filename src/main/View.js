@@ -33,7 +33,7 @@ class View {
 
       this.updateStorage();
 
-      this.emit(TAB_EVENTS.UPDATE_TITLE, this.title || 'Untitled');
+      this.updateTitleState();
     });
     this.webContents.on('page-favicon-updated', (e, favicons) => {
       const [favicon] = favicons;
@@ -65,10 +65,8 @@ class View {
 
       this.lastUrl = url;
 
-      this.emit(
-        TAB_EVENTS.UPDATE_TITLE,
-        this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.title || 'Untitled',
-      );
+      this.updateTitleState();
+
       this.emit(
         TAB_EVENTS.UPDATE_URL,
         this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.errorUrl || this.lastUrl,
@@ -165,7 +163,8 @@ class View {
       });
     }
 
-    this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);
+    this.updateTitleState();
+
     this.emit(TAB_EVENTS.UPDATE_FAVICON, this.favicon);
     this.emit(TAB_EVENTS.UPDATE_URL, this.lastUrl);
   }
@@ -183,6 +182,20 @@ class View {
       canGoBack: this.webContents.canGoBack(),
       canGoForward: this.webContents.canGoForward(),
     });
+  }
+
+  updateTitleState() {
+    let title = this.title || 'Untitled';
+
+    if (this.opts.url?.startsWith?.(VIEW_SOURCE)) {
+      title = this.opts.url;
+    }
+
+    this.title = title;
+
+    this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);
+
+    this.window.updateTitle();
   }
 
   emit(event, ...args) {

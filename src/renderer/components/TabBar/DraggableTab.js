@@ -138,10 +138,15 @@ const DraggableTab = ({ index }) => {
 
   // scroll to end
   useEffect(() => {
-    const handler = setTimeout(() => {
-      ref.current.scrollIntoView();
-    }, 250);
-    return () => clearTimeout(handler);
+    function animationEndListener(e) {
+      e.currentTarget.scrollIntoView();
+
+      e.currentTarget.removeEventListener('animationend', this);
+      e.currentTarget.removeEventListener('webkitAnimationEnd', this);
+    }
+
+    ref.current.addEventListener('animationend', animationEndListener);
+    ref.current.addEventListener('webkitAnimationEnd', animationEndListener);
   }, []);
 
   drag(drop(ref));
@@ -152,7 +157,6 @@ const DraggableTab = ({ index }) => {
       data-handler-id={handlerId}
       id={`tab-${index}`}
       active={tab.active}
-      animation={tab.anim}
       style={{ zIndex: tabs.length - index }}
       onClick={handleTabChange(index)}
       onDoubleClick={handlePreventDoubleClick}

@@ -46,3 +46,10 @@ export const getRendererPath = (...paths) => {
 
 export const getPreload = (name) =>
   `${is.main ? app.getAppPath() : remote.app.getAppPath()}/dist/${name}-preload.bundle.js`;
+
+export const defer =
+  typeof setImmediate === 'function'
+    ? setImmediate
+    : (callback, ...args) => {
+        process.nextTick(callback.bind.apply(callback, ...args));
+      };

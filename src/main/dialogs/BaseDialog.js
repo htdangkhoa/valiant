@@ -1,6 +1,6 @@
 import { BrowserView, ipcMain } from 'electron';
 
-import { getPreload, getRendererPath } from 'common';
+import { defer, getPreload, getRendererPath } from 'common';
 import { DIALOG_EVENTS } from 'constants/event-names';
 import AppInstance from 'main/AppInstance';
 
@@ -75,7 +75,7 @@ class BaseDialog {
 
     this.window.win.removeBrowserView(this.browserView);
 
-    setTimeout(() => {
+    defer(() => {
       this.window.win.addBrowserView(this.browserView);
 
       this.webContents.executeJavaScript(`
@@ -91,7 +91,7 @@ class BaseDialog {
       // }
 
       this.browserView.webContents.focus();
-    }, 50);
+    });
   }
 
   hide() {

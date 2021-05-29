@@ -1,7 +1,7 @@
 import { WINDOW_EVENTS } from 'constants/event-names';
-import { BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 
-import { getRendererPath } from 'common';
+import { defer, getRendererPath } from 'common';
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
@@ -36,20 +36,30 @@ class Window {
     });
 
     this.win.on('resize', () => {
-      setTimeout(() => {
-        this.dialogs.settings.fixBounds();
-        this.dialogs.settings.webContents.focus();
-      }, 200);
+      defer(() => {
+        this.instance.dialogs.settings.fixBounds();
+        this.instance.dialogs.settings.webContents.focus();
+      });
     });
 
     (async () => {
       await this.win.loadURL(getRendererPath('index.html'));
 
       if (isDev) {
-        this.win.webContents.openDevTools({ mode: 'detach' });
+        this.webContents.openDevTools({ mode: 'detach' });
 
-        this.win.webContents.on('dom-ready', () => {
-          this.instance.closeWindow(this.id);
+        // hot reload when the renderer is changed.
+        this.webContents.on('dom-ready', () => {
+          const { windows } = this.instance;
+
+          for (let i = 0; i < windows.size; i += 1) {
+            const key = Array.from(windows.keys())[i];
+
+            if (this.webContents.isDevToolsOpened()) {
+              this.webContents.closeDevTools();
+            }
+            this.instance.closeWindow(key);
+          }
 
           this.instance.createWindow();
         });
@@ -132,11 +142,17 @@ class Window {
   }
 
   updateTitle() {
-    // const { selected, getView } = this.viewManager;
-    // const view = getView.apply(this.viewManager, [selected]);
-    // if (!view) return this.win.setTitle(app.name);
+    const { selectedView: view } = this.viewManager;
+    if (!view) return this.win.setTitle(app.name);
     // const { browserView } = view;
-    // this.win.setTitle(`${browserView.title} | ${app.name}`);
+
+    let title = `${app.name}`;
+
+    if (view.title) {
+      title = `${view.title} | ${title}`;
+    }
+
+    this.win.setTitle(title);
   }
 
   emit(event, ...args) {
