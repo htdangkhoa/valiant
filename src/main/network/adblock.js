@@ -1,7 +1,7 @@
 import { session } from 'electron';
 import { ElectronBlocker, fullLists } from '@cliqz/adblocker-electron';
 import fetch from 'node-fetch';
-import { promises as fs } from 'fs';
+import { promises as fs, existsSync, mkdirSync } from 'fs';
 import { getPath } from 'common';
 import logger from 'common/logger';
 
@@ -17,6 +17,12 @@ const emitEvent = (request) => {
 };
 
 export const runAdblock = async () => {
+  const adblockerEngineDir = getPath('.bin');
+
+  if (!existsSync(adblockerEngineDir)) {
+    mkdirSync(adblockerEngineDir);
+  }
+
   blocker = await ElectronBlocker.fromLists(
     fetch,
     fullLists,
