@@ -111,3 +111,5 @@ build
 
 storages/*
 !storages/.gitkeep
+
+.bin/*

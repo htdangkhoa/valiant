@@ -1,5 +1,6 @@
 import SettingsDialog from './dialogs/SettingsDialog';
 import Window from './Window';
+import { runAdblock } from './network/adblock';
 
 // singleton
 let appInstance;
@@ -25,6 +26,9 @@ class AppInstance {
     this.dialogs = {
       settings: new SettingsDialog(),
     };
+
+    // TODO: the settings will be loaded at here.
+    runAdblock();
   }
 
   createWindow(options = { incognito: false, view: null }) {

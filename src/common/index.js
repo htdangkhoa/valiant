@@ -1,6 +1,6 @@
 import url from 'url';
-import path from 'path';
 import { app, remote } from 'electron';
+import { resolve } from 'path';
 
 export const isURL = (s) => {
   const pattern = /^(?:\w+:)?\/\/([^\s.]+\.\S{2}|localhost[:?\d]*)\S*$/;
@@ -40,7 +40,7 @@ export const getRendererPath = (...paths) => {
   return url.format({
     protocol: 'file',
     slashes: true,
-    pathname: path.resolve(__dirname, ...paths),
+    pathname: resolve(__dirname, ...paths),
   });
 };
 
@@ -53,3 +53,18 @@ export const defer =
     : (callback, ...args) => {
         process.nextTick(callback.bind.apply(callback, ...args));
       };
+export const getPath = (...relativePaths) => {
+  let path;
+
+  if (process.type === 'renderer') {
+    path = remote.app.getPath('userData');
+  } else {
+    path = app.getPath('userData');
+  }
+
+  if (process.env === 'development') {
+    path = process.cwd();
+  }
+
+  return resolve(path, ...relativePaths).replace(/\\g/, '/');
+};
