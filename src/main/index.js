@@ -2,6 +2,8 @@ import path from 'path';
 import { app, protocol, ipcMain, BrowserWindow } from 'electron';
 import { initialize as initializeRemoteModule } from '@electron/remote/main';
 import unhandled from 'electron-unhandled';
+
+import { VALIANT, VIEW_SOURCE } from 'constants/protocol';
 import AppInstance from './core/AppInstance';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -17,7 +19,7 @@ if (isDev) {
 app
   .whenReady()
   .then(() => {
-    protocol.registerFileProtocol('valiant', (request, callback) => {
+    protocol.registerFileProtocol(VALIANT, (request, callback) => {
       const url = new URL(request.url);
 
       if (url.hostname === 'network-error') {
@@ -58,11 +60,13 @@ ipcMain.handle('web-contents-call', async (e, { webContentsId, method, args }) =
 
   if (!view) return;
 
-  if (method === 'reload' && view.errorUrl) {
-    view.webContents.loadURL(view.errorUrl);
-    view.errorUrl = undefined;
+  if (method === 'reload') {
+    if (view.errorUrl || view.lastUrl?.startsWith?.(VIEW_SOURCE)) {
+      view.webContents.loadURL(view.errorUrl || view.lastUrl);
+      return;
+    }
 
-    return;
+    view.errorUrl = undefined;
   }
 
   const result = view.webContents[method](...args);

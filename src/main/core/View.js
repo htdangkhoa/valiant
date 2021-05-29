@@ -1,7 +1,7 @@
 import { ipcMain, BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 
-import { VIEW_SOURCE } from 'constants/protocol';
+import { VIEW_SOURCE, VALIANT } from 'constants/protocol';
 import { getPreload } from 'common';
 
 import AppInstance from './AppInstance';
@@ -63,22 +63,15 @@ class View {
     this.webContents.on('did-navigate', async (e, url) => {
       this.addHistory(url);
 
-      this.lastUrl = url;
+      this.updateUrlState(url);
 
       this.updateTitleState();
-
-      this.emit(
-        TAB_EVENTS.UPDATE_URL,
-        this.opts.url?.startsWith?.(VIEW_SOURCE) ? this.opts.url : this.errorUrl || this.lastUrl,
-      );
     });
     this.webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
       if (isMainFrame) {
         this.addHistory(url, true);
 
-        this.lastUrl = url;
-
-        this.emit(TAB_EVENTS.UPDATE_URL, url);
+        this.updateUrlState(url);
       }
     });
     this.webContents.on('did-fail-load', async (e, errorCode, errorDescription, validateUrl, isMainFrame) => {
@@ -87,7 +80,7 @@ class View {
 
         this.title = validateUrl;
 
-        this.webContents.loadURL(`valiant://network-error/${errorCode}`);
+        this.webContents.loadURL(`${VALIANT}://network-error/${errorCode}`);
       }
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {
@@ -165,8 +158,9 @@ class View {
 
     this.updateTitleState();
 
+    this.updateUrlState(this.lastUrl);
+
     this.emit(TAB_EVENTS.UPDATE_FAVICON, this.favicon);
-    this.emit(TAB_EVENTS.UPDATE_URL, this.lastUrl);
   }
 
   destroy() {
@@ -196,6 +190,16 @@ class View {
     this.emit(TAB_EVENTS.UPDATE_TITLE, this.title);
 
     this.window.updateTitle();
+  }
+
+  updateUrlState(url) {
+    this.lastUrl = url;
+
+    if (this.opts.url.startsWith(VIEW_SOURCE)) {
+      this.lastUrl = this.opts.url;
+    }
+
+    this.emit(TAB_EVENTS.UPDATE_URL, this.lastUrl);
   }
 
   emit(event, ...args) {
