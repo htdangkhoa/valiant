@@ -2,12 +2,13 @@ import { BrowserView, ipcMain } from 'electron';
 
 import { getPreload, getRendererPath } from 'common';
 import { DIALOG_EVENTS } from 'constants/event-names';
+import AppInstance from 'main/AppInstance';
 
 class BaseDialog {
-  constructor(window, viewName, targetElement, options) {
+  constructor(viewName, targetElement, options) {
     this.opts = Object.assign({}, options);
 
-    this.window = window;
+    // this.window = window;
 
     this.targetElement = targetElement;
 
@@ -33,6 +34,10 @@ class BaseDialog {
     this.webContents.loadURL(getRendererPath('index.html'));
 
     ipcMain.handle('get-dialog-id', async () => this.id);
+  }
+
+  get window() {
+    return AppInstance.getInstance().focusedWindow;
   }
 
   get webContents() {

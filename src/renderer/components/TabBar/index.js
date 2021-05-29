@@ -54,7 +54,7 @@ const TabBarView = () => {
     <TabContainer onDoubleClick={onDoubleClick}>
       <Tabs ref={ref}>
         {tabs.map((tab, i) => (
-          <DraggableTab key={`tab-${i}`} index={i} />
+          <DraggableTab key={`tab-${tab.id}`} index={i} />
         ))}
       </Tabs>
 

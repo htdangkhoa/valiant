@@ -5,7 +5,6 @@ import { getRendererPath } from 'common';
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
-import SettingsDialog from './dialogs/SettingsDialog';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -35,10 +34,6 @@ class Window {
         additionalArguments: [`viewName=toolbar`],
       },
     });
-
-    this.dialogs = {
-      settings: new SettingsDialog(this),
-    };
 
     this.win.on('resize', () => {
       setTimeout(() => {
@@ -112,7 +107,7 @@ class Window {
         }
 
         if (event === WINDOW_EVENTS.OPEN_QUICK_MENU) {
-          this.dialogs.settings.show(message);
+          this.instance.dialogs.settings.show(message);
         }
       });
 

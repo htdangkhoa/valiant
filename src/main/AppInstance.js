@@ -1,3 +1,4 @@
+import SettingsDialog from './dialogs/SettingsDialog';
 import Window from './Window';
 
 // singleton
@@ -20,6 +21,10 @@ class AppInstance {
     this.windows = new Map();
 
     this.focusedWindow = null;
+
+    this.dialogs = {
+      settings: new SettingsDialog(),
+    };
   }
 
   createWindow(options = { incognito: false, view: null }) {

@@ -5,8 +5,8 @@ const WIDTH = 320;
 const MARGIN = 8;
 
 class SettingsDialog extends BaseDialog {
-  constructor(window) {
-    super(window, 'settings', 'btn-quick-menu');
+  constructor() {
+    super('settings', 'btn-quick-menu');
   }
 
   onDraw(contentHeight, rect) {
