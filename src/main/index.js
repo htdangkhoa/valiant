@@ -1,9 +1,8 @@
 import path from 'path';
-import { app, protocol, ipcMain, BrowserWindow, webContents } from 'electron';
+import { app, protocol, ipcMain, BrowserWindow } from 'electron';
 import { initialize as initializeRemoteModule } from '@electron/remote/main';
 import unhandled from 'electron-unhandled';
 import AppInstance from './core/AppInstance';
-import logger from 'common/logger';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -58,8 +57,6 @@ ipcMain.handle('web-contents-call', async (e, { webContentsId, method, args }) =
   const view = window.viewManager.views.get(webContentsId);
 
   if (!view) return;
-
-  logger.log('web-contents-call', view.errorUrl);
 
   if (method === 'reload' && view.errorUrl) {
     view.webContents.loadURL(view.errorUrl);
