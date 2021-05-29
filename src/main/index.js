@@ -63,7 +63,7 @@ ipcMain.handle('web-contents-call', async (e, { webContentsId, method, args }) =
 
   if (method === 'reload' && view.errorUrl) {
     view.webContents.loadURL(view.errorUrl);
-    view.errorUrl = null;
+    view.errorUrl = undefined;
 
     return;
   }
