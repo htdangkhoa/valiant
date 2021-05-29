@@ -11,6 +11,6 @@
 - [x] Move Tab to New Window
 - [ ] Search engine with suggestions
 - [ ] Incognito
-- [ ] Adblock
+- [x] Adblock
 - [ ] Chrome Extensions
 - [ ] Import bookmarks
