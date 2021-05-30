@@ -53,6 +53,7 @@ export const defer =
     : (callback, ...args) => {
         process.nextTick(callback.bind.apply(callback, ...args));
       };
+
 export const getPath = (...relativePaths) => {
   let path;
 
@@ -62,7 +63,7 @@ export const getPath = (...relativePaths) => {
     path = app.getPath('userData');
   }
 
-  if (process.env === 'development') {
+  if (is.dev) {
     path = process.cwd();
   }
 

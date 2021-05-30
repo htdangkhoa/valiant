@@ -6,7 +6,8 @@ import { getPreload } from 'common';
 
 import AppInstance from './AppInstance';
 import contextMenu from '../menus/view';
-import { History, insert, update } from '../database';
+import { findOne, History, insert, update } from '../database';
+import logger from 'common/logger';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -213,7 +214,6 @@ class View {
         title: this.title,
         url,
         favicon: this.favicon,
-        date: new Date().getTime(),
       });
 
       this.lastHistoryId = history._id;
