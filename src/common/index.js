@@ -21,6 +21,14 @@ export const first = (input) => {
   return [...input].splice(0, 1)[0];
 };
 
+export const last = (input) => {
+  if (typeof input !== 'string' && !Array.isArray(input)) {
+    return undefined;
+  }
+
+  return [...input].splice(-1)[0];
+};
+
 export const is = {
   get dev() {
     return process.env.NODE_ENV === 'development';

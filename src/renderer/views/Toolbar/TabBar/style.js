@@ -32,17 +32,6 @@ export const Tabs = styled.div`
 `;
 
 export const Tab = styled.div`
-  @keyframes slide-in {
-    0% {
-      left: -100px;
-    }
-    100% {
-      left: 0;
-    }
-  }
-
-  animation: slide-in 0.2s;
-
   border-radius: 4px;
   min-width: 100px;
   padding: 4px;

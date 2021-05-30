@@ -1,4 +1,6 @@
-import React, { memo, useEffect, useRef } from 'react';
+/** @jsx jsx */
+import { jsx, css } from '@emotion/react';
+import { memo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import { ipcRenderer } from 'electron';
@@ -151,17 +153,32 @@ const DraggableTab = ({ index }) => {
 
   drag(drop(ref));
 
+  const lastTabElement = document.getElementById(`tab-${tabs.length - 1}`);
+  const rect = lastTabElement?.getBoundingClientRect?.();
+
   return (
     <Tab
       ref={ref}
       data-handler-id={handlerId}
       id={`tab-${index}`}
       active={tab.active}
-      style={{ zIndex: tabs.length - index }}
       onClick={handleTabChange(index)}
       onDoubleClick={handlePreventDoubleClick}
       onContextMenu={onContextMenu(index)}
-      title={tab.title}>
+      title={tab.title}
+      css={css`
+        @keyframes slide-in {
+          0% {
+            left: -${rect?.left || 100}px;
+          }
+          100% {
+            left: 0;
+          }
+        }
+
+        animation: slide-in 0.2s;
+        z-index: ${tabs.length - index};
+      `}>
       {!tab.loading && (
         <TabFavicon>
           {hasFavicon ? (

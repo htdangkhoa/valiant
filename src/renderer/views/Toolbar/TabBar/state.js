@@ -273,6 +273,7 @@ const useTabBarState = () => {
         },
         {
           label: 'Move Tab to New Window',
+          enabled: tabs.length > 1,
           click: () => {
             handleCloseTab(index, true)();
 
