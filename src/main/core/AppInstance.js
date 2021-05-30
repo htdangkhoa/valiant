@@ -1,3 +1,6 @@
+import { ipcMain } from 'electron';
+import { DIALOG_EVENTS } from 'constants/event-names';
+
 import SettingsDialog from '../dialogs/SettingsDialog';
 import SuggestionDialog from '../dialogs/SuggestionDialog';
 import Window from './Window';
@@ -34,6 +37,12 @@ class AppInstance {
 
     // TODO: the settings will be loaded at here.
     runAdblock();
+
+    ipcMain.on(DIALOG_EVENTS.HIDE_ALL_DIALOG, () => {
+      Object.values(this.dialogs).forEach((dialog) => {
+        if (dialog.isOpening) dialog.hide();
+      });
+    });
   }
 
   createWindow(options = { incognito: false, view: null }) {

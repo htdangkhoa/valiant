@@ -66,7 +66,9 @@ class BaseDialog {
   }
 
   show(showDevTools) {
-    this.window.win.removeBrowserView(this.browserView);
+    if (this.isOpening) return;
+
+    this.isOpening = true;
 
     defer(() => {
       this.window.win.addBrowserView(this.browserView);
@@ -89,6 +91,7 @@ class BaseDialog {
 
   hide() {
     this.window.win.removeBrowserView(this.browserView);
+    this.isOpening = false;
   }
 }
 

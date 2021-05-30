@@ -25,4 +25,5 @@ export const ADDRESS_BAR_EVENTS = {
 
 export const DIALOG_EVENTS = {
   HIDE_DIALOG: 'HIDE_DIALOG',
+  HIDE_ALL_DIALOG: 'HIDE_ALL_DIALOG',
 };

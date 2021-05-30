@@ -44,8 +44,8 @@ const preloadConfig = getConfig({
   target: 'electron-renderer',
   watch: isDev,
   entry: {
-    'view-preload': './src/preloads/view.js',
-    'dialog-preload': './src/preloads/dialog.js',
+    'view-preload': './src/main/preloads/view.js',
+    'dialog-preload': './src/main/preloads/dialog.js',
   },
   output: outputBundleConfig,
 });
