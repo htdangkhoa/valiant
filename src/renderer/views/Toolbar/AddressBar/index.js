@@ -30,18 +30,55 @@ const AddressBard = () => {
     urlSegments,
   } = AddressBarState.useContainer();
 
-  const onFocus = useCallback((e) => {
-    handleSearchBarFocusChange(true)();
+  const onFocus = useCallback(
+    (e) => {
+      handleSearchBarFocusChange(true)();
 
-    e.target.select();
-  }, []);
+      e.target.select();
+    },
+    [activeTab],
+  );
 
-  const onBlur = useCallback((e) => {
-    e.currentTarget.blur();
-    window.getSelection().removeAllRanges();
+  const onBlur = useCallback(
+    (e) => {
+      e.currentTarget.blur();
+      window.getSelection().removeAllRanges();
 
-    handleSearchBarFocusChange(false)();
-  }, []);
+      handleSearchBarFocusChange(false)();
+    },
+    [activeTab],
+  );
+
+  const onKeyDown = useCallback(
+    async (e) => {
+      const target = e.currentTarget;
+
+      if (e.key === 'Escape') {
+        await handleUrlChange(activeTab?.id, activeTab?.originalUrl);
+
+        requestAnimationFrame(() => target.select());
+
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        e.currentTarget.blur();
+
+        const { value } = e.currentTarget;
+
+        let url = value;
+
+        if (isURL(value)) {
+          url = value.indexOf('://') === -1 ? `http://${value}` : value;
+        } else {
+          url = `https://google.com/search?q=${value}`;
+        }
+
+        onLoadURL(activeTab?.id, url)();
+      }
+    },
+    [activeTab],
+  );
 
   return (
     <AddressBarContainer>
@@ -72,37 +109,11 @@ const AddressBard = () => {
           <Input
             spellCheck={false}
             visible={isSearchBarFocused}
-            value={inputValue}
+            defaultValue={inputValue}
             onChange={handleInputValueChange}
             onFocus={onFocus}
             onBlur={onBlur}
-            onKeyDown={async (e) => {
-              const target = e.currentTarget;
-
-              if (e.key === 'Escape') {
-                await handleUrlChange(activeTab?.id, activeTab?.originalUrl);
-
-                requestAnimationFrame(() => target.select());
-
-                return;
-              }
-
-              if (e.key === 'Enter') {
-                e.currentTarget.blur();
-
-                const { value } = e.currentTarget;
-
-                let url = value;
-
-                if (isURL(value)) {
-                  url = value.indexOf('://') === -1 ? `http://${value}` : value;
-                } else {
-                  url = `https://google.com/search?q=${value}`;
-                }
-
-                onLoadURL(activeTab?.id, url)();
-              }
-            }}
+            onKeyDown={onKeyDown}
           />
 
           <Text visible={!isSearchBarFocused}>
