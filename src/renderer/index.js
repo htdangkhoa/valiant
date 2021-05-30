@@ -34,7 +34,7 @@ styleElement.textContent = `
     margin: unset;
   }
 
-  ul li {
+  li {
     list-style: none;
   }
 

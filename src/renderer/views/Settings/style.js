@@ -1,13 +1,10 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import Dialog from 'renderer/components/Dialog';
 
-export const MenuItems = styled.ul`
-  padding: 0.25rem 0.5rem;
+export const MenuItems = styled(Dialog)`
+  padding: 0.5rem 0.5rem;
   background-color: rgb(68, 65, 76);
-
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  border-radius: 6px;
-  margin: 6px;
 `;
 
 export const MenuItem = styled.li`

@@ -1,0 +1,5 @@
+export const VIEW_TOOLBAR = 'VIEW_TOOLBAR';
+
+export const VIEW_SETTINGS = 'VIEW_SETTINGS';
+
+export const VIEW_SUGGESTION = 'VIEW_SUGGESTION';

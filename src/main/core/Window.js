@@ -1,7 +1,9 @@
 import { WINDOW_EVENTS } from 'constants/event-names';
 import { app, BrowserWindow, ipcMain } from 'electron';
 
+import { VIEW_TOOLBAR } from 'constants/view-names';
 import { defer, getRendererPath } from 'common';
+
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
@@ -31,7 +33,7 @@ class Window {
         plugins: true,
         javascript: true,
         worldSafeExecuteJavaScript: true,
-        additionalArguments: [`viewName=toolbar`],
+        additionalArguments: [`viewName=${VIEW_TOOLBAR}`],
       },
     });
 
@@ -73,6 +75,10 @@ class Window {
         this.viewManager.views.set(view.id, view);
         this.viewManager.selectView(view.id);
       }
+
+      // setTimeout(() => {
+      //   this.instance.dialogs.suggestion.show(true);
+      // }, 1500);
 
       this.setBoundsListener();
 

@@ -1,5 +1,6 @@
 import url from 'url';
-import { app, remote } from 'electron';
+import { app } from 'electron';
+import * as remote from '@electron/remote/main';
 import { resolve } from 'path';
 
 export const isURL = (s) => {

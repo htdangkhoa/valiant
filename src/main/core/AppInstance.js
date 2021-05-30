@@ -1,4 +1,5 @@
 import SettingsDialog from '../dialogs/SettingsDialog';
+import SuggestionDialog from '../dialogs/SuggestionDialog';
 import Window from './Window';
 import { runAdblock } from '../network/adblock';
 import SessionsManager from './SessionsManager';
@@ -28,6 +29,7 @@ class AppInstance {
 
     this.dialogs = {
       settings: new SettingsDialog(),
+      suggestion: new SuggestionDialog(),
     };
 
     // TODO: the settings will be loaded at here.

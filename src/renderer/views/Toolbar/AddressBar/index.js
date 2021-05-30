@@ -100,7 +100,7 @@ const AddressBard = () => {
         <IconHome color='#ffffff' />
       </NavigationButton>
 
-      <AddressBar>
+      <AddressBar id='address-bar'>
         <Button topRightRadius={0} bottomRightRadius={0}>
           <IconLock fill='#88cc88' />
         </Button>
@@ -140,10 +140,8 @@ const AddressBard = () => {
 
       <NavigationButton
         id='btn-quick-menu'
-        onClick={(e) => {
-          const { right, bottom } = e.currentTarget.getBoundingClientRect();
-
-          ipcRenderer.send(windowId, WINDOW_EVENTS.OPEN_QUICK_MENU, { right, bottom });
+        onClick={() => {
+          ipcRenderer.send(windowId, WINDOW_EVENTS.OPEN_QUICK_MENU);
         }}>
         <IconMenu color='#ffffff' />
       </NavigationButton>

@@ -1,16 +1,22 @@
-const { default: BaseDialog } = require('./BaseDialog');
+import { DIALOG_MARGIN } from 'constants/theme';
+import { VIEW_SETTINGS } from 'constants/view-names';
+
+import BaseDialog from './BaseDialog';
 
 const WIDTH = 320;
 
-const MARGIN = 8;
-
 class SettingsDialog extends BaseDialog {
   constructor() {
-    super('settings', 'btn-quick-menu');
+    super(VIEW_SETTINGS, 'btn-quick-menu');
   }
 
   onDraw(contentHeight, rect) {
-    return { x: rect.right - (WIDTH - MARGIN), y: rect.bottom - 2, width: WIDTH, height: contentHeight + MARGIN * 2 };
+    return {
+      x: rect.right - (WIDTH - DIALOG_MARGIN),
+      y: rect.bottom - 2,
+      width: WIDTH,
+      height: contentHeight + DIALOG_MARGIN * 2,
+    };
   }
 }
 
