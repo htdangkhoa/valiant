@@ -1,6 +1,7 @@
 import SettingsDialog from '../dialogs/SettingsDialog';
 import Window from './Window';
 import { runAdblock } from '../network/adblock';
+import SessionsManager from './SessionsManager';
 
 // singleton
 let appInstance;
@@ -22,6 +23,8 @@ class AppInstance {
     this.windows = new Map();
 
     this.focusedWindow = null;
+
+    this.sessions = new SessionsManager();
 
     this.dialogs = {
       settings: new SettingsDialog(),

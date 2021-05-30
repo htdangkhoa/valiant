@@ -24,6 +24,7 @@ class View {
         worldSafeExecuteJavaScript: false,
         sandbox: true,
         enableRemoteModule: false,
+        partition: 'persist:view',
       },
     });
     this.browserView.setBackgroundColor('#ffffff');
