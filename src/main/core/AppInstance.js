@@ -39,9 +39,7 @@ class AppInstance {
     runAdblock();
 
     ipcMain.on(DIALOG_EVENTS.HIDE_ALL_DIALOG, () => {
-      Object.values(this.dialogs).forEach((dialog) => {
-        if (dialog.isOpening) dialog.hide();
-      });
+      this.hideAllDialog();
     });
   }
 
@@ -65,6 +63,16 @@ class AppInstance {
     window.win.close();
     window.win = null;
     this.windows.delete(id);
+  }
+
+  showDialog(name, devTools) {
+    return this.dialogs[name].show(devTools);
+  }
+
+  hideAllDialog() {
+    Object.values(this.dialogs).forEach((dialog) => {
+      if (dialog.isOpening) dialog.hide();
+    });
   }
 }
 

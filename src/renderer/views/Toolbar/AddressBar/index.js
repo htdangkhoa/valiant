@@ -10,7 +10,7 @@ import IconLock from 'renderer/assets/svg/icon-lock.svg';
 import IconStar from 'renderer/assets/svg/icon-star.svg';
 import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
-import { WINDOW_EVENTS } from 'constants/event-names';
+import { DIALOG_EVENTS } from 'constants/event-names';
 import { isURL } from 'common';
 
 import Button from 'renderer/components/Button';
@@ -75,7 +75,11 @@ const AddressBard = () => {
         }
 
         onLoadURL(activeTab?.id, url)();
+
+        return;
       }
+
+      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, { value: e.target.value });
     },
     [activeTab],
   );
@@ -141,7 +145,7 @@ const AddressBard = () => {
       <NavigationButton
         id='btn-quick-menu'
         onClick={() => {
-          ipcRenderer.send(windowId, WINDOW_EVENTS.OPEN_QUICK_MENU);
+          ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SETTINGS_DIALOG);
         }}>
         <IconMenu color='#ffffff' />
       </NavigationButton>

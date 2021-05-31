@@ -6,11 +6,16 @@ const HEIGHT = 250;
 
 class SuggestionDialog extends BaseDialog {
   constructor() {
-    super(VIEW_SUGGESTION, 'address-bar');
+    super(VIEW_SUGGESTION, 'address-bar', { autoHide: false });
   }
 
   onDraw(contentHeight, rect) {
-    return { x: rect.left - DIALOG_MARGIN, y: rect.bottom, width: rect.width + DIALOG_MARGIN * 2, height: HEIGHT };
+    return {
+      x: rect.left - DIALOG_MARGIN,
+      y: rect.top - DIALOG_MARGIN,
+      width: rect.width + DIALOG_MARGIN * 2,
+      height: HEIGHT,
+    };
   }
 }
 

@@ -1,4 +1,4 @@
-import { WINDOW_EVENTS } from 'constants/event-names';
+import { DIALOG_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import { VIEW_TOOLBAR } from 'constants/view-names';
@@ -52,7 +52,9 @@ class Window {
 
         // hot reload when the renderer is changed.
         this.webContents.on('dom-ready', () => {
-          const { windows } = this.instance;
+          const { windows, hideAllDialog } = this.instance;
+
+          hideAllDialog.apply(this.instance);
 
           for (let i = 0; i < windows.size; i += 1) {
             const key = Array.from(windows.keys())[i];
@@ -122,8 +124,12 @@ class Window {
           this.instance.createWindow({ view });
         }
 
-        if (event === WINDOW_EVENTS.OPEN_QUICK_MENU) {
-          this.instance.dialogs.settings.show(message);
+        if (event === DIALOG_EVENTS.SHOW_SETTINGS_DIALOG) {
+          this.instance.showDialog('settings');
+        }
+
+        if (event === DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG) {
+          // this.instance.showDialog('suggestion');
         }
       });
 

@@ -162,9 +162,6 @@ const DraggableTab = ({ index }) => {
       data-handler-id={handlerId}
       id={`tab-${index}`}
       active={tab.active}
-      onClick={handleTabChange(index)}
-      onDoubleClick={handlePreventDoubleClick}
-      onContextMenu={onContextMenu(index)}
       title={tab.title}
       css={css`
         @keyframes slide-in {
@@ -178,7 +175,13 @@ const DraggableTab = ({ index }) => {
 
         animation: slide-in 0.2s;
         z-index: ${tabs.length - index};
-      `}>
+      `}
+      onClick={handleTabChange(index)}
+      onDoubleClick={handlePreventDoubleClick}
+      onContextMenu={onContextMenu(index)}
+      onMouseOver={() => {
+        console.log('=====', 'mouseover');
+      }}>
       {!tab.loading && (
         <TabFavicon>
           {hasFavicon ? (

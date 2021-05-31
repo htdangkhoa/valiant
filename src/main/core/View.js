@@ -6,8 +6,7 @@ import { getPreload } from 'common';
 
 import AppInstance from './AppInstance';
 import contextMenu from '../menus/view';
-import { findOne, History, insert, update } from '../database';
-import logger from 'common/logger';
+import { History, insert, update } from '../database';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -120,6 +119,12 @@ class View {
       const menu = contextMenu(params, this.webContents);
       menu.popup();
     });
+    // this.webContents.on('ipc-message', (e, ...args) => {
+    //   logger.log(e.channel, args);
+    // });
+    // ipcMain.on(this.id, (e, ...args) => {
+    //   logger.log(...args);
+    // });
 
     ipcMain.handle(`get-error-url-${this.id}`, () => this.errorUrl);
 
@@ -129,7 +134,7 @@ class View {
   }
 
   get id() {
-    return this.webContents.id;
+    return this.webContents.id.toString();
   }
 
   get webContents() {
@@ -205,7 +210,7 @@ class View {
   }
 
   emit(event, ...args) {
-    this.window.webContents.send(String(this.id), event, ...args);
+    this.window.webContents.send(this.id, event, ...args);
   }
 
   async addHistory(url, inPage) {

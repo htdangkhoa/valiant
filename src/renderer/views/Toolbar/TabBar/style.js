@@ -67,6 +67,7 @@ export const TabTitle = styled.div`
   white-space: nowrap;
   width: 100%;
   color: white;
+  pointer-events: none;
 `;
 
 export const TabFavicon = styled.div`
@@ -82,6 +83,7 @@ export const TabFavicon = styled.div`
   -o-user-select: none;
   user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;
 `;
 
 export const ButtonCloseTab = styled(Button)`

@@ -4,14 +4,16 @@ import { DIALOG_EVENTS } from 'constants/event-names';
 import AppInstance from 'main/core/AppInstance';
 
 class BaseDialog {
-  constructor(viewName, targetElement, options) {
+  constructor(viewName, targetElement, options = { autoHide: true }) {
     this.opts = Object.assign({}, options);
+
+    this.isOpening = false;
 
     this.targetElement = targetElement;
 
     this.browserView = new BrowserView({
       webPreferences: {
-        preload: getPreload('dialog'),
+        preload: this.opts.autoHide && getPreload('dialog'),
         nodeIntegration: true,
         contextIsolation: false,
         additionalArguments: [`viewName=${viewName}`],
@@ -82,10 +84,10 @@ class BaseDialog {
     `);
 
       if (showDevTools) {
-        this.browserView.webContents.openDevTools({ mode: 'detach' });
+        this.webContents.openDevTools({ mode: 'detach' });
       }
 
-      this.browserView.webContents.focus();
+      this.webContents.focus();
     });
   }
 

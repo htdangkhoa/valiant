@@ -6,4 +6,4 @@ export const radius = '4px';
 
 export const TITLE_BAR_COLOR = 'rgb(28, 27, 33)';
 
-export const DIALOG_MARGIN = 6;
+export const DIALOG_MARGIN = 4;
