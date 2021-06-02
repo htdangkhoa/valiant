@@ -1,8 +1,17 @@
-/** @jsx jsx */
-import React from 'react';
-import { jsx, css } from '@emotion/react';
+import React, { memo } from 'react';
+import styled, { keyframes } from 'styled-components';
 
-const style = css`
+const ring = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+const StyledSpinner = styled.div`
   display: table;
   position: relative;
   width: 16px;
@@ -18,35 +27,28 @@ const style = css`
     height: 16px;
     border: 0.13rem solid rgba(33, 136, 255, 1);
     border-radius: 50%;
-    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    animation: ${ring} 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     border-color: rgba(33, 136, 255, 1) transparent transparent transparent;
-  }
-  .lds-ring div:nth-of-type(1) {
-    animation-delay: -0.45s;
-  }
-  .lds-ring div:nth-of-type(2) {
-    animation-delay: -0.3s;
-  }
-  .lds-ring div:nth-of-type(3) {
-    animation-delay: -0.15s;
-  }
-  @keyframes lds-ring {
-    0% {
-      transform: rotate(0deg);
+
+    &:nth-of-type(1) {
+      animation-delay: -0.45s;
     }
-    100% {
-      transform: rotate(360deg);
+    &:nth-of-type(2) {
+      animation-delay: -0.3s;
+    }
+    &:nth-of-type(3) {
+      animation-delay: -0.15s;
     }
   }
 `;
 
 const Spinner = () => (
-  <div css={style}>
+  <StyledSpinner>
     <div></div>
     <div></div>
     <div></div>
     <div></div>
-  </div>
+  </StyledSpinner>
 );
 
-export default React.memo(Spinner);
+export default memo(Spinner);

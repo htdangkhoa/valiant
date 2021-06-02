@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import styled, { css } from 'styled-components';
 import { dark, radius } from 'constants/theme';
 import Button from 'renderer/components/Button';
 

@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import styled, { css } from 'styled-components';
 import Dialog from 'renderer/components/Dialog';
 
 export const MenuItems = styled(Dialog)`

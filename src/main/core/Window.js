@@ -7,6 +7,7 @@ import { defer, getRendererPath } from 'common';
 import AppInstance from './AppInstance';
 // import request from './request';
 import ViewManager from './ViewManager';
+import logger from 'common/logger';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -48,7 +49,7 @@ class Window {
       await this.win.loadURL(getRendererPath('index.html'));
 
       if (isDev) {
-        this.webContents.openDevTools({ mode: 'detach' });
+        // this.webContents.openDevTools({ mode: 'detach' });
 
         // hot reload when the renderer is changed.
         this.webContents.on('dom-ready', () => {
@@ -79,7 +80,7 @@ class Window {
       }
 
       // setTimeout(() => {
-      //   this.instance.dialogs.suggestion.show(true);
+      //   this.instance.dialogs.suggestion.show();
       // }, 1500);
 
       this.setBoundsListener();
@@ -129,7 +130,10 @@ class Window {
         }
 
         if (event === DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG) {
-          // this.instance.showDialog('suggestion');
+          logger.log(message);
+
+          this.instance.showDialog('suggestion', true);
+          this.instance.dialogs.suggestion.webContents.send('get-address-bar-input-value', message);
         }
       });
 

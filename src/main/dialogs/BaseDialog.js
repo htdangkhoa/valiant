@@ -89,6 +89,8 @@ class BaseDialog {
 
       this.webContents.focus();
     });
+
+    return this.id;
   }
 
   hide() {

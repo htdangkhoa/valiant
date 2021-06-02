@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import styled, { css } from 'styled-components';
 import { TITLE_BAR_COLOR } from 'constants/theme';
 import Button from 'renderer/components/Button';
 
@@ -43,7 +42,7 @@ export const Tab = styled.div`
   display: flex;
   align-items: center;
 
-  ${({ active }) => [
+  ${({ active, animationSize, zIndex }) => [
     !active &&
       css`
         &:hover {
@@ -54,6 +53,20 @@ export const Tab = styled.div`
       css`
         background-color: rgb(85, 84, 89);
       `,
+
+    css`
+      @keyframes slide-in {
+        0% {
+          left: -${animationSize || 100}px;
+        }
+        100% {
+          left: 0;
+        }
+      }
+
+      animation: slide-in 0.2s;
+      z-index: ${zIndex};
+    `,
   ]};
 `;
 

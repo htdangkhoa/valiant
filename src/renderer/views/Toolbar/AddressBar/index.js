@@ -34,7 +34,9 @@ const AddressBard = () => {
     (e) => {
       handleSearchBarFocusChange(true)();
 
-      e.target.select();
+      requestAnimationFrame(() => e.target.select());
+
+      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, { value: e.currentTarget.value });
     },
     [activeTab],
   );

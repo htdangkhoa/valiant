@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import styled from 'styled-components';
 import { DIALOG_MARGIN } from 'constants/theme';
 
 const Dialog = styled.div`
