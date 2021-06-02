@@ -35,8 +35,6 @@ const AddressBard = () => {
       handleSearchBarFocusChange(true)();
 
       requestAnimationFrame(() => e.target.select());
-
-      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, { value: e.currentTarget.value });
     },
     [activeTab],
   );
@@ -77,11 +75,7 @@ const AddressBard = () => {
         }
 
         onLoadURL(activeTab?.id, url)();
-
-        return;
       }
-
-      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, { value: e.target.value });
     },
     [activeTab],
   );
@@ -120,6 +114,19 @@ const AddressBard = () => {
             onFocus={onFocus}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
+            onInput={async (e) => {
+              const { value } = e.target;
+
+              if (value.trim() === '') {
+                ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
+
+                return;
+              }
+
+              e.currentTarget.focus();
+
+              await ipcRenderer.invoke('fetch', value);
+            }}
           />
 
           <Text visible={!isSearchBarFocused}>

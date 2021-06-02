@@ -1,3 +1,4 @@
+import { isURL } from 'common';
 import logger from 'common/logger';
 import { DIALOG_MARGIN } from 'constants/theme';
 import { VIEW_SUGGESTION } from 'constants/view-names';
@@ -22,6 +23,14 @@ class SuggestionDialog extends BaseDialog {
        * Qwant: { data: { items: [{ value: "google.com", suggestType: 12 }, ...] } }
        */
 
+      let result = [];
+
+      if (isURL(message)) {
+        result.push({ text: message });
+      }
+
+      result.push({ text: message, searchWithEngine: true });
+
       try {
         const { data } = await request(
           `https://www.google.com/complete/search?client=chrome&q=${encodeURIComponent(message)}`,
@@ -31,10 +40,13 @@ class SuggestionDialog extends BaseDialog {
 
         const [, suggestions] = res;
 
-        return suggestions;
+        result = result.concat(...[].concat(suggestions).map((text) => ({ text })));
       } catch (error) {
         logger.error(error);
-        return [message, []];
+      } finally {
+        this.show({ showDevTools: true, focus: false });
+
+        this.webContents.send('receive-suggestions', result);
       }
     });
   }
@@ -42,7 +54,7 @@ class SuggestionDialog extends BaseDialog {
   onDraw(contentHeight, rect) {
     return {
       x: rect.left - DIALOG_MARGIN,
-      y: rect.top - DIALOG_MARGIN,
+      y: rect.bottom - DIALOG_MARGIN,
       width: rect.width + DIALOG_MARGIN * 2,
       height: contentHeight,
     };

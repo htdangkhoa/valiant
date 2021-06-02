@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import Dialog from 'renderer/components/Dialog';
 
 export const MenuItems = styled(Dialog)`
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem;
   background-color: rgb(68, 65, 76);
 `;
 

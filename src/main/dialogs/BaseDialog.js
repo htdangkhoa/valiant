@@ -67,7 +67,9 @@ class BaseDialog {
     throw new Error(`'onDraw' must be overridden.`);
   }
 
-  show(showDevTools) {
+  show(options = { showDevTools: false, focus: true }) {
+    const opts = Object.assign({}, options);
+
     if (this.isOpening) return;
 
     this.isOpening = true;
@@ -83,11 +85,13 @@ class BaseDialog {
       resizeObserver.observe(document.body);
     `);
 
-      if (showDevTools) {
+      if (opts.showDevTools) {
         this.webContents.openDevTools({ mode: 'detach' });
       }
 
-      this.webContents.focus();
+      if (opts.focus) {
+        this.webContents.focus();
+      }
     });
 
     return this.id;

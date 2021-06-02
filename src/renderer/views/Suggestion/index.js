@@ -1,10 +1,9 @@
 import { ipcRenderer } from 'electron';
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import Select from 'react-select';
-import Autosuggest from 'react-autosuggest';
-import { SuggestionContainer } from './style';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+
 import { DIALOG_EVENTS } from 'constants/event-names';
-import { isURL } from 'common';
+
+import { SuggestionContainer, SuggestionItem } from './style';
 
 // const Suggestion = () => {
 //   const ref = useRef();
@@ -35,55 +34,22 @@ import { isURL } from 'common';
 //   );
 // };
 
-const getSuggestionValue = (suggestion) => suggestion.text;
-
-const renderSuggestion = (suggestion) => (
-  <div>
-    {suggestion.text}
-    {suggestion.original && ' - Google Search'}
-  </div>
-);
-
 const Suggestion = () => {
-  const ref = useRef();
-
   const [suggestions, setSuggestions] = useState([]);
-  const [value, setValue] = useState('');
+
   const [selected, setSelected] = useState(0);
 
-  const onFetch = useCallback(async (q) => {
-    let suggestionList = [];
-
-    if (isURL(q)) {
-      suggestionList.push({ text: q });
-    }
-
-    suggestionList.push({ text: q, searchWithEngine: true });
-
-    const results = await ipcRenderer.invoke('fetch', q);
-
-    suggestionList = suggestionList.concat(...[].concat(results).map((text) => ({ text })));
-
-    setSuggestions(() => suggestionList);
-  }, []);
-
   useEffect(() => {
-    ipcRenderer.on('get-address-bar-input-value', async (e, { value }) => {
-      setValue(value);
-
-      // setSuggestions(() => []);
-
-      onFetch(value);
+    ipcRenderer.on('receive-suggestions', (e, results) => {
+      setSuggestions(() => results);
     });
-
-    ref.current.focus();
   }, []);
 
   const hideDialog = useCallback(() => ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG), []);
 
   return (
     <SuggestionContainer>
-      <input
+      {/* <input
         ref={ref}
         autoFocus
         type='text'
@@ -137,16 +103,25 @@ const Suggestion = () => {
 
           // setSelected(0);
         }}
-      />
+      /> */}
 
-      <div>
-        {suggestions.map((suggestion, i) => (
-          <div key={i} style={{ backgroundColor: selected === i ? 'blue' : 'red' }}>
-            <span>{suggestion.text}</span>
-            {suggestion.searchWithEngine && <span> - Google Search</span>}
-          </div>
-        ))}
-      </div>
+      {suggestions.map((suggestion, i) => (
+        <SuggestionItem
+          key={i}
+          onClick={async () => {
+            const viewId = await ipcRenderer.sendSync('get-current-view-id');
+            ipcRenderer.invoke('webcontents-call', {
+              webContentsId: viewId,
+              method: 'loadURL',
+              args: `https://google.com/search?q=${suggestions[i].text}`,
+            });
+
+            hideDialog();
+          }}>
+          <span>{suggestion.text}</span>
+          {suggestion.searchWithEngine && <span> - Google Search</span>}
+        </SuggestionItem>
+      ))}
     </SuggestionContainer>
   );
 };

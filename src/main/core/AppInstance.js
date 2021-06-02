@@ -65,8 +65,8 @@ class AppInstance {
     this.windows.delete(id);
   }
 
-  showDialog(name, devTools) {
-    return this.dialogs[name].show(devTools);
+  showDialog(name, options = { showDevTools: false, focus: true }) {
+    return this.dialogs[name].show(options);
   }
 
   hideAllDialog() {

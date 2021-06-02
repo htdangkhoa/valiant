@@ -5,9 +5,7 @@ import { VIEW_TOOLBAR } from 'constants/view-names';
 import { defer, getRendererPath } from 'common';
 
 import AppInstance from './AppInstance';
-// import request from './request';
 import ViewManager from './ViewManager';
-import logger from 'common/logger';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -128,24 +126,7 @@ class Window {
         if (event === DIALOG_EVENTS.SHOW_SETTINGS_DIALOG) {
           this.instance.showDialog('settings');
         }
-
-        if (event === DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG) {
-          logger.log(message);
-
-          this.instance.showDialog('suggestion', true);
-          this.instance.dialogs.suggestion.webContents.send('get-address-bar-input-value', message);
-        }
       });
-
-      // const suggestionEvent = `${ADDRESS_BAR_EVENTS.REQUEST_SUGGEST}-${this.id}`;
-      // ipcMain.on(suggestionEvent, async (e, message) => {
-      //   try {
-      //     const res = await request(`http://google.com/complete/search?client=chrome&q=${encodeURIComponent(message)}`);
-      //     this.webContents.send(suggestionEvent, { input: message, ...res });
-      //   } catch (error) {
-      //     this.webContents.send(suggestionEvent, { input: message, error });
-      //   }
-      // });
     })();
   }
 
@@ -160,7 +141,6 @@ class Window {
   updateTitle() {
     const { selectedView: view } = this.viewManager;
     if (!view) return this.win.setTitle(app.name);
-    // const { browserView } = view;
 
     let title = `${app.name}`;
 
