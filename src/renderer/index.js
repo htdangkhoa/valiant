@@ -29,6 +29,11 @@ styleElement.textContent = `
     overflow: hidden;
   }
 
+  html *,
+  body * {
+    user-select: none;
+  }
+
   ul {
     padding: unset;
     margin: unset;

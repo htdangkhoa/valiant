@@ -12,7 +12,7 @@ class SuggestionDialog extends BaseDialog {
 
     this.browserView.setAutoResize({ width: true, height: true });
 
-    ipcMain.handle(`fetch`, async (e, message) => {
+    ipcMain.on(`fetch2`, async (e, message) => {
       /**
        * index 0: Lilo
        *
@@ -44,9 +44,11 @@ class SuggestionDialog extends BaseDialog {
       } catch (error) {
         logger.error(error);
       } finally {
-        this.show({ showDevTools: true, focus: false });
+        this.show({ showDevTools: true, focus: true });
 
-        this.webContents.send('receive-suggestions', result);
+        // this.webContents.send('receive-suggestions', result);
+
+        e.returnValue = result;
       }
     });
   }
@@ -54,7 +56,7 @@ class SuggestionDialog extends BaseDialog {
   onDraw(contentHeight, rect) {
     return {
       x: rect.left - DIALOG_MARGIN,
-      y: rect.bottom - DIALOG_MARGIN,
+      y: rect.top - DIALOG_MARGIN,
       width: rect.width + DIALOG_MARGIN * 2,
       height: contentHeight,
     };

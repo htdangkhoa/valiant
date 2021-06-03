@@ -75,7 +75,11 @@ const AddressBard = () => {
         }
 
         onLoadURL(activeTab?.id, url)();
+
+        return;
       }
+
+      await ipcRenderer.sendSync('fetch2', e.currentTarget.value);
     },
     [activeTab],
   );
@@ -114,19 +118,19 @@ const AddressBard = () => {
             onFocus={onFocus}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
-            onInput={async (e) => {
-              const { value } = e.target;
+            // onInput={async (e) => {
+            //   const { value } = e.target;
 
-              if (value.trim() === '') {
-                ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
+            //   if (value.trim() === '') {
+            //     ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
 
-                return;
-              }
+            //     return;
+            //   }
 
-              e.currentTarget.focus();
+            //   e.currentTarget.focus();
 
-              await ipcRenderer.invoke('fetch', value);
-            }}
+            //   await ipcRenderer.invoke('fetch', value);
+            // }}
           />
 
           <Text visible={!isSearchBarFocused}>
