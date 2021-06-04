@@ -1,9 +1,10 @@
 import styled, { css } from 'styled-components';
 import Dialog from 'renderer/components/Dialog';
+import { DARK } from 'constants/theme';
 
 export const MenuItems = styled(Dialog)`
   padding: 0.5rem;
-  background-color: rgb(68, 65, 76);
+  background-color: ${DARK.MAIN_COLOR};
 `;
 
 export const MenuItem = styled.li`
@@ -15,7 +16,7 @@ export const MenuItem = styled.li`
   font-size: 14px;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: ${DARK.HOVER_COLOR};
   }
 
   ${({ separator }) =>
@@ -24,7 +25,7 @@ export const MenuItem = styled.li`
         css`
           padding: 0;
           height: 1px;
-          background-color: rgb(82, 81, 92);
+          background-color: ${DARK.SEPARATOR};
           margin: 0.5rem 0;
         `,
     ].filter(Boolean)};

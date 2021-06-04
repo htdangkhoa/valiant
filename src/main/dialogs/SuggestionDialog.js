@@ -1,6 +1,6 @@
 import { isURL } from 'common';
 import logger from 'common/logger';
-import { DIALOG_MARGIN } from 'constants/theme';
+import { DIALOG } from 'constants/theme';
 import { VIEW_SUGGESTION } from 'constants/view-names';
 import { ipcMain } from 'electron';
 import request from 'main/network/request';
@@ -55,9 +55,9 @@ class SuggestionDialog extends BaseDialog {
 
   onDraw(contentHeight, rect) {
     return {
-      x: rect.left - DIALOG_MARGIN,
-      y: rect.top - DIALOG_MARGIN,
-      width: rect.width + DIALOG_MARGIN * 2,
+      x: rect.left - DIALOG.MARGIN,
+      y: rect.top - DIALOG.MARGIN,
+      width: rect.width + DIALOG.MARGIN * 2,
       height: contentHeight,
     };
   }

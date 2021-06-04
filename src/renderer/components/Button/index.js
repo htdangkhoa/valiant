@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
+import { DARK, PADDING, RADIUS } from 'constants/theme';
 
 function parseRadiusValue(value) {
   return typeof value === 'number' ? `${value}px` : value;
@@ -7,8 +8,8 @@ function parseRadiusValue(value) {
 
 const Button = styled.div`
   display: inherit;
-  padding: 2px;
-  border-radius: 4px;
+  padding: ${PADDING}px;
+  border-radius: ${RADIUS}px;
 
   ${({ disable, size, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius }) => css`
     width: ${size}px;
@@ -24,10 +25,10 @@ const Button = styled.div`
     opacity: ${disable ? '0.5' : '1'};
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: ${DARK.HOVER_COLOR};
     }
     &:active {
-      background-color: rgba(255, 255, 255, 0.25);
+      background-color: ${DARK.ACTIVE_COLOR};
     }
   `}
 `;
@@ -42,7 +43,7 @@ Button.propTypes = {
 };
 
 Button.defaultProps = {
-  size: 24,
+  size: 28,
 };
 
 export default Button;

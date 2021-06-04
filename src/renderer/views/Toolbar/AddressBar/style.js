@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import { dark, radius } from 'constants/theme';
+import { DARK, RADIUS } from 'constants/theme';
 import Button from 'renderer/components/Button';
 
 const font = () => css`
@@ -9,7 +9,7 @@ const font = () => css`
 `;
 
 export const AddressBarContainer = styled.div`
-  background-color: ${dark};
+  background-color: ${DARK.ADDRESS_BAR};
   display: flex;
   align-items: center;
   padding: 0.5rem;
@@ -17,7 +17,7 @@ export const AddressBarContainer = styled.div`
 
 export const AddressBar = styled.div`
   display: flex;
-  border-radius: ${radius};
+  border-radius: ${RADIUS}px;
   border: 1px solid white;
   width: 100%;
   margin: auto 0.5rem;

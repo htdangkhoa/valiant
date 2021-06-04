@@ -8,9 +8,12 @@ import IconClose from 'renderer/assets/svg/icon-close.svg';
 import IconHome from 'renderer/assets/svg/icon-home.svg';
 import IconLock from 'renderer/assets/svg/icon-lock.svg';
 import IconStar from 'renderer/assets/svg/icon-star.svg';
+import IconDownload from 'renderer/assets/svg/icon-download.svg';
+import IconAd from 'renderer/assets/svg/icon-ad.svg';
 import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
 import { DIALOG_EVENTS } from 'constants/event-names';
+import { DARK } from 'constants/theme';
 import { isURL } from 'common';
 
 import Button from 'renderer/components/Button';
@@ -87,26 +90,26 @@ const AddressBard = () => {
   return (
     <AddressBarContainer>
       <NavigationButton disable={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
-        <IconBack color='#ffffff' />
+        <IconBack color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
       <NavigationButton disable={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
-        <IconForward color='#ffffff' />
+        <IconForward color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
       <NavigationButton onClick={activeTab?.loading ? onStop(activeTab?.id) : onReload(activeTab?.id)}>
-        {!activeTab?.loading && <IconRefresh color='#ffffff' />}
+        {!activeTab?.loading && <IconRefresh color={DARK.TEXT_COLOR} />}
 
-        {!!activeTab?.loading && <IconClose color='#ffffff' />}
+        {!!activeTab?.loading && <IconClose color={DARK.TEXT_COLOR} />}
       </NavigationButton>
 
       <NavigationButton>
-        <IconHome color='#ffffff' />
+        <IconHome color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
       <AddressBar id='address-bar'>
         <Button topRightRadius={0} bottomRightRadius={0}>
-          <IconLock fill='#88cc88' />
+          <IconLock color={DARK.TEXT_COLOR} />
         </Button>
 
         <InputContainer>
@@ -151,16 +154,24 @@ const AddressBard = () => {
         </InputContainer>
 
         <Button topLeftRadius={0} bottomLeftRadius={0}>
-          <IconStar color='#ffffff' />
+          <IconStar color={DARK.TEXT_COLOR} />
         </Button>
       </AddressBar>
+
+      <NavigationButton>
+        <IconDownload color={DARK.TEXT_COLOR} />
+      </NavigationButton>
+
+      <NavigationButton>
+        <IconAd color={DARK.TEXT_COLOR} />
+      </NavigationButton>
 
       <NavigationButton
         id='btn-quick-menu'
         onClick={() => {
           ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SETTINGS_DIALOG);
         }}>
-        <IconMenu color='#ffffff' />
+        <IconMenu color={DARK.TEXT_COLOR} />
       </NavigationButton>
     </AddressBarContainer>
   );

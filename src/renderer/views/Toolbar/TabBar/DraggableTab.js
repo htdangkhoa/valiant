@@ -8,6 +8,7 @@ import IconClose from 'renderer/assets/svg/icon-close.svg';
 import IconWorld from 'renderer/assets/svg/icon-world.svg';
 
 import { TAB_EVENTS } from 'constants/event-names';
+import { DARK } from 'constants/theme';
 import TabBarState from './state';
 
 import { Tab, TabFavicon, TabTitle, ButtonCloseTab } from './style';
@@ -174,7 +175,7 @@ const DraggableTab = ({ index }) => {
           {hasFavicon ? (
             <img src={tab.favicon} width={16} height={16} />
           ) : (
-            <IconWorld color='#ffffff' width={40} height={40} />
+            <IconWorld color={DARK.TEXT_COLOR} width={40} height={40} />
           )}
         </TabFavicon>
       )}
@@ -189,7 +190,7 @@ const DraggableTab = ({ index }) => {
         onClick={handleCloseTab(index)}
         onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconClose color='#ffffff' />
+        <IconClose color={DARK.TEXT_COLOR} />
       </ButtonCloseTab>
     </Tab>
   );

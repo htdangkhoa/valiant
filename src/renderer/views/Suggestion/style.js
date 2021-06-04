@@ -1,12 +1,13 @@
 import styled, { css } from 'styled-components';
 import Dialog from 'renderer/components/Dialog';
+import { DARK } from 'constants/theme';
 
 export const SuggestionContainer = styled(Dialog)`
   background-color: red;
   border-radius: 4px;
   padding: 0.25rem 0;
   line-height: 0;
-  background-color: rgb(68, 65, 76);
+  background-color: ${DARK.MAIN_COLOR};
 `;
 
 export const Input = styled.input`
@@ -36,14 +37,14 @@ export const SuggestionItem = styled.div`
   }
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: ${DARK.HOVER_COLOR};
   }
 
   ${({ willSelect }) =>
     [
       willSelect &&
         css`
-          background-color: rgba(255, 255, 255, 0.15);
+          background-color: ${DARK.HOVER_COLOR};
         `,
     ].filter(Boolean)}
 `;
