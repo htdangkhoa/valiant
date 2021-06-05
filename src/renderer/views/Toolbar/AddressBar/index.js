@@ -38,6 +38,10 @@ const AddressBard = () => {
       handleSearchBarFocusChange(true)();
 
       requestAnimationFrame(() => e.target.select());
+
+      if (e.currentTarget.value.trim() === '') return;
+
+      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, e.currentTarget.value);
     },
     [activeTab],
   );
@@ -84,7 +88,8 @@ const AddressBard = () => {
   );
 
   const onInput = useCallback(async (e) => {
-    await ipcRenderer.sendSync('fetch2', e.currentTarget.value);
+    if (e.currentTarget.value.trim() === '') return;
+    ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, e.currentTarget.value);
   }, []);
 
   return (
@@ -116,7 +121,7 @@ const AddressBard = () => {
           <Input
             spellCheck={false}
             visible={isSearchBarFocused}
-            defaultValue={inputValue}
+            value={inputValue}
             onChange={handleInputValueChange}
             onFocus={onFocus}
             onBlur={onBlur}

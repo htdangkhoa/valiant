@@ -63,6 +63,14 @@ ipcMain.on('get-current-view-id', (e) => {
   e.returnValue = viewManager.selected;
 });
 
+ipcMain.on('get-current-window-id', (e) => {
+  const { focusedWindow: window } = AppInstance.getInstance();
+
+  if (!window) return;
+
+  e.returnValue = window.id;
+});
+
 ipcMain.handle('webcontents-call', async (e, { webContentsId, method, args }) => {
   const { focusedWindow: window } = AppInstance.getInstance();
 

@@ -1,4 +1,4 @@
-import { DIALOG_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
+import { ADDRESS_BAR_EVENTS, DIALOG_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import { VIEW_TOOLBAR } from 'constants/view-names';
@@ -125,6 +125,15 @@ class Window {
 
         if (event === DIALOG_EVENTS.SHOW_SETTINGS_DIALOG) {
           this.instance.showDialog('settings');
+        }
+
+        if (event === DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG) {
+          this.instance.showDialog('suggestion');
+          this.instance.dialogs.suggestion.webContents.send(ADDRESS_BAR_EVENTS.INITIAL_VALUE, message);
+        }
+
+        if (event === 'update-address-bar') {
+          this.viewManager.selectedView.updateUrlState(message);
         }
       });
     })();

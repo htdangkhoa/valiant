@@ -8,7 +8,7 @@ import BaseDialog from './BaseDialog';
 
 class SuggestionDialog extends BaseDialog {
   constructor() {
-    super(VIEW_SUGGESTION, 'address-bar', { autoHide: false });
+    super(VIEW_SUGGESTION, 'address-bar', { autoHide: true });
 
     this.browserView.setAutoResize({ width: true, height: true });
 
@@ -44,7 +44,7 @@ class SuggestionDialog extends BaseDialog {
       } catch (error) {
         logger.error(error);
       } finally {
-        this.show({ showDevTools: true, focus: true });
+        this.show({ showDevTools: false, focus: true });
 
         // this.webContents.send('receive-suggestions', result);
 

@@ -1,25 +1,44 @@
 import { ipcRenderer } from 'electron';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState, useRef } from 'react';
 
-import { DIALOG_EVENTS } from 'constants/event-names';
+import { ADDRESS_BAR_EVENTS, DIALOG_EVENTS } from 'constants/event-names';
 
 import IconSearch from 'renderer/assets/svg/icon-search.svg';
 import { SuggestionContainer, Input, SuggestionItem } from './style';
 
 const Suggestion = () => {
+  const ref = useRef();
+
   const [suggestions, setSuggestions] = useState([]);
 
   const [value, setValue] = useState('');
 
   const [select, setSelect] = useState(0);
 
-  useEffect(() => {
-    ipcRenderer.on('receive-suggestions', (e, results) => {
-      setSuggestions(() => results);
-    });
-  }, []);
+  const hideDialog = useCallback(async (input) => {
+    setValue('');
+    setSuggestions(() => []);
 
-  const hideDialog = useCallback(() => ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG), []);
+    let query = input;
+
+    if (query.trim() !== '') {
+      query = `https://google.com/search?q=${encodeURIComponent(query)}`;
+    }
+
+    ipcRenderer.send(window.windowId, 'update-address-bar', query);
+
+    if (query) {
+      const viewId = await ipcRenderer.sendSync('get-current-view-id');
+
+      ipcRenderer.invoke('webcontents-call', {
+        webContentsId: viewId,
+        method: 'loadURL',
+        args: query,
+      });
+    }
+
+    ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
+  }, []);
 
   const onFetch = useCallback(async (q) => {
     // if (q.trim() === '') {
@@ -35,7 +54,7 @@ const Suggestion = () => {
     const v = e.currentTarget.value;
 
     if (v.trim() === '') {
-      return setSuggestions(() => []);
+      return hideDialog('');
     }
 
     onFetch(v);
@@ -43,15 +62,7 @@ const Suggestion = () => {
 
   const onKeyPress = useCallback(async (e) => {
     if (e.key === 'Enter') {
-      const viewId = await ipcRenderer.sendSync('get-current-view-id');
-
-      ipcRenderer.invoke('webcontents-call', {
-        webContentsId: viewId,
-        method: 'loadURL',
-        args: 'https://google.com',
-      });
-
-      hideDialog();
+      hideDialog(e.currentTarget.value);
     }
   }, []);
 
@@ -84,9 +95,23 @@ const Suggestion = () => {
     [suggestions],
   );
 
+  useEffect(() => {
+    const listener = (e, v) => {
+      setValue(v);
+
+      ref.current.select();
+
+      onFetch(v);
+    };
+
+    ipcRenderer.addListener(ADDRESS_BAR_EVENTS.INITIAL_VALUE, listener);
+    return () => ipcRenderer.removeListener(ADDRESS_BAR_EVENTS.INITIAL_VALUE, listener);
+  }, [ref]);
+
   return (
     <SuggestionContainer>
       <Input
+        ref={ref}
         autoFocus
         type='text'
         value={value}
@@ -98,19 +123,7 @@ const Suggestion = () => {
 
       {suggestions.length > 0 &&
         suggestions.map((suggestion, i) => (
-          <SuggestionItem
-            key={i}
-            willSelect={select === i}
-            onClick={async () => {
-              const viewId = await ipcRenderer.sendSync('get-current-view-id');
-              ipcRenderer.invoke('webcontents-call', {
-                webContentsId: viewId,
-                method: 'loadURL',
-                args: `https://google.com/search?q=${suggestions[i].text}`,
-              });
-
-              hideDialog();
-            }}>
+          <SuggestionItem key={i} willSelect={select === i} onClick={() => hideDialog(suggestions[i].text)}>
             <div>
               <IconSearch />
             </div>
