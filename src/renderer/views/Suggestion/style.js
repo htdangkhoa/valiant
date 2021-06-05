@@ -18,10 +18,8 @@ export const Input = styled.input`
   padding: 0.25rem 0.5rem;
   line-height: 1;
   background-color: transparent;
-  color: white;
+  color: ${DARK.TEXT_COLOR};
 `;
-
-export const SuggestionItems = styled.div``;
 
 export const SuggestionItem = styled.div`
   margin: 0.225rem 0.45rem;

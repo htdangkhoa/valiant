@@ -4,7 +4,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { DIALOG_EVENTS } from 'constants/event-names';
 
 import IconSearch from 'renderer/assets/svg/icon-search.svg';
-import { SuggestionContainer, Input, SuggestionItems, SuggestionItem } from './style';
+import { SuggestionContainer, Input, SuggestionItem } from './style';
 
 const Suggestion = () => {
   const [suggestions, setSuggestions] = useState([]);
@@ -96,34 +96,31 @@ const Suggestion = () => {
         onKeyDown={onKeyDown}
       />
 
-      {suggestions.length > 0 && (
-        <SuggestionItems>
-          {suggestions.map((suggestion, i) => (
-            <SuggestionItem
-              key={i}
-              willSelect={select === i}
-              onClick={async () => {
-                const viewId = await ipcRenderer.sendSync('get-current-view-id');
-                ipcRenderer.invoke('webcontents-call', {
-                  webContentsId: viewId,
-                  method: 'loadURL',
-                  args: `https://google.com/search?q=${suggestions[i].text}`,
-                });
+      {suggestions.length > 0 &&
+        suggestions.map((suggestion, i) => (
+          <SuggestionItem
+            key={i}
+            willSelect={select === i}
+            onClick={async () => {
+              const viewId = await ipcRenderer.sendSync('get-current-view-id');
+              ipcRenderer.invoke('webcontents-call', {
+                webContentsId: viewId,
+                method: 'loadURL',
+                args: `https://google.com/search?q=${suggestions[i].text}`,
+              });
 
-                hideDialog();
-              }}>
-              <div>
-                <IconSearch />
-              </div>
+              hideDialog();
+            }}>
+            <div>
+              <IconSearch />
+            </div>
 
-              <div>
-                <span>{suggestion.text}</span>
-                {suggestion.searchWithEngine && <span> - Google Search</span>}
-              </div>
-            </SuggestionItem>
-          ))}
-        </SuggestionItems>
-      )}
+            <div>
+              <span>{suggestion.text}</span>
+              {suggestion.searchWithEngine && <span> - Google Search</span>}
+            </div>
+          </SuggestionItem>
+        ))}
     </SuggestionContainer>
   );
 };

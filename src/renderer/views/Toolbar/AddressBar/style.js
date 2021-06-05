@@ -9,16 +9,16 @@ const font = () => css`
 `;
 
 export const AddressBarContainer = styled.div`
-  background-color: ${DARK.ADDRESS_BAR};
+  background-color: ${DARK.NAVIGATION_BAR};
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem;
 `;
 
 export const AddressBar = styled.div`
   display: flex;
+  background-color: ${DARK.ADDRESS_BAR};
   border-radius: ${RADIUS}px;
-  border: 1px solid white;
   width: 100%;
   margin: auto 0.5rem;
 `;
@@ -35,11 +35,12 @@ export const Input = styled.input`
   width: 100%;
   height: auto;
   padding: 0 4px;
+  background-color: ${DARK.ADDRESS_BAR};
 
   ${font};
 
   ${({ visible }) => css`
-    color: ${visible ? 'inherit' : 'transparent'};
+    color: ${visible ? DARK.TEXT_COLOR : 'transparent'};
   `}
 `;
 
@@ -54,6 +55,7 @@ export const Text = styled.div`
   white-space: nowrap;
   pointer-events: none;
   margin: 0 4px;
+  color: ${DARK.TEXT_COLOR};
 
   ${font};
 

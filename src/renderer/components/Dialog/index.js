@@ -6,6 +6,10 @@ const Dialog = styled.div`
   border-radius: ${RADIUS}px;
   margin: ${DIALOG.MARGIN}px;
   border: 1px solid ${DARK.MAIN_COLOR};
+
+  * {
+    color: ${DARK.TEXT_COLOR};
+  }
 `;
 
 export default Dialog;

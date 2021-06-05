@@ -78,14 +78,14 @@ const AddressBard = () => {
         }
 
         onLoadURL(activeTab?.id, url)();
-
-        return;
       }
-
-      await ipcRenderer.sendSync('fetch2', e.currentTarget.value);
     },
     [activeTab],
   );
+
+  const onInput = useCallback(async (e) => {
+    await ipcRenderer.sendSync('fetch2', e.currentTarget.value);
+  }, []);
 
   return (
     <AddressBarContainer>
@@ -121,6 +121,7 @@ const AddressBard = () => {
             onFocus={onFocus}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
+            onInput={onInput}
             // onInput={async (e) => {
             //   const { value } = e.target;
 

@@ -9,15 +9,10 @@ export const MenuItems = styled(Dialog)`
 
 export const MenuItem = styled.li`
   padding: 0.25rem 0.5rem;
-  color: white;
   border-radius: 6px;
   user-select: none;
   cursor: default;
   font-size: 14px;
-
-  &:hover {
-    background-color: ${DARK.HOVER_COLOR};
-  }
 
   ${({ separator }) =>
     [
@@ -27,6 +22,12 @@ export const MenuItem = styled.li`
           height: 1px;
           background-color: ${DARK.SEPARATOR};
           margin: 0.5rem 0;
+        `,
+      !separator &&
+        css`
+          &:hover {
+            background-color: ${DARK.HOVER_COLOR};
+          }
         `,
     ].filter(Boolean)};
 `;
