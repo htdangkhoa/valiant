@@ -1,11 +1,10 @@
-import { DIALOG_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
+import { ADDRESS_BAR_EVENTS, DIALOG_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import { VIEW_TOOLBAR } from 'constants/view-names';
 import { defer, getRendererPath } from 'common';
 
 import AppInstance from './AppInstance';
-// import request from './request';
 import ViewManager from './ViewManager';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -79,7 +78,7 @@ class Window {
       }
 
       // setTimeout(() => {
-      //   this.instance.dialogs.suggestion.show(true);
+      //   this.instance.dialogs.suggestion.show();
       // }, 1500);
 
       this.setBoundsListener();
@@ -129,19 +128,18 @@ class Window {
         }
 
         if (event === DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG) {
-          // this.instance.showDialog('suggestion');
+          // this.instance.showDialog('suggestion', { focus: false });
+          this.instance.dialogs.suggestion.webContents.send(ADDRESS_BAR_EVENTS.INITIAL_VALUE, message);
+        }
+
+        if (event === 'update-address-bar') {
+          const { text, isSearchTerm } = message;
+          this.viewManager.selectedView.updateUrlState(text, {
+            isSearchTerm,
+            preventUpdateOriginal: true,
+          });
         }
       });
-
-      // const suggestionEvent = `${ADDRESS_BAR_EVENTS.REQUEST_SUGGEST}-${this.id}`;
-      // ipcMain.on(suggestionEvent, async (e, message) => {
-      //   try {
-      //     const res = await request(`http://google.com/complete/search?client=chrome&q=${encodeURIComponent(message)}`);
-      //     this.webContents.send(suggestionEvent, { input: message, ...res });
-      //   } catch (error) {
-      //     this.webContents.send(suggestionEvent, { input: message, error });
-      //   }
-      // });
     })();
   }
 
@@ -156,7 +154,6 @@ class Window {
   updateTitle() {
     const { selectedView: view } = this.viewManager;
     if (!view) return this.win.setTitle(app.name);
-    // const { browserView } = view;
 
     let title = `${app.name}`;
 

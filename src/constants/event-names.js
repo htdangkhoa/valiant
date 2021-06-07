@@ -19,6 +19,7 @@ export const TAB_EVENTS = {
 };
 
 export const ADDRESS_BAR_EVENTS = {
+  INITIAL_VALUE: 'INITIAL_VALUE',
   REQUEST_SUGGEST: 'REQUEST_SUGGEST',
 };
 

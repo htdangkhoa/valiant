@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ipcRenderer } from 'electron';
 
 import { DIALOG_EVENTS } from 'constants/event-names';
+import { DARK } from 'constants/theme';
 import IconAdd from 'renderer/assets/svg/icon-add.svg';
 
 import { TabContainer, Tabs, ButtonNewTab } from './style';
@@ -69,7 +70,7 @@ const TabBarView = () => {
         title='New Tab'
         onClick={handleAddNewTab({ active: true })}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconAdd color='#ffffff' />
+        <IconAdd color={DARK.TEXT_COLOR} />
       </ButtonNewTab>
     </TabContainer>
   );

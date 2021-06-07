@@ -199,14 +199,16 @@ class View {
     this.window.updateTitle();
   }
 
-  updateUrlState(url) {
+  updateUrlState(url, options = { isSearchTerm: false, preventUpdateOriginal: false }) {
+    const opts = Object.assign({}, options);
+
     this.lastUrl = url;
 
     if (this.opts.url.startsWith(VIEW_SOURCE)) {
       this.lastUrl = this.opts.url;
     }
 
-    this.emit(TAB_EVENTS.UPDATE_URL, this.lastUrl);
+    this.emit(TAB_EVENTS.UPDATE_URL, this.lastUrl, opts);
   }
 
   emit(event, ...args) {

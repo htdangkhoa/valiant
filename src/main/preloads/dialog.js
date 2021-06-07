@@ -1,5 +1,7 @@
 import { DIALOG_EVENTS } from 'constants/event-names';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, webFrame } from 'electron';
+
+const windowId = ipcRenderer.sendSync('get-current-window-id');
 
 (async () => {
   const dialogId = await ipcRenderer.sendSync('get-webcontents-id');
@@ -7,4 +9,7 @@ import { ipcRenderer } from 'electron';
   window.addEventListener('blur', () => {
     ipcRenderer.send(DIALOG_EVENTS.HIDE_DIALOG, dialogId);
   });
+
+  const w = await webFrame.executeJavaScript('window');
+  w.windowId = windowId;
 })();

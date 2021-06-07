@@ -1,6 +1,5 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-import { TITLE_BAR_COLOR } from 'constants/theme';
+import styled, { css } from 'styled-components';
+import { DARK, PADDING, RADIUS } from 'constants/theme';
 import Button from 'renderer/components/Button';
 
 export const TabContainer = styled.div`
@@ -10,7 +9,7 @@ export const TabContainer = styled.div`
   padding-left: 7.5rem;
   padding-right: 5.5rem;
   -webkit-app-region: drag;
-  background-color: ${TITLE_BAR_COLOR};
+  background-color: ${DARK.TITLE_BAR};
 
   * {
     -webkit-app-region: no-drag;
@@ -32,28 +31,42 @@ export const Tabs = styled.div`
 `;
 
 export const Tab = styled.div`
-  border-radius: 4px;
+  border-radius: ${RADIUS}px;
   min-width: 100px;
-  padding: 4px;
+  padding: ${PADDING}px;
   max-width: 18em;
   width: 100vw;
   font-size: 0.75rem;
   position: relative;
-  background-color: rgb(43, 42, 50);
+  background-color: ${DARK.TAB_COLOR};
   display: flex;
   align-items: center;
 
-  ${({ active }) => [
+  ${({ active, animationSize, zIndex }) => [
     !active &&
       css`
         &:hover {
-          background-color: rgba(255, 255, 255, 0.15);
+          background-color: ${DARK.TAB_HOVER};
         }
       `,
     active &&
       css`
-        background-color: rgb(85, 84, 89);
+        background-color: ${DARK.TAB_ACTIVE};
       `,
+
+    css`
+      @keyframes slide-in {
+        0% {
+          left: -${animationSize || 100}px;
+        }
+        100% {
+          left: 0;
+        }
+      }
+
+      animation: slide-in 0.2s;
+      z-index: ${zIndex};
+    `,
   ]};
 `;
 
@@ -66,7 +79,7 @@ export const TabTitle = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
-  color: white;
+  color: ${DARK.TEXT_COLOR};
   pointer-events: none;
 `;
 

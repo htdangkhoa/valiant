@@ -1,10 +1,15 @@
-import styled from '@emotion/styled';
-import { DIALOG_MARGIN } from 'constants/theme';
+import styled from 'styled-components';
+import { DARK, DIALOG, RADIUS } from 'constants/theme';
 
 const Dialog = styled.div`
-  box-shadow: 0 3px ${DIALOG_MARGIN}px rgba(0, 0, 0, 0.16), 0 3px ${DIALOG_MARGIN}px rgba(0, 0, 0, 0.23);
-  border-radius: ${DIALOG_MARGIN}px;
-  margin: ${DIALOG_MARGIN}px;
+  box-shadow: ${DIALOG.SHADOW};
+  border-radius: ${RADIUS}px;
+  margin: ${DIALOG.MARGIN}px;
+  border: 1px solid ${DARK.MAIN_COLOR};
+
+  * {
+    color: ${DARK.TEXT_COLOR};
+  }
 `;
 
 export default Dialog;

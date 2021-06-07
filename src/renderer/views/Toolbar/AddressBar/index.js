@@ -8,9 +8,12 @@ import IconClose from 'renderer/assets/svg/icon-close.svg';
 import IconHome from 'renderer/assets/svg/icon-home.svg';
 import IconLock from 'renderer/assets/svg/icon-lock.svg';
 import IconStar from 'renderer/assets/svg/icon-star.svg';
+import IconDownload from 'renderer/assets/svg/icon-download.svg';
+import IconAd from 'renderer/assets/svg/icon-ad.svg';
 import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
 import { DIALOG_EVENTS } from 'constants/event-names';
+import { DARK } from 'constants/theme';
 import { isURL } from 'common';
 
 import Button from 'renderer/components/Button';
@@ -20,7 +23,7 @@ import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
 
 const AddressBard = () => {
-  const { windowId, onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
+  const { windowId, onGoBack, onGoForward, onReload, onStop, onLoadURL } = TabBarState.useContainer();
   const {
     activeTab,
     isSearchBarFocused,
@@ -34,7 +37,7 @@ const AddressBard = () => {
     (e) => {
       handleSearchBarFocusChange(true)();
 
-      e.target.select();
+      requestAnimationFrame(() => e.target.select());
     },
     [activeTab],
   );
@@ -45,6 +48,8 @@ const AddressBard = () => {
       window.getSelection().removeAllRanges();
 
       handleSearchBarFocusChange(false)();
+
+      ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
     },
     [activeTab],
   );
@@ -54,9 +59,13 @@ const AddressBard = () => {
       const target = e.currentTarget;
 
       if (e.key === 'Escape') {
-        await handleUrlChange(activeTab?.id, activeTab?.originalUrl);
+        e.preventDefault();
+
+        handleInputValueChange(activeTab.url.original);
 
         requestAnimationFrame(() => target.select());
+
+        ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
 
         return;
       }
@@ -64,14 +73,16 @@ const AddressBard = () => {
       if (e.key === 'Enter') {
         e.currentTarget.blur();
 
-        const { value } = e.currentTarget;
+        const { text, isSearchTerm } = activeTab.url;
 
-        let url = value;
+        let url = text;
 
-        if (isURL(value)) {
-          url = value.indexOf('://') === -1 ? `http://${value}` : value;
+        if (isSearchTerm) {
+          url = `https://google.com/search?q=${encodeURIComponent(text)}`;
+        } else if (isURL(text)) {
+          url = text.indexOf('://') === -1 ? `http://${text}` : text;
         } else {
-          url = `https://google.com/search?q=${value}`;
+          url = `https://google.com/search?q=${encodeURIComponent(text)}`;
         }
 
         onLoadURL(activeTab?.id, url)();
@@ -79,45 +90,58 @@ const AddressBard = () => {
         return;
       }
 
-      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, { value: e.target.value });
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+
+        ipcRenderer.send('suggestion:forwarding-keydown', e.key);
+      }
     },
-    [activeTab],
+    [activeTab, handleInputValueChange],
+  );
+
+  const onInput = useCallback(
+    async (e) => {
+      const v = e.currentTarget.value;
+      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, v);
+    },
+    [inputValue],
   );
 
   return (
     <AddressBarContainer>
       <NavigationButton disable={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
-        <IconBack color='#ffffff' />
+        <IconBack color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
       <NavigationButton disable={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
-        <IconForward color='#ffffff' />
+        <IconForward color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
       <NavigationButton onClick={activeTab?.loading ? onStop(activeTab?.id) : onReload(activeTab?.id)}>
-        {!activeTab?.loading && <IconRefresh color='#ffffff' />}
+        {!activeTab?.loading && <IconRefresh color={DARK.TEXT_COLOR} />}
 
-        {!!activeTab?.loading && <IconClose color='#ffffff' />}
+        {!!activeTab?.loading && <IconClose color={DARK.TEXT_COLOR} />}
       </NavigationButton>
 
       <NavigationButton>
-        <IconHome color='#ffffff' />
+        <IconHome color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
       <AddressBar id='address-bar'>
         <Button topRightRadius={0} bottomRightRadius={0}>
-          <IconLock fill='#88cc88' />
+          <IconLock color={DARK.TEXT_COLOR} />
         </Button>
 
         <InputContainer>
           <Input
             spellCheck={false}
             visible={isSearchBarFocused}
-            defaultValue={inputValue}
-            onChange={handleInputValueChange}
+            onChange={(e) => handleInputValueChange(e.target.value)}
+            value={activeTab?.url?.text || ''}
             onFocus={onFocus}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
+            onInput={onInput}
           />
 
           <Text visible={!isSearchBarFocused}>
@@ -138,16 +162,24 @@ const AddressBard = () => {
         </InputContainer>
 
         <Button topLeftRadius={0} bottomLeftRadius={0}>
-          <IconStar color='#ffffff' />
+          <IconStar color={DARK.TEXT_COLOR} />
         </Button>
       </AddressBar>
+
+      <NavigationButton>
+        <IconDownload color={DARK.TEXT_COLOR} />
+      </NavigationButton>
+
+      <NavigationButton>
+        <IconAd color={DARK.TEXT_COLOR} />
+      </NavigationButton>
 
       <NavigationButton
         id='btn-quick-menu'
         onClick={() => {
           ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SETTINGS_DIALOG);
         }}>
-        <IconMenu color='#ffffff' />
+        <IconMenu color={DARK.TEXT_COLOR} />
       </NavigationButton>
     </AddressBarContainer>
   );

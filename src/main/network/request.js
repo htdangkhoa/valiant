@@ -6,8 +6,8 @@ const request = (url) => {
 
   let fetch = http.request;
 
-  if ($url.protocol === 'https') {
-    fetch = https.request;
+  if ($url.protocol === 'https:') {
+    fetch = https.get;
   }
 
   return new Promise((resolve, reject) => {

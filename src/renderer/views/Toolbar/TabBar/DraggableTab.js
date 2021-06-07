@@ -1,6 +1,4 @@
-/** @jsx jsx */
-import { jsx, css } from '@emotion/react';
-import { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import { ipcRenderer } from 'electron';
@@ -10,6 +8,7 @@ import IconClose from 'renderer/assets/svg/icon-close.svg';
 import IconWorld from 'renderer/assets/svg/icon-world.svg';
 
 import { TAB_EVENTS } from 'constants/event-names';
+import { DARK } from 'constants/theme';
 import TabBarState from './state';
 
 import { Tab, TabFavicon, TabTitle, ButtonCloseTab } from './style';
@@ -43,8 +42,8 @@ const DraggableTab = ({ index }) => {
   const hasFavicon = !!tab.favicon && typeof tab.favicon === 'string' && tab.favicon.startsWith('http');
 
   useEffect(() => {
-    const listener = (e, event, message) => {
-      console.log('🚀 ~ file: Tab.js ~ line 44 ~ listener ~ event, message', event, message);
+    const listener = (e, event, message, ...args) => {
+      // console.log('🚀 ~ file: Tab.js ~ line 44 ~ listener ~ event, message', event, message);
       if (event === TAB_EVENTS.UPDATE_TITLE) {
         handleTitleChange(tab.id, message);
       }
@@ -62,7 +61,10 @@ const DraggableTab = ({ index }) => {
       }
 
       if (event === TAB_EVENTS.UPDATE_URL) {
-        handleUrlChange(tab.id, message);
+        const opts = args[0];
+        console.log('<<<<<', message, ...args);
+
+        handleUrlChange(tab.id, message, opts);
       }
     };
 
@@ -163,19 +165,8 @@ const DraggableTab = ({ index }) => {
       id={`tab-${index}`}
       active={tab.active}
       title={tab.title}
-      css={css`
-        @keyframes slide-in {
-          0% {
-            left: -${rect?.left || 100}px;
-          }
-          100% {
-            left: 0;
-          }
-        }
-
-        animation: slide-in 0.2s;
-        z-index: ${tabs.length - index};
-      `}
+      animationSize={rect?.left}
+      zIndex={tabs.length - index}
       onClick={handleTabChange(index)}
       onDoubleClick={handlePreventDoubleClick}
       onContextMenu={onContextMenu(index)}
@@ -187,7 +178,7 @@ const DraggableTab = ({ index }) => {
           {hasFavicon ? (
             <img src={tab.favicon} width={16} height={16} />
           ) : (
-            <IconWorld color='#ffffff' width={40} height={40} />
+            <IconWorld color={DARK.TEXT_COLOR} width={40} height={40} />
           )}
         </TabFavicon>
       )}
@@ -202,7 +193,7 @@ const DraggableTab = ({ index }) => {
         onClick={handleCloseTab(index)}
         onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconClose color='#ffffff' />
+        <IconClose color={DARK.TEXT_COLOR} />
       </ButtonCloseTab>
     </Tab>
   );

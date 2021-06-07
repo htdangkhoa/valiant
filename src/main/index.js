@@ -53,7 +53,25 @@ ipcMain.on('get-webcontents-id', (e) => {
   e.returnValue = e.sender.id;
 });
 
-ipcMain.handle('web-contents-call', async (e, { webContentsId, method, args }) => {
+ipcMain.on('get-current-view-id', (e) => {
+  const { focusedWindow: window } = AppInstance.getInstance();
+
+  if (!window) return;
+
+  const { viewManager } = window;
+
+  e.returnValue = viewManager.selected;
+});
+
+ipcMain.on('get-current-window-id', (e) => {
+  const { focusedWindow: window } = AppInstance.getInstance();
+
+  if (!window) return;
+
+  e.returnValue = window.id;
+});
+
+ipcMain.handle('webcontents-call', async (e, { webContentsId, method, args }) => {
   const { focusedWindow: window } = AppInstance.getInstance();
 
   const view = window.viewManager.views.get(webContentsId);
@@ -69,7 +87,8 @@ ipcMain.handle('web-contents-call', async (e, { webContentsId, method, args }) =
     view.errorUrl = undefined;
   }
 
-  const result = view.webContents[method](...args);
+  const params = [].concat(args);
+  const result = view.webContents[method](...params);
 
   if (result) {
     if (result instanceof Promise) {

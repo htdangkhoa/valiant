@@ -1,6 +1,5 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-import { dark, radius } from 'constants/theme';
+import styled, { css } from 'styled-components';
+import { DARK, RADIUS } from 'constants/theme';
 import Button from 'renderer/components/Button';
 
 const font = () => css`
@@ -10,16 +9,16 @@ const font = () => css`
 `;
 
 export const AddressBarContainer = styled.div`
-  background-color: ${dark};
+  background-color: ${DARK.NAVIGATION_BAR};
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem;
 `;
 
 export const AddressBar = styled.div`
   display: flex;
-  border-radius: ${radius};
-  border: 1px solid white;
+  background-color: ${DARK.ADDRESS_BAR};
+  border-radius: ${RADIUS}px;
   width: 100%;
   margin: auto 0.5rem;
 `;
@@ -36,11 +35,17 @@ export const Input = styled.input`
   width: 100%;
   height: auto;
   padding: 0 4px;
+  background-color: ${DARK.ADDRESS_BAR};
+
+  :focus {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 
   ${font};
 
   ${({ visible }) => css`
-    color: ${visible ? 'inherit' : 'transparent'};
+    color: ${visible ? DARK.TEXT_COLOR : 'transparent'};
   `}
 `;
 
@@ -55,6 +60,7 @@ export const Text = styled.div`
   white-space: nowrap;
   pointer-events: none;
   margin: 0 4px;
+  color: ${DARK.TEXT_COLOR};
 
   ${font};
 
