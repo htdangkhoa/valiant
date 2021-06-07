@@ -9,7 +9,7 @@
 - [ ] Pin tab
 - [ ] Tab groups
 - [x] Move Tab to New Window
-- [ ] Search engine with suggestions
+- [x] Search engine with suggestions
 - [ ] Incognito
 - [x] Adblock
 - [ ] Chrome Extensions

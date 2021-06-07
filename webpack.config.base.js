@@ -34,7 +34,7 @@ const config = {
       },
     ],
   },
-  // plugins: [new ESLintPlugin()],
+  plugins: [new ESLintPlugin()],
   resolve: {
     modules: ['node_modules'],
     extensions: ['.js', '.json', '.jsx'],
