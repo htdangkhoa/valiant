@@ -36,8 +36,11 @@ const useTabBarState = () => {
             loading: false,
             canGoBack: false,
             canGoForward: false,
-            originalUrl: '',
-            url: '',
+            url: {
+              original: '',
+              text: '',
+              isSearchTerm: false,
+            },
           };
 
           if (typeof nextTo === 'number') {
@@ -232,12 +235,17 @@ const useTabBarState = () => {
     );
   }, []);
 
-  const handleUrlChange = useCallback((id, url) => {
+  const handleUrlChange = useCallback((id, url, options = { isSearchTerm: false, preventUpdateOriginal: false }) => {
+    const opts = Object.assign({}, options);
+
     setTabs((his) =>
       [...his].map((tab) => {
         if (tab.id === id) {
-          tab.url = url;
-          tab.originalUrl = url;
+          tab.url = Object.assign({}, tab.url, {
+            text: url,
+            original: opts.preventUpdateOriginal ? tab.url.original : url,
+            isSearchTerm: opts.isSearchTerm,
+          });
         }
         return tab;
       }),

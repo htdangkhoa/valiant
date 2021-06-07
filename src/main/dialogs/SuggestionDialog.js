@@ -1,8 +1,9 @@
-import { isURL } from 'common';
-import logger from 'common/logger';
+import { ipcMain } from 'electron';
+
 import { DIALOG } from 'constants/theme';
 import { VIEW_SUGGESTION } from 'constants/view-names';
-import { ipcMain } from 'electron';
+import { isURL } from 'common';
+import logger from 'common/logger';
 import request from 'main/network/request';
 import BaseDialog from './BaseDialog';
 
@@ -11,6 +12,12 @@ class SuggestionDialog extends BaseDialog {
     super(VIEW_SUGGESTION, 'address-bar', { autoHide: true });
 
     this.browserView.setAutoResize({ width: true, height: true });
+
+    ipcMain.on('suggestion:forwarding-keydown', (e, key) => {
+      if (this.isOpening) {
+        this.webContents.send('suggestion:forwarding-keydown', key);
+      }
+    });
 
     ipcMain.on(`fetch2`, async (e, message) => {
       /**
@@ -23,13 +30,21 @@ class SuggestionDialog extends BaseDialog {
        * Qwant: { data: { items: [{ value: "google.com", suggestType: 12 }, ...] } }
        */
 
+      this.show({ showDevTools: false, focus: false });
+
       let result = [];
+
+      if (message.trim() === '') {
+        e.returnValue = result;
+
+        return;
+      }
 
       if (isURL(message)) {
         result.push({ text: message });
       }
 
-      result.push({ text: message, searchWithEngine: true });
+      result.push({ text: message, label: ' - Google Search', isSearchTerm: true });
 
       try {
         const { data } = await request(
@@ -40,14 +55,10 @@ class SuggestionDialog extends BaseDialog {
 
         const [, suggestions] = res;
 
-        result = result.concat(...[].concat(suggestions).map((text) => ({ text })));
+        result = result.concat(...[].concat(suggestions).map((text) => ({ text, isSearchTerm: true })));
       } catch (error) {
         logger.error(error);
       } finally {
-        this.show({ showDevTools: false, focus: true });
-
-        // this.webContents.send('receive-suggestions', result);
-
         e.returnValue = result;
       }
     });
@@ -56,7 +67,7 @@ class SuggestionDialog extends BaseDialog {
   onDraw(contentHeight, rect) {
     return {
       x: rect.left - DIALOG.MARGIN,
-      y: rect.top - DIALOG.MARGIN,
+      y: rect.bottom,
       width: rect.width + DIALOG.MARGIN * 2,
       height: contentHeight,
     };

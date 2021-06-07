@@ -20,15 +20,15 @@ const useAddressBarState = () => {
   const [url, setUrl] = useState('');
 
   useEffect(() => {
-    setUrl(activeTab?.url || '');
+    setUrl(activeTab?.url?.text || '');
   }, [activeTab?.url]);
 
   const handleInputValueChange = useCallback(
-    (e) => {
+    (value) => {
       setTabs((his) =>
         [...his].map((tab) => {
           if (tab.id === activeTab?.id) {
-            tab.url = e.target.value;
+            tab.url = Object.assign({}, tab.url, { text: value });
           }
           return tab;
         }),

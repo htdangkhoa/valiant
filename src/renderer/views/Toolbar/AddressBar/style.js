@@ -37,6 +37,11 @@ export const Input = styled.input`
   padding: 0 4px;
   background-color: ${DARK.ADDRESS_BAR};
 
+  :focus {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
   ${font};
 
   ${({ visible }) => css`

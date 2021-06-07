@@ -10,17 +10,6 @@ export const SuggestionContainer = styled(Dialog)`
   background-color: ${DARK.MAIN_COLOR};
 `;
 
-export const Input = styled.input`
-  outline: none;
-  border: none;
-  width: 100%;
-  height: auto;
-  padding: 0.25rem 0.5rem;
-  line-height: 1;
-  background-color: transparent;
-  color: ${DARK.TEXT_COLOR};
-`;
-
 export const SuggestionItem = styled.div`
   margin: 0.225rem 0.45rem;
   padding: 0.45rem 0.35rem;

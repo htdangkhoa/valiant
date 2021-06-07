@@ -23,7 +23,7 @@ import AddressBarState from './state';
 import TabBarState from '../TabBar/state';
 
 const AddressBard = () => {
-  const { windowId, onGoBack, onGoForward, onReload, onStop, onLoadURL, handleUrlChange } = TabBarState.useContainer();
+  const { windowId, onGoBack, onGoForward, onReload, onStop, onLoadURL } = TabBarState.useContainer();
   const {
     activeTab,
     isSearchBarFocused,
@@ -38,10 +38,6 @@ const AddressBard = () => {
       handleSearchBarFocusChange(true)();
 
       requestAnimationFrame(() => e.target.select());
-
-      if (e.currentTarget.value.trim() === '') return;
-
-      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, e.currentTarget.value);
     },
     [activeTab],
   );
@@ -52,6 +48,8 @@ const AddressBard = () => {
       window.getSelection().removeAllRanges();
 
       handleSearchBarFocusChange(false)();
+
+      ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
     },
     [activeTab],
   );
@@ -61,9 +59,13 @@ const AddressBard = () => {
       const target = e.currentTarget;
 
       if (e.key === 'Escape') {
-        await handleUrlChange(activeTab?.id, activeTab?.originalUrl);
+        e.preventDefault();
+
+        handleInputValueChange(activeTab.url.original);
 
         requestAnimationFrame(() => target.select());
+
+        ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
 
         return;
       }
@@ -71,26 +73,39 @@ const AddressBard = () => {
       if (e.key === 'Enter') {
         e.currentTarget.blur();
 
-        const { value } = e.currentTarget;
+        const { text, isSearchTerm } = activeTab.url;
 
-        let url = value;
+        let url = text;
 
-        if (isURL(value)) {
-          url = value.indexOf('://') === -1 ? `http://${value}` : value;
+        if (isSearchTerm) {
+          url = `https://google.com/search?q=${encodeURIComponent(text)}`;
+        } else if (isURL(text)) {
+          url = text.indexOf('://') === -1 ? `http://${text}` : text;
         } else {
-          url = `https://google.com/search?q=${value}`;
+          url = `https://google.com/search?q=${encodeURIComponent(text)}`;
         }
 
         onLoadURL(activeTab?.id, url)();
+
+        return;
+      }
+
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+
+        ipcRenderer.send('suggestion:forwarding-keydown', e.key);
       }
     },
-    [activeTab],
+    [activeTab, handleInputValueChange],
   );
 
-  const onInput = useCallback(async (e) => {
-    if (e.currentTarget.value.trim() === '') return;
-    ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, e.currentTarget.value);
-  }, []);
+  const onInput = useCallback(
+    async (e) => {
+      const v = e.currentTarget.value;
+      ipcRenderer.send(windowId, DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG, v);
+    },
+    [inputValue],
+  );
 
   return (
     <AddressBarContainer>
@@ -121,25 +136,12 @@ const AddressBard = () => {
           <Input
             spellCheck={false}
             visible={isSearchBarFocused}
-            value={inputValue}
-            onChange={handleInputValueChange}
+            onChange={(e) => handleInputValueChange(e.target.value)}
+            value={activeTab?.url?.text || ''}
             onFocus={onFocus}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
             onInput={onInput}
-            // onInput={async (e) => {
-            //   const { value } = e.target;
-
-            //   if (value.trim() === '') {
-            //     ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
-
-            //     return;
-            //   }
-
-            //   e.currentTarget.focus();
-
-            //   await ipcRenderer.invoke('fetch', value);
-            // }}
           />
 
           <Text visible={!isSearchBarFocused}>

@@ -42,8 +42,8 @@ const DraggableTab = ({ index }) => {
   const hasFavicon = !!tab.favicon && typeof tab.favicon === 'string' && tab.favicon.startsWith('http');
 
   useEffect(() => {
-    const listener = (e, event, message) => {
-      console.log('🚀 ~ file: Tab.js ~ line 44 ~ listener ~ event, message', event, message);
+    const listener = (e, event, message, ...args) => {
+      // console.log('🚀 ~ file: Tab.js ~ line 44 ~ listener ~ event, message', event, message);
       if (event === TAB_EVENTS.UPDATE_TITLE) {
         handleTitleChange(tab.id, message);
       }
@@ -61,7 +61,10 @@ const DraggableTab = ({ index }) => {
       }
 
       if (event === TAB_EVENTS.UPDATE_URL) {
-        handleUrlChange(tab.id, message);
+        const opts = args[0];
+        console.log('<<<<<', message, ...args);
+
+        handleUrlChange(tab.id, message, opts);
       }
     };
 

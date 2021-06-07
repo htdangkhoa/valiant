@@ -47,7 +47,7 @@ class Window {
       await this.win.loadURL(getRendererPath('index.html'));
 
       if (isDev) {
-        // this.webContents.openDevTools({ mode: 'detach' });
+        this.webContents.openDevTools({ mode: 'detach' });
 
         // hot reload when the renderer is changed.
         this.webContents.on('dom-ready', () => {
@@ -128,12 +128,16 @@ class Window {
         }
 
         if (event === DIALOG_EVENTS.SHOW_SUGGESTION_DIALOG) {
-          this.instance.showDialog('suggestion');
+          // this.instance.showDialog('suggestion', { focus: false });
           this.instance.dialogs.suggestion.webContents.send(ADDRESS_BAR_EVENTS.INITIAL_VALUE, message);
         }
 
         if (event === 'update-address-bar') {
-          this.viewManager.selectedView.updateUrlState(message);
+          const { text, isSearchTerm } = message;
+          this.viewManager.selectedView.updateUrlState(text, {
+            isSearchTerm,
+            preventUpdateOriginal: true,
+          });
         }
       });
     })();
