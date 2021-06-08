@@ -1038,7 +1038,7 @@
   dependencies:
     "@cliqz/adblocker-content" "^1.22.1"
 
-"@cliqz/adblocker-electron@^1.22.0":
+"@cliqz/adblocker-electron@^1.22.1":
   version "1.22.1"
   resolved "https://registry.yarnpkg.com/@cliqz/adblocker-electron/-/adblocker-electron-1.22.1.tgz#13fe6de4be0c3beb2851634b27ea1223d10ca92b"
   integrity sha512-RZUog6ogMZnOx9Rz1LWIHE5MOWdDStfzkbfLpelka6PerRSKKltUvV4qwqM455eUMqHqPd27ZMM183+MQ85WpQ==
