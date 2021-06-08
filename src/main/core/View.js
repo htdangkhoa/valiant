@@ -61,6 +61,9 @@ class View {
     this.webContents.on('did-start-navigation', () => {
       this.updateNavigationState();
     });
+    this.webContents.on('will-navigate', () => {
+      this.instance.hideDialog('suggestion');
+    });
     this.webContents.on('did-navigate', async (e, url) => {
       this.addHistory(url);
 
@@ -83,6 +86,12 @@ class View {
 
         this.webContents.loadURL(`${VALIANT}://network-error/${errorCode}`);
       }
+    });
+    this.webContents.on('media-started-playing', () => {
+      this.emit(TAB_EVENTS.MEDIA_IS_PLAYING, true);
+    });
+    this.webContents.on('media-paused', () => {
+      this.emit(TAB_EVENTS.MEDIA_IS_PLAYING, false);
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {
       if (disposition === 'new-window') {
@@ -128,6 +137,9 @@ class View {
 
     ipcMain.handle(`get-error-url-${this.id}`, () => this.errorUrl);
 
+    ipcMain.handle(`${TAB_EVENTS.MUTE}-${this.id}`, () => this.webContents.setAudioMuted(true));
+    ipcMain.handle(`${TAB_EVENTS.UNMUTE}-${this.id}`, () => this.webContents.setAudioMuted(false));
+
     this.render(this.opts);
 
     this.webContents.loadURL(this.opts.url);
@@ -141,8 +153,12 @@ class View {
     return this.browserView.webContents;
   }
 
+  get instance() {
+    return AppInstance.getInstance();
+  }
+
   get window() {
-    const { focusedWindow } = AppInstance.getInstance();
+    const { focusedWindow } = this.instance;
     return focusedWindow;
   }
 
@@ -200,6 +216,8 @@ class View {
   }
 
   updateUrlState(url, options = { isSearchTerm: false, preventUpdateOriginal: false }) {
+    this.instance.hideDialog('suggestion');
+
     const opts = Object.assign({}, options);
 
     this.lastUrl = url;

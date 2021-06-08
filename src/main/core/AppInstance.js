@@ -69,6 +69,10 @@ class AppInstance {
     return this.dialogs[name].show(options);
   }
 
+  hideDialog(name) {
+    return this.dialogs[name].hide();
+  }
+
   hideAllDialog() {
     Object.values(this.dialogs).forEach((dialog) => {
       if (dialog.isOpening) dialog.hide();
