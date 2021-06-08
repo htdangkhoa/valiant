@@ -35,4 +35,4 @@ export const RADIUS = 4;
 
 export const PADDING = 4;
 
-export const SPINNER_COLOR = 'rgb(33, 136, 255)';
+export const HIGHLIGHT_COLOR = 'rgb(33, 136, 255)';

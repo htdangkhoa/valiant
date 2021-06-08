@@ -4,19 +4,19 @@ import fetch from 'node-fetch';
 import { promises as fs, existsSync, mkdirSync } from 'fs';
 import { getPath } from 'common';
 import logger from 'common/logger';
-
-// const instance = AppInstance.getInstance();
+import { TAB_EVENTS } from 'constants/event-names';
 
 let blocker;
 
-const emitEvent = (request) => {
-  // for (let i = 0; i < instance.windows.length; i += 1) {
-  //   const window = instance.windows[i];
-  //   window.webContents.send(`blocked-ad-${request.tabId}`);
-  // }
+const emitEvent = (instance, request) => {
+  const view = instance.findViewById(request.tabId.toString());
+
+  if (!view) return;
+
+  view.webContents.send(request.tabId.toString(), TAB_EVENTS.ADS_COUNTING);
 };
 
-export const runAdblock = async () => {
+export const runAdblock = async (instance) => {
   const adblockerEngineDir = getPath('.bin');
 
   if (!existsSync(adblockerEngineDir)) {
@@ -25,7 +25,11 @@ export const runAdblock = async () => {
 
   blocker = await ElectronBlocker.fromLists(
     fetch,
-    fullLists,
+    [
+      ...fullLists,
+      'https://raw.githubusercontent.com/deathbybandaid/piholeparser/master/Subscribable-Lists/CountryCodesLists/Vietnam.txt',
+      'https://raw.githubusercontent.com/bigdargon/hostsVN/master/hosts',
+    ],
     { enableCompression: true },
     {
       path: getPath('.bin/engine.bin'),
@@ -34,18 +38,18 @@ export const runAdblock = async () => {
     },
   );
 
-  blocker.enableBlockingInSession(session.defaultSession);
+  blocker.enableBlockingInSession(session.fromPartition('persist:view'));
 
   blocker.on('request-blocked', (request) => {
     logger.log('blocked', request.tabId, request.url);
 
-    // emitEvent(request);
+    emitEvent(instance, request);
   });
 
   blocker.on('request-redirected', (request) => {
     logger.log('redirected', request.tabId, request.url);
 
-    // emitEvent(request);
+    emitEvent(instance, request);
   });
 
   blocker.on('request-whitelisted', (request) => {

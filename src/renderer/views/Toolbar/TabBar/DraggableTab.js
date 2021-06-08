@@ -4,8 +4,11 @@ import { useDrag, useDrop } from 'react-dnd';
 import { ipcRenderer } from 'electron';
 
 import Spinner from 'renderer/components/Spinner';
+import Button from 'renderer/components/Button';
 import IconClose from 'renderer/assets/svg/icon-close.svg';
 import IconWorld from 'renderer/assets/svg/icon-world.svg';
+import IconVolume from 'renderer/assets/svg/icon-volume.svg';
+import IconMute from 'renderer/assets/svg/icon-mute.svg';
 
 import { TAB_EVENTS } from 'constants/event-names';
 import { DARK } from 'constants/theme';
@@ -23,11 +26,16 @@ const moveItemNextTo = (source, from, to) => {
 
 const DraggableTab = ({ index }) => {
   const {
+    handleLoadCommit,
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
     handleNavigationStateChange,
     handleUrlChange,
+    handleMediaIsPlayingChange,
+    handleMuteChange,
+    handleUnmuteChange,
+    handleAdsCounting,
     tabs,
     setTabs,
     handleTabChange,
@@ -44,6 +52,14 @@ const DraggableTab = ({ index }) => {
   useEffect(() => {
     const listener = (e, event, message, ...args) => {
       // console.log('🚀 ~ file: Tab.js ~ line 44 ~ listener ~ event, message', event, message);
+      if (event === TAB_EVENTS.LOAD_COMMIT) {
+        // reset ...
+        const [, , isMainFrame] = [message, ...args];
+        if (isMainFrame) {
+          handleLoadCommit(tab.id);
+        }
+      }
+
       if (event === TAB_EVENTS.UPDATE_TITLE) {
         handleTitleChange(tab.id, message);
       }
@@ -65,6 +81,15 @@ const DraggableTab = ({ index }) => {
         console.log('<<<<<', message, ...args);
 
         handleUrlChange(tab.id, message, opts);
+      }
+
+      if (event === TAB_EVENTS.MEDIA_IS_PLAYING) {
+        handleMediaIsPlayingChange(tab.id, message);
+      }
+
+      if (event === TAB_EVENTS.ADS_COUNTING) {
+        console.log(';dksal;sdkl;');
+        handleAdsCounting(tab.id);
       }
     };
 
@@ -187,13 +212,29 @@ const DraggableTab = ({ index }) => {
 
       <TabTitle>{tab.title}</TabTitle>
 
+      {tab.mediaIsPlaying && (
+        <>
+          {!tab.isMuted && (
+            <Button size={18} style={{ padding: 2 }} onClick={handleMuteChange(tab.id)}>
+              <IconVolume color={DARK.TEXT_COLOR} />
+            </Button>
+          )}
+
+          {tab.isMuted && (
+            <Button size={18} style={{ padding: 2 }} onClick={handleUnmuteChange(tab.id)}>
+              <IconMute color={DARK.TEXT_COLOR} />
+            </Button>
+          )}
+        </>
+      )}
+
       <ButtonCloseTab
-        size={20}
+        size={24}
         title='Close Tab'
         onClick={handleCloseTab(index)}
         onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconClose color={DARK.TEXT_COLOR} />
+        <IconClose color={DARK.TEXT_COLOR} strokeWidth={8} />
       </ButtonCloseTab>
     </Tab>
   );

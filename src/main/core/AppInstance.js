@@ -36,7 +36,7 @@ class AppInstance {
     };
 
     // TODO: the settings will be loaded at here.
-    runAdblock();
+    runAdblock(this);
 
     ipcMain.on(DIALOG_EVENTS.HIDE_ALL_DIALOG, () => {
       this.hideAllDialog();
@@ -65,8 +65,16 @@ class AppInstance {
     this.windows.delete(id);
   }
 
+  findViewById(id) {
+    return Array.from(this.windows.values()).find((x) => !!x.viewManager.views.get(id));
+  }
+
   showDialog(name, options = { showDevTools: false, focus: true }) {
     return this.dialogs[name].show(options);
+  }
+
+  hideDialog(name) {
+    return this.dialogs[name].hide();
   }
 
   hideAllDialog() {

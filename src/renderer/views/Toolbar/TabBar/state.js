@@ -3,7 +3,7 @@ import { createContainer } from 'unstated-next';
 import { ipcRenderer } from 'electron';
 import * as remote from '@electron/remote';
 
-import { ADDRESS_BAR_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
+import { ADDRESS_BAR_EVENTS, TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { first } from 'common';
 import logger from 'common/logger';
 import { getCurrentWindow } from 'renderer/utils/window';
@@ -36,6 +36,9 @@ const useTabBarState = () => {
             loading: false,
             canGoBack: false,
             canGoForward: false,
+            mediaIsPlaying: false,
+            isMuted: false,
+            blockedAds: 0,
             url: {
               original: '',
               text: '',
@@ -190,6 +193,17 @@ const useTabBarState = () => {
   }, []);
 
   // browser view handler
+  const handleLoadCommit = useCallback((id) => {
+    setTabs((his) =>
+      [...his].map(($tab) => {
+        if ($tab.id === id) {
+          $tab.blockedAds = 0;
+        }
+        return $tab;
+      }),
+    );
+  }, []);
+
   const handleTitleChange = useCallback((id, title) => {
     setTabs((his) =>
       [...his].map(($tab) => {
@@ -252,6 +266,60 @@ const useTabBarState = () => {
     );
   }, []);
 
+  const handleMediaIsPlayingChange = useCallback((id, isPlaying) => {
+    setTabs((his) =>
+      [...his].map(($tab) => {
+        if ($tab.id === id) {
+          $tab.mediaIsPlaying = isPlaying;
+        }
+        return $tab;
+      }),
+    );
+  }, []);
+
+  const handleMuteChange = useCallback(
+    (id) => () => {
+      ipcRenderer.invoke(`${TAB_EVENTS.MUTE}-${id}`);
+
+      setTabs((his) =>
+        [...his].map(($tab) => {
+          if ($tab.id === id) {
+            $tab.isMuted = true;
+          }
+          return $tab;
+        }),
+      );
+    },
+    [],
+  );
+
+  const handleUnmuteChange = useCallback(
+    (id) => () => {
+      ipcRenderer.invoke(`${TAB_EVENTS.UNMUTE}-${id}`);
+
+      setTabs((his) =>
+        [...his].map(($tab) => {
+          if ($tab.id === id) {
+            $tab.isMuted = false;
+          }
+          return $tab;
+        }),
+      );
+    },
+    [],
+  );
+
+  const handleAdsCounting = useCallback((id) => {
+    setTabs((his) =>
+      [...his].map(($tab) => {
+        if ($tab.id === id) {
+          $tab.blockedAds += 1;
+        }
+        return $tab;
+      }),
+    );
+  }, []);
+
   const onGoBack = useCallback((id) => () => callWebContentsMethod(id, 'goBack'), []);
   const onGoForward = useCallback((id) => () => callWebContentsMethod(id, 'goForward'), []);
   const onReload = useCallback((id) => () => callWebContentsMethod(id, 'reload'), []);
@@ -277,7 +345,7 @@ const useTabBarState = () => {
       const menu = remote.Menu.buildFromTemplate([
         {
           label: 'New Tab',
-          click: () => handleAddNewTab({ nextTo: index + 1 })(),
+          click: handleAddNewTab({ nextTo: index + 1 }),
         },
         {
           label: 'Move Tab to New Window',
@@ -302,7 +370,8 @@ const useTabBarState = () => {
           label: 'Pin',
         },
         {
-          label: 'Mute Site',
+          label: tab.isMuted ? 'Unmute Site' : 'Mute Site',
+          click: tab.isMuted ? handleUnmuteChange(tab.id) : handleMuteChange(tab.id),
         },
         {
           type: 'separator',
@@ -319,7 +388,7 @@ const useTabBarState = () => {
 
       menu.popup();
     },
-    [handleAddNewTab],
+    [handleAddNewTab, handleMuteChange, handleUnmuteChange],
   );
 
   return {
@@ -331,11 +400,16 @@ const useTabBarState = () => {
     handleAddNewTab,
     handlePreventDoubleClick,
     handleDragEnd,
+    handleLoadCommit,
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
     handleNavigationStateChange,
     handleUrlChange,
+    handleMediaIsPlayingChange,
+    handleMuteChange,
+    handleUnmuteChange,
+    handleAdsCounting,
     onGoBack,
     onGoForward,
     onReload,

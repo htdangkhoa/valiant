@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { SPINNER_COLOR } from 'constants/theme';
+import { HIGHLIGHT_COLOR } from 'constants/theme';
 
 const ring = keyframes`
   0% {
@@ -26,10 +26,10 @@ const StyledSpinner = styled.div`
     position: absolute;
     width: 16px;
     height: 16px;
-    border: 0.13rem solid ${SPINNER_COLOR};
+    border: 0.13rem solid ${HIGHLIGHT_COLOR};
     border-radius: 50%;
     animation: ${ring} 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: ${SPINNER_COLOR} transparent transparent transparent;
+    border-color: ${HIGHLIGHT_COLOR} transparent transparent transparent;
 
     &:nth-of-type(1) {
       animation-delay: -0.45s;

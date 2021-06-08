@@ -66,7 +66,7 @@ const TabBarView = () => {
       </Tabs>
 
       <ButtonNewTab
-        size={28}
+        size={32}
         title='New Tab'
         onClick={handleAddNewTab({ active: true })}
         onDoubleClick={handlePreventDoubleClick}>
