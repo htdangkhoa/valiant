@@ -9,14 +9,14 @@ import IconHome from 'renderer/assets/svg/icon-home.svg';
 import IconLock from 'renderer/assets/svg/icon-lock.svg';
 import IconStar from 'renderer/assets/svg/icon-star.svg';
 import IconDownload from 'renderer/assets/svg/icon-download.svg';
-import IconAd from 'renderer/assets/svg/icon-ad.svg';
+import IconShield from 'renderer/assets/svg/icon-shield.svg';
 import IconMenu from 'renderer/assets/svg/icon-menu.svg';
 
 import { DIALOG_EVENTS } from 'constants/event-names';
 import { DARK } from 'constants/theme';
 import { isURL } from 'common';
 
-import Button from 'renderer/components/Button';
+import Button, { ButtonBadge } from 'renderer/components/Button';
 import { AddressBarContainer, AddressBar, InputContainer, Input, Text, NavigationButton } from './style';
 
 import AddressBarState from './state';
@@ -170,8 +170,8 @@ const AddressBard = () => {
         <IconDownload color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
-      <NavigationButton>
-        <IconAd color={DARK.TEXT_COLOR} />
+      <NavigationButton as={ButtonBadge} label={activeTab?.blockedAds}>
+        <IconShield color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
       <NavigationButton

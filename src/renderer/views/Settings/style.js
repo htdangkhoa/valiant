@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 import Dialog from 'renderer/components/Dialog';
-import { DARK } from 'constants/theme';
+import { DARK, RADIUS } from 'constants/theme';
 
 export const MenuItems = styled(Dialog)`
   padding: 0.5rem;
@@ -9,7 +9,7 @@ export const MenuItems = styled(Dialog)`
 
 export const MenuItem = styled.li`
   padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  border-radius: ${RADIUS}px;
   user-select: none;
   cursor: default;
   font-size: 14px;

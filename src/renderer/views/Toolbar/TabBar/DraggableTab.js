@@ -26,6 +26,7 @@ const moveItemNextTo = (source, from, to) => {
 
 const DraggableTab = ({ index }) => {
   const {
+    handleLoadCommit,
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
@@ -34,6 +35,7 @@ const DraggableTab = ({ index }) => {
     handleMediaIsPlayingChange,
     handleMuteChange,
     handleUnmuteChange,
+    handleAdsCounting,
     tabs,
     setTabs,
     handleTabChange,
@@ -50,6 +52,14 @@ const DraggableTab = ({ index }) => {
   useEffect(() => {
     const listener = (e, event, message, ...args) => {
       // console.log('🚀 ~ file: Tab.js ~ line 44 ~ listener ~ event, message', event, message);
+      if (event === TAB_EVENTS.LOAD_COMMIT) {
+        // reset ...
+        const [, , isMainFrame] = [message, ...args];
+        if (isMainFrame) {
+          handleLoadCommit(tab.id);
+        }
+      }
+
       if (event === TAB_EVENTS.UPDATE_TITLE) {
         handleTitleChange(tab.id, message);
       }
@@ -75,6 +85,11 @@ const DraggableTab = ({ index }) => {
 
       if (event === TAB_EVENTS.MEDIA_IS_PLAYING) {
         handleMediaIsPlayingChange(tab.id, message);
+      }
+
+      if (event === TAB_EVENTS.ADS_COUNTING) {
+        console.log(';dksal;sdkl;');
+        handleAdsCounting(tab.id);
       }
     };
 
@@ -219,7 +234,7 @@ const DraggableTab = ({ index }) => {
         onClick={handleCloseTab(index)}
         onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconClose color={DARK.TEXT_COLOR} />
+        <IconClose color={DARK.TEXT_COLOR} strokeWidth={8} />
       </ButtonCloseTab>
     </Tab>
   );

@@ -2,6 +2,7 @@
   "presets": [["@babel/env", { "shippedProposals": true }], "@babel/react"],
   "plugins": [
     "@babel/transform-runtime",
+    "@babel/proposal-export-default-from",
     [
       "module-resolver",
       {

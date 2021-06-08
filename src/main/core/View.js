@@ -3,6 +3,7 @@ import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 
 import { VIEW_SOURCE, VALIANT } from 'constants/protocol';
 import { getPreload } from 'common';
+import logger from 'common/logger';
 
 import AppInstance from './AppInstance';
 import contextMenu from '../menus/view';
@@ -61,10 +62,19 @@ class View {
     this.webContents.on('did-start-navigation', () => {
       this.updateNavigationState();
     });
-    this.webContents.on('will-navigate', () => {
+    this.webContents.on('did-start-navigation', (e, ...args) => {
       this.instance.hideDialog('suggestion');
+
+      this.updateNavigationState();
+
+      this.favicon = '';
+
+      this.emit(TAB_EVENTS.LOAD_COMMIT, ...args);
+      this.updateUrlState(this.webContents.getURL());
     });
     this.webContents.on('did-navigate', async (e, url) => {
+      this.instance.hideDialog('suggestion');
+
       this.addHistory(url);
 
       this.updateUrlState(url);
@@ -73,6 +83,8 @@ class View {
     });
     this.webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
       if (isMainFrame) {
+        this.instance.hideDialog('suggestion');
+
         this.addHistory(url, true);
 
         this.updateUrlState(url);
@@ -92,6 +104,11 @@ class View {
     });
     this.webContents.on('media-paused', () => {
       this.emit(TAB_EVENTS.MEDIA_IS_PLAYING, false);
+    });
+    this.webContents.on('certificate-error', (event, url, error, certificate, callback) => {
+      logger.log(url, error, certificate);
+      event.preventDefault();
+      callback(true);
     });
     this.webContents.on('new-window', (e, url, frameName, disposition) => {
       if (disposition === 'new-window') {
@@ -163,6 +180,8 @@ class View {
   }
 
   render(options = { nextTo: null, active: false }) {
+    this.instance.hideDialog('suggestion');
+
     const opts = Object.assign({}, options);
 
     if (opts.active) {
@@ -216,8 +235,6 @@ class View {
   }
 
   updateUrlState(url, options = { isSearchTerm: false, preventUpdateOriginal: false }) {
-    this.instance.hideDialog('suggestion');
-
     const opts = Object.assign({}, options);
 
     this.lastUrl = url;

@@ -38,6 +38,7 @@ const useTabBarState = () => {
             canGoForward: false,
             mediaIsPlaying: false,
             isMuted: false,
+            blockedAds: 0,
             url: {
               original: '',
               text: '',
@@ -192,6 +193,17 @@ const useTabBarState = () => {
   }, []);
 
   // browser view handler
+  const handleLoadCommit = useCallback((id) => {
+    setTabs((his) =>
+      [...his].map(($tab) => {
+        if ($tab.id === id) {
+          $tab.blockedAds = 0;
+        }
+        return $tab;
+      }),
+    );
+  }, []);
+
   const handleTitleChange = useCallback((id, title) => {
     setTabs((his) =>
       [...his].map(($tab) => {
@@ -297,6 +309,17 @@ const useTabBarState = () => {
     [],
   );
 
+  const handleAdsCounting = useCallback((id) => {
+    setTabs((his) =>
+      [...his].map(($tab) => {
+        if ($tab.id === id) {
+          $tab.blockedAds += 1;
+        }
+        return $tab;
+      }),
+    );
+  }, []);
+
   const onGoBack = useCallback((id) => () => callWebContentsMethod(id, 'goBack'), []);
   const onGoForward = useCallback((id) => () => callWebContentsMethod(id, 'goForward'), []);
   const onReload = useCallback((id) => () => callWebContentsMethod(id, 'reload'), []);
@@ -377,6 +400,7 @@ const useTabBarState = () => {
     handleAddNewTab,
     handlePreventDoubleClick,
     handleDragEnd,
+    handleLoadCommit,
     handleTitleChange,
     handleFaviconChange,
     handleLoadingChange,
@@ -385,6 +409,7 @@ const useTabBarState = () => {
     handleMediaIsPlayingChange,
     handleMuteChange,
     handleUnmuteChange,
+    handleAdsCounting,
     onGoBack,
     onGoForward,
     onReload,
