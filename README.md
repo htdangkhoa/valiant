@@ -1,6 +1,6 @@
 # Valiant
 
-![image](https://user-images.githubusercontent.com/15341301/119271964-16aebd00-bc2e-11eb-8085-69fc8c997eed.png)
+![image](https://user-images.githubusercontent.com/15341301/121248966-3d2b5400-c8ce-11eb-98e0-e96b04d2f64d.png)
 
 ## Features
 
