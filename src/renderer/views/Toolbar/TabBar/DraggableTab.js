@@ -88,7 +88,6 @@ const DraggableTab = ({ index }) => {
       }
 
       if (event === TAB_EVENTS.ADS_COUNTING) {
-        console.log(';dksal;sdkl;');
         handleAdsCounting(tab.id);
       }
     };
