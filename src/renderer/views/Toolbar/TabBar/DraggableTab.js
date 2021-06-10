@@ -233,7 +233,7 @@ const DraggableTab = ({ index }) => {
         onClick={handleCloseTab(index)}
         onContextMenu={(e) => e.stopPropagation()}
         onDoubleClick={handlePreventDoubleClick}>
-        <IconClose color={DARK.TEXT_COLOR} strokeWidth={8} />
+        <IconClose color={DARK.TEXT_COLOR} />
       </ButtonCloseTab>
     </Tab>
   );

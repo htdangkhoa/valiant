@@ -46,6 +46,10 @@ class Window {
     (async () => {
       await this.win.loadURL(getRendererPath('index.html'));
 
+      // this.win.webContents.executeJavaScript(`
+      //   window.addEventListener('mouseout', () => console.log('====='));
+      // `);
+
       if (isDev) {
         this.webContents.openDevTools({ mode: 'detach' });
 
@@ -69,7 +73,7 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://github.com', active: true });
+        this.viewManager.create({ url: 'https://whatwebcando.today/permissions.html', active: true });
       } else {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });

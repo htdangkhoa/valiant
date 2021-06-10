@@ -1,5 +1,6 @@
-import { session, BrowserWindow, dialog } from 'electron';
+import { systemPreferences, session, BrowserWindow } from 'electron';
 import logger from 'common/logger';
+import PermissionDialog from 'main/dialogs/PermissionDialog';
 
 class SessionManager {
   constructor() {
@@ -20,7 +21,7 @@ class SessionManager {
       ],
     });
 
-    this.view.setPermissionRequestHandler((webContents, permission, callback, details) => {
+    this.view.setPermissionRequestHandler(async (webContents, permission, callback, details) => {
       logger.log(webContents.id, permission);
 
       const win = BrowserWindow.getFocusedWindow();
@@ -28,14 +29,31 @@ class SessionManager {
       if (!win) return;
       const url = new URL(details.requestingUrl);
 
-      const id = dialog.showMessageBoxSync(win, {
-        type: 'question',
-        message: `${url.hostname} wants to:`,
-        detail: permission,
-        buttons: ['Allow', 'Block'],
+      // const id = dialog.showMessageBoxSync(win, {
+      //   type: 'question',
+      //   message: `${url.hostname} wants to:`,
+      //   detail: permission,
+      //   buttons: ['Allow', 'Block'],
+      // });
+
+      // callback(id === 0);
+
+      const result = await this.requestPermission();
+      callback(result === 1);
+    });
+  }
+
+  requestPermission() {
+    return new Promise((resolve) => {
+      const dialog = new PermissionDialog();
+
+      dialog.on('result', (e, result) => {
+        logger.log(result);
+        resolve(result);
+        dialog.hide();
       });
 
-      callback(id === 0);
+      dialog.show({ focus: true });
     });
   }
 }

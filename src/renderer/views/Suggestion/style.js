@@ -3,11 +3,8 @@ import Dialog from 'renderer/components/Dialog';
 import { DARK } from 'constants/theme';
 
 export const SuggestionContainer = styled(Dialog)`
-  background-color: red;
-  border-radius: 4px;
   padding: 0.25rem 0;
   line-height: 0;
-  background-color: ${DARK.MAIN_COLOR};
 `;
 
 export const SuggestionItem = styled.div`

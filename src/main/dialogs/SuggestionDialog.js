@@ -9,7 +9,7 @@ import BaseDialog from './BaseDialog';
 
 class SuggestionDialog extends BaseDialog {
   constructor() {
-    super(VIEW_SUGGESTION, 'address-bar', { autoHide: true });
+    super(VIEW_SUGGESTION, { targetElement: 'address-bar' });
 
     this.browserView.setAutoResize({ width: true, height: true });
 
