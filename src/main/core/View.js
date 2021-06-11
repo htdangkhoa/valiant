@@ -27,13 +27,12 @@ class View {
         worldSafeExecuteJavaScript: false,
         sandbox: true,
         enableRemoteModule: false,
-        partition: 'persist:view',
+        partition: this.window.incognito ? 'incognito:view' : 'persist:view',
       },
     });
+    this.webContents.openDevTools();
     this.browserView.setBackgroundColor('#ffffff');
     this.browserView.setAutoResize({ width: true });
-
-    // this.webContents.session.setPermissionRequestHandler(this.permissionRequestHandler.bind(this));
 
     this.webContents.on('page-title-updated', (e, title) => {
       this.title = title;
@@ -149,6 +148,14 @@ class View {
       const menu = contextMenu(params, this.webContents);
       menu.popup();
     });
+    // this.webContents.session.on('will-download', (e, item, webContents) => {
+    //   item.
+    //   item.on('updated', (e, state) => {
+
+    //   });
+    //   item.once('done', (e, state) => {});
+    // });
+    // preserve approximate location
 
     const ua = this.webContents.userAgent
       .replace(/ Electron\\?.([^\s]+)/g, '')

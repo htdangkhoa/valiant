@@ -1,4 +1,5 @@
 import { ipcRenderer, webFrame } from 'electron';
+import { injectChromeWebStoreInstallButton } from 'main/core/chrome-webstore';
 
 console.log('preload', 'ping');
 
@@ -9,15 +10,8 @@ console.log(browserViewId);
 (async () => {
   const w = await webFrame.executeJavaScript('window');
   w.errorUrl = await ipcRenderer.invoke(`get-error-url-${browserViewId}`);
-
-  // w.addEventListener(
-  //   'wheel',
-  //   (e) => {
-  //     console.log('ldasjdkasjlkdajsklj');
-  //     ipcRenderer.send(browserViewId, 'wheel', { x: e.deltaX, y: e.deltaY });
-  //   },
-  //   {
-  //     passive: true,
-  //   },
-  // );
 })();
+
+if (window.location.host === 'chrome.google.com') {
+  injectChromeWebStoreInstallButton();
+}

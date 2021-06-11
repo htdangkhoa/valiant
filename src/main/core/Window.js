@@ -15,6 +15,8 @@ class Window {
 
     this.opts = Object.assign({}, options);
 
+    this.incognito = this.opts.incognito;
+
     this.viewManager = new ViewManager(this);
 
     // create the new browser window from electron
@@ -73,7 +75,7 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://whatwebcando.today/permissions.html', active: true });
+        this.viewManager.create({ url: 'https://chrome.google.com/webstore/category/extensions', active: true });
       } else {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });
