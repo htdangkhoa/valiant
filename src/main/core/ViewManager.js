@@ -30,6 +30,10 @@ class ViewManager {
 
     const hasNextTo = typeof opts.nextTo === 'number';
 
+    if (this.selectedView) {
+      this.selectedView.hidePermissionDialog();
+    }
+
     const view = new View({
       url: opts.url,
       nextTo: hasNextTo ? opts.nextTo : this.views.size,
@@ -59,8 +63,17 @@ class ViewManager {
 
   selectView(id) {
     if (this.selected === id) return;
+
+    this.selectedView.hidePermissionDialog();
+    this.selectedView.webContents.session.setPermissionRequestHandler(null);
+
     const view = this.views.get(id);
     if (!view) return;
+
+    if (view.permissionDialog) {
+      view.permissionDialog.show();
+    }
+
     this.window.win.removeBrowserView(view.browserView);
     this.selected = view.id;
     view.render({ active: true });

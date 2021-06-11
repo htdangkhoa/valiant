@@ -32,6 +32,7 @@
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "no-underscore-dangle": "off",
     "import/prefer-default-export": "off",
-    "import/no-cycle": "off"
+    "import/no-cycle": "off",
+    "import/named": "off"
   }
 }

@@ -51,7 +51,7 @@ class Window {
       // `);
 
       if (isDev) {
-        this.webContents.openDevTools({ mode: 'detach' });
+        // this.webContents.openDevTools({ mode: 'detach' });
 
         // hot reload when the renderer is changed.
         this.webContents.on('dom-ready', () => {

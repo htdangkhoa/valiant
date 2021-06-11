@@ -106,10 +106,12 @@ class BaseDialog {
   }
 
   hide() {
+    this.webContents.closeDevTools();
     this.window.win.removeBrowserView(this.browserView);
     this.isOpening = false;
 
     this.channels.forEach((event) => {
+      ipcMain.removeHandler(event);
       ipcMain.removeAllListeners(event);
     });
   }
@@ -117,6 +119,12 @@ class BaseDialog {
   on(event, callback) {
     const channel = `${event}-${this.id}`;
     ipcMain.on(channel, callback);
+    this.channels.push(channel);
+  }
+
+  handle(event, callback) {
+    const channel = `${event}-${this.id}`;
+    ipcMain.handle(channel, callback);
     this.channels.push(channel);
   }
 }
