@@ -4,7 +4,6 @@ import { DARK, RADIUS } from 'constants/theme';
 
 export const MenuItems = styled(Dialog)`
   padding: 0.5rem;
-  background-color: ${DARK.MAIN_COLOR};
 `;
 
 export const MenuItem = styled.li`

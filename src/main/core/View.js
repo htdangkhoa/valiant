@@ -1,13 +1,15 @@
-import { ipcMain, BrowserView } from 'electron';
+import { app, ipcMain, BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 
+import PermissionDialog from 'main/dialogs/PermissionDialog';
 import { VIEW_SOURCE, VALIANT } from 'constants/protocol';
+import { PERMISSION_STATE_ALLOW, PERMISSION_STATE_PROMPT } from 'constants/permission-states';
 import { getPreload } from 'common';
 import logger from 'common/logger';
 
 import AppInstance from './AppInstance';
 import contextMenu from '../menus/view';
-import { History, insert, update } from '../database';
+import { History, operator, Permission } from '../database';
 
 class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
@@ -30,6 +32,9 @@ class View {
     });
     this.browserView.setBackgroundColor('#ffffff');
     this.browserView.setAutoResize({ width: true });
+
+    // this.webContents.session.setPermissionRequestHandler(this.permissionRequestHandler.bind(this));
+
     this.webContents.on('page-title-updated', (e, title) => {
       this.title = title;
 
@@ -59,10 +64,9 @@ class View {
 
       this.emit(TAB_EVENTS.UPDATE_LOADING, false);
     });
-    this.webContents.on('did-start-navigation', () => {
-      this.updateNavigationState();
-    });
     this.webContents.on('did-start-navigation', (e, ...args) => {
+      this.hidePermissionDialog(true);
+
       this.instance.hideDialog('suggestion');
 
       this.updateNavigationState();
@@ -145,6 +149,13 @@ class View {
       const menu = contextMenu(params, this.webContents);
       menu.popup();
     });
+
+    const ua = this.webContents.userAgent
+      .replace(/ Electron\\?.([^\s]+)/g, '')
+      .replace(` ${app.name}/${app.getVersion()}`, '')
+      .replace(/ Chrome\\?.([^\s]+)/g, ' Chrome/91.0.4472.77');
+    logger.log(ua);
+    this.webContents.setUserAgent(ua);
     // this.webContents.on('ipc-message', (e, ...args) => {
     //   logger.log(e.channel, args);
     // });
@@ -180,6 +191,8 @@ class View {
   }
 
   render(options = { nextTo: null, active: false }) {
+    this.webContents.session.setPermissionRequestHandler(this.permissionRequestHandler.bind(this));
+
     this.instance.hideDialog('suggestion');
 
     const opts = Object.assign({}, options);
@@ -252,7 +265,7 @@ class View {
 
   async addHistory(url, inPage) {
     if (this.lastUrl !== url) {
-      const history = await insert(History, {
+      const history = await operator.insert(History, {
         title: this.title,
         url,
         favicon: this.favicon,
@@ -268,13 +281,81 @@ class View {
     if (this.lastHistoryId) {
       const { title, favicon } = this;
 
-      await update(
+      await operator.update(
         History,
         {
           _id: this.lastHistoryId,
         },
         { $set: { title, favicon } },
       );
+    }
+  }
+
+  async permissionRequestHandler(webContents, permission, callback, details) {
+    logger.log(webContents.id, permission, details);
+
+    const webContentsId = webContents.id.toString();
+
+    const url = new URL(details.requestingUrl);
+
+    let permissionName = permission;
+
+    if (permissionName === 'unknown' || (permissionName === 'media' && details.mediaTypes.length === 0)) {
+      return callback(false);
+    }
+
+    if (permissionName === 'media') {
+      if (details.mediaTypes.includes('audio')) {
+        permissionName = 'microphone';
+      } else if (details.mediaTypes.includes('video')) {
+        permissionName = 'camera';
+      }
+    }
+
+    const data = await operator.findOne(Permission, { hostname: url.hostname, permission: permissionName });
+
+    if (!data) {
+      await operator.insert(Permission, {
+        hostname: url.hostname,
+        permission: permissionName,
+        state: PERMISSION_STATE_PROMPT,
+      });
+    } else if (data.state !== PERMISSION_STATE_PROMPT) {
+      return callback(data.state === PERMISSION_STATE_ALLOW);
+    }
+
+    const channel = `result-${webContentsId}`;
+    ipcMain.removeAllListeners(channel);
+    ipcMain.addListener(channel, async (e, result) => {
+      this.hidePermissionDialog(true);
+
+      logger.log(url.hostname, permissionName, result);
+
+      await operator.update(
+        Permission,
+        { hostname: url.hostname, permission: permissionName },
+        { $set: { state: result } },
+      );
+
+      callback(result === PERMISSION_STATE_ALLOW);
+    });
+
+    this.hidePermissionDialog(true);
+    this.permissionDialog = new PermissionDialog();
+
+    this.permissionDialog.on(`get-permission`, (e) => {
+      e.returnValue = { hostname: url.hostname, name: permission };
+    });
+    this.permissionDialog.show({ focus: true });
+  }
+
+  hidePermissionDialog(force) {
+    if (!this.permissionDialog) return;
+
+    this.permissionDialog.hide();
+
+    if (force) {
+      this.permissionDialog = undefined;
     }
   }
 }

@@ -7,7 +7,7 @@ const WIDTH = 320;
 
 class SettingsDialog extends BaseDialog {
   constructor() {
-    super(VIEW_SETTINGS, 'btn-quick-menu');
+    super(VIEW_SETTINGS, { targetElement: 'btn-quick-menu' });
   }
 
   onDraw(contentHeight, rect) {

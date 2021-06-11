@@ -1,15 +1,18 @@
-import { BrowserView } from 'electron';
+import { BrowserView, ipcMain } from 'electron';
 import { defer, getPreload, getRendererPath } from 'common';
 import { DIALOG_EVENTS } from 'constants/event-names';
 import AppInstance from 'main/core/AppInstance';
 
 class BaseDialog {
-  constructor(viewName, targetElement, options = { autoHide: true }) {
+  constructor(viewName, options = { autoHide: true, targetElement: undefined }) {
     this.opts = Object.assign({}, options);
+    if (typeof this.opts.autoHide !== 'boolean') {
+      this.opts.autoHide = true;
+    }
+
+    this.channels = [];
 
     this.isOpening = false;
-
-    this.targetElement = targetElement;
 
     this.browserView = new BrowserView({
       webPreferences: {
@@ -46,24 +49,29 @@ class BaseDialog {
   }
 
   async fixBounds() {
-    const rect = await this.window.webContents.executeJavaScript(
-      `
-        (() => {
-          const propValueSet = (prop) => (value) => (obj) => ({...obj, [prop]: value});
-          const toObj = keys => obj => keys.reduce((o, k) => propValueSet(k)(obj[k])(o), {});
-          const getBoundingClientRect = el => toObj(['top', 'right', 'bottom', 'left', 'width', 'height', 'x', 'y'])(el.getBoundingClientRect());
+    let rect = { top: 0, right: 0, bottom: 0, left: 0, width: 0, height: 0, x: 0, y: 0 };
 
-          return getBoundingClientRect(document.getElementById('${this.targetElement}'));
-        })();
-      `,
-    );
+    if (this.opts.targetElement) {
+      rect = await this.window.webContents.executeJavaScript(
+        `
+          (() => {
+            const propValueSet = (prop) => (value) => (obj) => ({...obj, [prop]: value});
+            const toObj = keys => obj => keys.reduce((o, k) => propValueSet(k)(obj[k])(o), {});
+            const getBoundingClientRect = el => toObj(['top', 'right', 'bottom', 'left', 'width', 'height', 'x', 'y'])(el.getBoundingClientRect());
+  
+            return getBoundingClientRect(document.getElementById('${this.opts.targetElement}'));
+          })();
+        `,
+      );
+    }
 
     const height = await this.webContents.executeJavaScript(`document.body.offsetHeight`);
 
     this.browserView.setBounds(this.onDraw(height, rect));
   }
 
-  onDraw(_contentHeight, _rect = { top: 0, right: 0, bottom: 0, left: 0, width: 0, height: 0, x: 0, y: 0 }) {
+  // eslint-disable-next-line no-unused-vars
+  onDraw(contentHeight, rect = { top: 0, right: 0, bottom: 0, left: 0, width: 0, height: 0, x: 0, y: 0 }) {
     throw new Error(`'onDraw' must be overridden.`);
   }
 
@@ -98,8 +106,26 @@ class BaseDialog {
   }
 
   hide() {
+    this.webContents.closeDevTools();
     this.window.win.removeBrowserView(this.browserView);
     this.isOpening = false;
+
+    this.channels.forEach((event) => {
+      ipcMain.removeHandler(event);
+      ipcMain.removeAllListeners(event);
+    });
+  }
+
+  on(event, callback) {
+    const channel = `${event}-${this.id}`;
+    ipcMain.on(channel, callback);
+    this.channels.push(channel);
+  }
+
+  handle(event, callback) {
+    const channel = `${event}-${this.id}`;
+    ipcMain.handle(channel, callback);
+    this.channels.push(channel);
   }
 }
 
