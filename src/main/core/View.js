@@ -30,7 +30,6 @@ class View {
         partition: this.window.incognito ? 'incognito:view' : 'persist:view',
       },
     });
-    this.webContents.openDevTools();
     this.browserView.setBackgroundColor('#ffffff');
     this.browserView.setAutoResize({ width: true });
 

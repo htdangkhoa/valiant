@@ -16,6 +16,8 @@ if (isDev) {
   require('source-map-support').install();
 }
 
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+
 app
   .whenReady()
   .then(() => {

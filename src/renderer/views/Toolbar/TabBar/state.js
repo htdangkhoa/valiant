@@ -5,7 +5,6 @@ import * as remote from '@electron/remote';
 
 import { ADDRESS_BAR_EVENTS, TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 import { first } from 'common';
-import logger from 'common/logger';
 import { getCurrentWindow } from 'renderer/utils/window';
 import { callWebContentsMethod } from 'renderer/utils/view';
 
@@ -93,14 +92,12 @@ const useTabBarState = () => {
       function requestCloseTab(hook) {
         const selectedTab = tabs[i];
 
-        logger.log('selectedTab', selectedTab);
-
         if (!selectedTab) return;
 
         setTabs((his) =>
           [...his]
             .map((tab) => {
-              if (selectedTab.id === tab.id && tab.active) {
+              if (selectedTab.id === tab.id) {
                 if (typeof hook === 'function') {
                   hook();
                 }
