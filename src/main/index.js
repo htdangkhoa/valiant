@@ -16,7 +16,7 @@ if (isDev) {
   require('source-map-support').install();
 }
 
-app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+app.commandLine.appendArgument('force_high_performance_gpu');
 
 app
   .whenReady()
