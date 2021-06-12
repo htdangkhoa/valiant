@@ -80,7 +80,7 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://www.youtube.com/watch?v=tbgFUbwmwXI', active: true });
+        this.viewManager.create({ url: 'https://chrome.google.com/webstore/category/extensions', active: true });
       } else {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });
