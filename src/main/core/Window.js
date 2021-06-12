@@ -44,6 +44,11 @@ class Window {
         this.instance.dialogs.settings.webContents.focus();
       });
     });
+    this.win.on('close', () => {
+      Array.from(this.viewManager.views.keys()).forEach((id) => {
+        this.viewManager.destroyView(id);
+      });
+    });
 
     (async () => {
       await this.win.loadURL(getRendererPath('index.html'));
@@ -75,7 +80,7 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://chrome.google.com/webstore/category/extensions', active: true });
+        this.viewManager.create({ url: 'https://www.youtube.com/watch?v=tbgFUbwmwXI', active: true });
       } else {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });
