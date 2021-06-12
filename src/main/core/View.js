@@ -63,16 +63,20 @@ class View {
       this.emit(TAB_EVENTS.UPDATE_LOADING, false);
     });
     this.webContents.on('did-start-navigation', (e, ...args) => {
-      this.hidePermissionDialog(true);
+      const [, , isMainFrame] = args;
 
-      this.instance.hideDialog('suggestion');
+      if (isMainFrame) {
+        this.hidePermissionDialog(true);
 
-      this.updateNavigationState();
+        this.instance.hideDialog('suggestion');
 
-      this.favicon = '';
+        this.updateNavigationState();
 
-      this.emit(TAB_EVENTS.LOAD_COMMIT, ...args);
-      this.updateUrlState(this.webContents.getURL());
+        this.favicon = '';
+
+        this.emit(TAB_EVENTS.LOAD_COMMIT, ...args);
+        this.updateUrlState(this.webContents.getURL());
+      }
     });
     this.webContents.on('did-navigate', async (e, url) => {
       this.instance.hideDialog('suggestion');
