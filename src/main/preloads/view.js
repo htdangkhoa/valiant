@@ -15,3 +15,9 @@ console.log(browserViewId);
 if (window.location.host === 'chrome.google.com') {
   injectChromeWebStoreInstallButton();
 }
+
+ipcRenderer.on(`${browserViewId}-leave-full-screen`, () => {
+  console.log(`${browserViewId}-leave-full-screen`);
+
+  typeof document.webkitExitFullscreen === 'function' ? document.webkitExitFullscreen() : document.exitFullscreen();
+});

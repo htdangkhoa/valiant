@@ -38,6 +38,16 @@ class Window {
       },
     });
 
+    this.win.on('enter-full-screen', () => {
+      this.webContents.send('fullscreen', true);
+    });
+    this.win.on('leave-full-screen', () => {
+      this.webContents.send('fullscreen', false);
+
+      if (this.viewManager.selectedView) {
+        this.viewManager.selectedView.webContents.send(`${this.viewManager.selected}-leave-full-screen`);
+      }
+    });
     this.win.on('resize', () => {
       defer(() => {
         this.instance.dialogs.settings.fixBounds();
@@ -80,7 +90,7 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://chrome.google.com/webstore/category/extensions', active: true });
+        this.viewManager.create({ url: 'https://www.youtube.com/watch?v=KB-1iKylAyY', active: true });
       } else {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });

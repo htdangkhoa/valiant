@@ -310,6 +310,10 @@ class View {
 
     let permissionName = permission;
 
+    if (['fullscreen'].includes(permission)) {
+      return callback(true);
+    }
+
     if (permissionName === 'unknown' || (permissionName === 'media' && details.mediaTypes.length === 0)) {
       return callback(false);
     }

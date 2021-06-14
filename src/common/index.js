@@ -72,7 +72,7 @@ export const getPath = (...relativePaths) => {
   }
 
   if (is.dev) {
-    path = process.cwd();
+    path = `${process.cwd()}/virtual_storage`;
   }
 
   return resolve(path, ...relativePaths).replace(/\\g/, '/');
