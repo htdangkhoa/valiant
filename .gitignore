@@ -109,7 +109,5 @@ build
 # TernJS port file
 .tern-port
 
-storages/*
-!storages/.gitkeep
-
-.bin/*
+virtual_storage/*
+!virtual_storage/.gitkeep
