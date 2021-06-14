@@ -3,7 +3,7 @@ import { isURL } from 'common';
 import AppInstance from '../core/AppInstance';
 
 const contextMenu = (params, webContents) => {
-  const { focusedWindow: window } = AppInstance.getInstance();
+  const { focusedWindow: window, sessions } = AppInstance.getInstance();
   const { viewManager } = window;
 
   let menuItems = [];
@@ -100,7 +100,42 @@ const contextMenu = (params, webContents) => {
     ]);
   }
 
-  if (!params.hasImageContents && params.linkURL === '' && params.selectionText === '' && !params.isEditable) {
+  if (['video', 'audio'].includes(params.mediaType)) {
+    const type = params.mediaType.charAt(0).toUpperCase() + params.mediaType.slice(1);
+
+    menuItems = menuItems.concat([
+      {
+        label: `Open ${type} in New Tab`,
+        click: () => {
+          const index = viewManager.ids.indexOf(viewManager.selected);
+
+          viewManager.create({ url: params.srcURL, nextTo: index + 1 });
+        },
+      },
+      {
+        label: `Save ${type} As...`,
+        click: () => {
+          sessions.view.downloadURL(params.srcURL);
+        },
+      },
+      {
+        label: `Copy ${type} Address`,
+        click: () => {
+          clipboard.clear();
+          clipboard.writeText(params.srcURL);
+        },
+      },
+      { type: 'separator' },
+    ]);
+  }
+
+  if (
+    !params.hasImageContents &&
+    params.linkURL === '' &&
+    params.selectionText === '' &&
+    !params.isEditable &&
+    params.mediaType === 'none'
+  ) {
     menuItems = menuItems.concat([
       {
         label: 'Back',

@@ -90,7 +90,7 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://www.youtube.com/watch?v=KB-1iKylAyY', active: true });
+        this.viewManager.create({ url: 'https://googlechrome.github.io/samples/picture-in-picture/', active: true });
       } else {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });
