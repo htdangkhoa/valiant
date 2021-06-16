@@ -70,6 +70,8 @@ class ViewManager {
     const view = this.views.get(id);
     if (!view) return;
 
+    view.checkFindInPage();
+
     if (view.permissionDialog) {
       view.permissionDialog.show();
     }

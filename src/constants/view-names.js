@@ -5,3 +5,5 @@ export const VIEW_SETTINGS = 'VIEW_SETTINGS';
 export const VIEW_SUGGESTION = 'VIEW_SUGGESTION';
 
 export const VIEW_PERMISSION = 'VIEW_PERMISSION';
+
+export const VIEW_FIND = 'VIEW_FIND';

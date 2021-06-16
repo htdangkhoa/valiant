@@ -47,7 +47,6 @@
     "copy-webpack-plugin": "^9.0.0",
     "dayjs": "^1.10.4",
     "electron": "12.0.0",
-    "electron-log": "^4.3.5",
     "electron-packager": "^15.2.0",
     "electron-unhandled": "^3.0.2",
     "env-cmd": "^10.1.0",
