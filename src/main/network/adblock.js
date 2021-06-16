@@ -3,7 +3,6 @@ import { ElectronBlocker, fullLists } from '@cliqz/adblocker-electron';
 import fetch from 'node-fetch';
 import { promises as fs, existsSync, mkdirSync } from 'fs';
 import { getPath } from 'common';
-import logger from 'common/logger';
 import { TAB_EVENTS } from 'constants/event-names';
 
 let blocker;
@@ -41,30 +40,30 @@ export const runAdblock = async (instance) => {
   blocker.enableBlockingInSession(session.fromPartition('persist:view'));
 
   blocker.on('request-blocked', (request) => {
-    logger.log('blocked', request.tabId, request.url);
+    console.log('blocked', request.tabId, request.url);
 
     emitEvent(instance, request);
   });
 
   blocker.on('request-redirected', (request) => {
-    logger.log('redirected', request.tabId, request.url);
+    console.log('redirected', request.tabId, request.url);
 
     emitEvent(instance, request);
   });
 
   blocker.on('request-whitelisted', (request) => {
-    logger.log('whitelisted', request.tabId, request.url);
+    console.log('whitelisted', request.tabId, request.url);
   });
 
   blocker.on('csp-injected', (request) => {
-    logger.log('csp', request.url);
+    console.log('csp', request.url);
   });
 
   blocker.on('script-injected', (script, url) => {
-    logger.log('script', script.length, url);
+    console.log('script', script.length, url);
   });
 
   blocker.on('style-injected', (style, url) => {
-    logger.log('style', style.length, url);
+    console.log('style', style.length, url);
   });
 };

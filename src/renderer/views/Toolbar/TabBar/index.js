@@ -54,7 +54,7 @@ const TabBarView = () => {
   }, []);
 
   const onMouseDown = useCallback(() => {
-    ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG);
+    ipcRenderer.send(DIALOG_EVENTS.HIDE_ALL_DIALOG, 'find');
   }, []);
 
   return (

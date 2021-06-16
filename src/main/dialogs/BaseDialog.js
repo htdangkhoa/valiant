@@ -78,7 +78,15 @@ class BaseDialog {
   show(options = { showDevTools: false, focus: true }) {
     const opts = Object.assign({}, options);
 
-    if (this.isOpening) return;
+    if (this.isOpening) {
+      this.window.win.setTopBrowserView(this.browserView);
+
+      if (opts.focus) {
+        this.webContents.focus();
+      }
+
+      return;
+    }
 
     this.isOpening = true;
 
@@ -114,6 +122,10 @@ class BaseDialog {
       ipcMain.removeHandler(event);
       ipcMain.removeAllListeners(event);
     });
+  }
+
+  emit(channel, ...args) {
+    this.webContents.send(channel, ...args);
   }
 
   on(event, callback) {

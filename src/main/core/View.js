@@ -5,7 +5,6 @@ import PermissionDialog from 'main/dialogs/PermissionDialog';
 import { VIEW_SOURCE, VALIANT } from 'constants/protocol';
 import { PERMISSION_STATE_ALLOW, PERMISSION_STATE_PROMPT } from 'constants/permission-states';
 import { getPreload } from 'common';
-import logger from 'common/logger';
 
 import AppInstance from './AppInstance';
 import contextMenu from '../menus/view';
@@ -66,6 +65,8 @@ class View {
       const [, , isMainFrame] = args;
 
       if (isMainFrame) {
+        this.checkFindInPage();
+
         this.hidePermissionDialog(true);
 
         this.instance.hideDialog('suggestion');
@@ -111,8 +112,15 @@ class View {
     this.webContents.on('media-paused', () => {
       this.emit(TAB_EVENTS.MEDIA_IS_PLAYING, false);
     });
+    this.webContents.on('found-in-page', (e, result) => {
+      const dialog = this.instance.getDialog('find');
+      if (dialog.isOpening) {
+        dialog.emit('found-in-page', result);
+      }
+    });
+
     this.webContents.on('certificate-error', (event, url, error, certificate, callback) => {
-      logger.log(url, error, certificate);
+      console.log(url, error, certificate);
       event.preventDefault();
       callback(true);
     });
@@ -164,13 +172,13 @@ class View {
       .replace(/ Electron\\?.([^\s]+)/g, '')
       .replace(` ${app.name}/${app.getVersion()}`, '')
       .replace(/ Chrome\\?.([^\s]+)/g, ' Chrome/91.0.4472.77');
-    logger.log(ua);
+    console.log(ua);
     this.webContents.setUserAgent(ua);
     // this.webContents.on('ipc-message', (e, ...args) => {
-    //   logger.log(e.channel, args);
+    //   console.log(e.channel, args);
     // });
     // ipcMain.on(this.id, (e, ...args) => {
-    //   logger.log(...args);
+    //   console.log(...args);
     // });
 
     ipcMain.handle(`get-error-url-${this.id}`, () => this.errorUrl);
@@ -302,7 +310,7 @@ class View {
   }
 
   async permissionRequestHandler(webContents, permission, callback, details) {
-    logger.log(webContents.id, permission, details);
+    console.log(webContents.id, permission, details);
 
     const webContentsId = webContents.id.toString();
 
@@ -343,7 +351,7 @@ class View {
     ipcMain.addListener(channel, async (e, result) => {
       this.hidePermissionDialog(true);
 
-      logger.log(url.hostname, permissionName, result);
+      console.log(url.hostname, permissionName, result);
 
       await operator.update(
         Permission,
@@ -370,6 +378,19 @@ class View {
 
     if (force) {
       this.permissionDialog = undefined;
+    }
+  }
+
+  checkFindInPage() {
+    const findDialog = this.instance.getDialog('find');
+
+    if (findDialog?.isOpening) {
+      findDialog.hide();
+      findDialog.show({ focus: true });
+
+      if (findDialog.lastValue !== '') {
+        this.webContents.findInPage(findDialog.lastValue);
+      }
     }
   }
 }

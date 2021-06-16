@@ -3,7 +3,6 @@ import { ipcMain } from 'electron';
 import { DIALOG } from 'constants/theme';
 import { VIEW_SUGGESTION } from 'constants/view-names';
 import { isURL } from 'common';
-import logger from 'common/logger';
 import request from 'main/network/request';
 import BaseDialog from './BaseDialog';
 
@@ -57,7 +56,7 @@ class SuggestionDialog extends BaseDialog {
 
         result = result.concat(...[].concat(suggestions).map((text) => ({ text, isSearchTerm: true })));
       } catch (error) {
-        logger.error(error);
+        console.error(error);
       } finally {
         e.returnValue = result;
       }

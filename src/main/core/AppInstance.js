@@ -3,9 +3,12 @@ import { DIALOG_EVENTS } from 'constants/event-names';
 
 import SettingsDialog from '../dialogs/SettingsDialog';
 import SuggestionDialog from '../dialogs/SuggestionDialog';
+import FindDialog from '../dialogs/FindDialog';
+
 import Window from './Window';
 import { runAdblock } from '../network/adblock';
 import SessionsManager from './SessionsManager';
+import appMenu from '../menus/app';
 
 // singleton
 let appInstance;
@@ -33,14 +36,17 @@ class AppInstance {
     this.dialogs = {
       settings: new SettingsDialog(),
       suggestion: new SuggestionDialog(),
+      find: new FindDialog(),
     };
 
     // TODO: the settings will be loaded at here.
     runAdblock(this);
 
-    ipcMain.on(DIALOG_EVENTS.HIDE_ALL_DIALOG, () => {
-      this.hideAllDialog();
+    ipcMain.on(DIALOG_EVENTS.HIDE_ALL_DIALOG, (e, ...args) => {
+      this.hideAllDialog(...args);
     });
+
+    appMenu(this);
   }
 
   createWindow(options = { incognito: false, view: null }) {
@@ -69,6 +75,10 @@ class AppInstance {
     return Array.from(this.windows.values()).find((x) => !!x.viewManager.views.get(id));
   }
 
+  getDialog(name) {
+    return this.dialogs[name];
+  }
+
   showDialog(name, options = { showDevTools: false, focus: true }) {
     return this.dialogs[name].show(options);
   }
@@ -77,10 +87,14 @@ class AppInstance {
     return this.dialogs[name].hide();
   }
 
-  hideAllDialog() {
-    Object.values(this.dialogs).forEach((dialog) => {
-      if (dialog.isOpening) dialog.hide();
-    });
+  hideAllDialog(...ignoreNames) {
+    Object.keys(this.dialogs)
+      .filter((k) => !ignoreNames.includes(k))
+      .forEach((k) => {
+        const dialog = this.dialogs[k];
+
+        if (dialog.isOpening) dialog.hide();
+      });
   }
 }
 
