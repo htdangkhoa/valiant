@@ -1,11 +1,11 @@
 import styled, { css } from 'styled-components';
-import { DARK, RADIUS } from 'constants/theme';
+import { DARK, FONT_SIZES, RADIUS } from 'constants/theme';
 import Button from 'renderer/components/Button';
 
 const font = () => css`
   font-family: inherit;
   word-spacing: inherit;
-  font-size: 14px;
+  font-size: ${FONT_SIZES.PRIMARY}px;
 `;
 
 export const AddressBarContainer = styled.div`

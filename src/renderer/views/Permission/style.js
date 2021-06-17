@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Dialog from 'renderer/components/Dialog';
 import Button from 'renderer/components/Button';
-import { DARK, PADDING } from 'constants/theme';
+import { DARK, FONT_SIZES, PADDING } from 'constants/theme';
 
 export const PermissionContainer = styled(Dialog)`
   padding: 0.5rem;
@@ -10,11 +10,12 @@ export const PermissionContainer = styled(Dialog)`
 export const Title = styled.div`
   word-break: break-word;
   line-height: 1;
+  font-size: ${FONT_SIZES.PRIMARY}px;
 `;
 
 export const Description = styled(Title)`
   word-break: break-word;
-  font-size: 12px;
+  font-size: ${FONT_SIZES.SECONDARY}px;
   display: flex;
   align-items: center;
   margin: 0.5rem 0;
@@ -35,6 +36,7 @@ export const Buttons = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+  font-size: ${FONT_SIZES.SECONDARY}px;
 `;
 
 export const RequestButton = styled(Button)`

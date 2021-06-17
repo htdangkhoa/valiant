@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import { DARK, PADDING, RADIUS } from 'constants/theme';
+import { DARK, FONT_SIZES, PADDING, RADIUS } from 'constants/theme';
 import Button from 'renderer/components/Button';
 
 export const TabContainer = styled.div`
@@ -36,7 +36,7 @@ export const Tab = styled.div`
   padding: ${PADDING}px;
   max-width: 18em;
   width: 100vw;
-  font-size: 0.75rem;
+  font-size: ${FONT_SIZES.SECONDARY}px;
   position: relative;
   background-color: ${DARK.TAB_COLOR};
   display: flex;

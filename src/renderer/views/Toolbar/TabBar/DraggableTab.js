@@ -25,6 +25,8 @@ const moveItemNextTo = (source, from, to) => {
 };
 
 const DraggableTab = ({ index }) => {
+  let hovered = false;
+
   const {
     handleLoadCommit,
     handleTitleChange,
@@ -98,13 +100,15 @@ const DraggableTab = ({ index }) => {
 
   const ref = useRef();
 
-  const [{ handlerId }, drag] = useDrag({
+  // handle drag & drop
+  const [{ handlerId, isDragging }, drag] = useDrag({
     type: 'tab',
     item: { tab, index },
     collect: (monitor) => ({
       handlerId: monitor.getHandlerId(),
       isDragging: monitor.isDragging(),
     }),
+    isDragging: (monitor) => tab.id === monitor.getItem().tab.id,
     end: (item) => {
       const from = index;
       const to = item.index;
@@ -113,9 +117,12 @@ const DraggableTab = ({ index }) => {
     },
   });
 
-  const [, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: 'tab',
-    hover: (item, _monitor) => {
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+    hover: (item) => {
       if (!ref.current) {
         return;
       }
@@ -164,6 +171,8 @@ const DraggableTab = ({ index }) => {
     },
   });
 
+  drag(drop(ref));
+
   // scroll to end
   useEffect(() => {
     function animationEndListener(e) {
@@ -177,10 +186,50 @@ const DraggableTab = ({ index }) => {
     ref.current.addEventListener('webkitAnimationEnd', animationEndListener);
   }, []);
 
-  drag(drop(ref));
-
   const lastTabElement = document.getElementById(`tab-${tabs.length - 1}`);
+
   const rect = lastTabElement?.getBoundingClientRect?.();
+
+  // handle tab preview
+  const hidePreviewTab = () => {
+    hovered = false;
+
+    ipcRenderer.send(`${TAB_EVENTS.MOUSE_LEAVE}-${tab.id}`);
+  };
+
+  const onMouseDown = () => {
+    hidePreviewTab();
+
+    handleTabChange(index)();
+  };
+
+  const onMouseOver = (e) => {
+    if (isDragging || isOver) {
+      e.preventDefault();
+
+      return;
+    }
+
+    if (hovered) return;
+
+    hovered = true;
+
+    const rectOfCurrentElement = e.currentTarget.getBoundingClientRect();
+    ipcRenderer.send(
+      `${TAB_EVENTS.MOUSE_OVER}-${tab.id}`,
+      {
+        top: rectOfCurrentElement.top,
+        right: rectOfCurrentElement.right,
+        bottom: rectOfCurrentElement.bottom,
+        left: rectOfCurrentElement.left,
+        width: rectOfCurrentElement.width,
+        height: rectOfCurrentElement.height,
+        x: rectOfCurrentElement.x,
+        y: rectOfCurrentElement.y,
+      },
+      !tab.active,
+    );
+  };
 
   return (
     <Tab
@@ -188,15 +237,14 @@ const DraggableTab = ({ index }) => {
       data-handler-id={handlerId}
       id={`tab-${index}`}
       active={tab.active}
-      title={tab.title}
       animationSize={rect?.left}
       zIndex={tabs.length - index}
-      onClick={handleTabChange(index)}
       onDoubleClick={handlePreventDoubleClick}
       onContextMenu={onContextMenu(index)}
-      onMouseOver={() => {
-        console.log('=====', 'mouseover');
-      }}>
+      onMouseDown={onMouseDown}
+      onMouseUp={hidePreviewTab}
+      onMouseLeave={hidePreviewTab}
+      onMouseOver={onMouseOver}>
       {!tab.loading && (
         <TabFavicon>
           {hasFavicon ? (

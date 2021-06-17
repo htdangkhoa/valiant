@@ -4,7 +4,10 @@ import { DIALOG_EVENTS } from 'constants/event-names';
 import AppInstance from 'main/core/AppInstance';
 
 class BaseDialog {
-  constructor(viewName, options = { autoHide: true, targetElement: undefined }) {
+  constructor(
+    viewName,
+    options = { autoHide: true, targetElement: undefined, dynamicBounds: undefined, dynamicHeight: false },
+  ) {
     this.opts = Object.assign({}, options);
     if (typeof this.opts.autoHide !== 'boolean') {
       this.opts.autoHide = true;
@@ -51,6 +54,18 @@ class BaseDialog {
   async fixBounds() {
     let rect = { top: 0, right: 0, bottom: 0, left: 0, width: 0, height: 0, x: 0, y: 0 };
 
+    const height = await this.webContents.executeJavaScript(`document.body.offsetHeight`);
+
+    const bounds = Object.assign({}, this.opts.dynamicBounds);
+
+    if (Object.keys(bounds).length !== 0 && [bounds.x, bounds.y, bounds.width].every((x) => typeof x === 'number')) {
+      if (!this.opts.dynamicHeight) {
+        bounds.height = height;
+      }
+
+      return this.browserView.setBounds(bounds);
+    }
+
     if (this.opts.targetElement) {
       rect = await this.window.webContents.executeJavaScript(
         `
@@ -65,8 +80,6 @@ class BaseDialog {
       );
     }
 
-    const height = await this.webContents.executeJavaScript(`document.body.offsetHeight`);
-
     this.browserView.setBounds(this.onDraw(height, rect));
   }
 
@@ -79,11 +92,11 @@ class BaseDialog {
     const opts = Object.assign({}, options);
 
     if (this.isOpening) {
-      this.window.win.setTopBrowserView(this.browserView);
+      // this.window.win.setTopBrowserView(this.browserView);
 
-      if (opts.focus) {
-        this.webContents.focus();
-      }
+      // if (opts.focus) {
+      //   this.webContents.focus();
+      // }
 
       return;
     }
