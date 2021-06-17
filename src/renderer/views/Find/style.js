@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Dialog from 'renderer/components/Dialog';
-import { DARK } from 'constants/theme';
+import { DARK, FONT_SIZES } from 'constants/theme';
 
 export const DialogContainer = styled(Dialog)`
   position: relative;
@@ -20,7 +20,7 @@ export const Input = styled.input`
 `;
 
 export const Label = styled.label`
-  font-size: 14px;
+  font-size: ${FONT_SIZES.SECONDARY}px;
   margin: auto;
 `;
 

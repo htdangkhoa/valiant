@@ -7,3 +7,5 @@ export const VIEW_SUGGESTION = 'VIEW_SUGGESTION';
 export const VIEW_PERMISSION = 'VIEW_PERMISSION';
 
 export const VIEW_FIND = 'VIEW_FIND';
+
+export const VIEW_TAB_PREVIEW = 'VIEW_TAB_PREVIEW';

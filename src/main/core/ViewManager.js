@@ -25,14 +25,12 @@ class ViewManager {
 
       if (latestView) {
         this.window.win.removeBrowserView(latestView.browserView);
+        latestView.hidePermissionDialog();
+        latestView.webContents.session.setPermissionRequestHandler(null);
       }
     }
 
     const hasNextTo = typeof opts.nextTo === 'number';
-
-    if (this.selectedView) {
-      this.selectedView.hidePermissionDialog();
-    }
 
     const view = new View({
       url: opts.url,
@@ -90,6 +88,10 @@ class ViewManager {
   }
 
   swapView(from, to) {
+    Array.from(this.views.values()).forEach((v) => {
+      v.hideTabPreviewDialog();
+    });
+
     const entries = Array.from(this.views.entries());
 
     if (typeof from !== 'number' || from < 0) return;

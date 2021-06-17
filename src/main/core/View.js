@@ -2,7 +2,9 @@ import { app, ipcMain, BrowserView } from 'electron';
 import { TAB_EVENTS, WINDOW_EVENTS } from 'constants/event-names';
 
 import PermissionDialog from 'main/dialogs/PermissionDialog';
+import TabPreviewDialog from 'main/dialogs/TabPreviewDialog';
 import { VIEW_SOURCE, VALIANT } from 'constants/protocol';
+import { DIALOG } from 'constants/theme';
 import { PERMISSION_STATE_ALLOW, PERMISSION_STATE_PROMPT } from 'constants/permission-states';
 import { getPreload } from 'common';
 
@@ -14,6 +16,7 @@ class View {
   constructor(options = { url: 'about:blank', nextTo: null, active: false }) {
     this.opts = Object.assign({}, options);
 
+    // initial BrowserView
     this.browserView = new BrowserView({
       webPreferences: {
         preload: getPreload('view'),
@@ -32,6 +35,16 @@ class View {
     this.browserView.setBackgroundColor('#ffffff');
     this.browserView.setAutoResize({ width: true });
 
+    // config webContents
+    const ua = this.webContents.userAgent
+      .replace(/ Electron\\?.([^\s]+)/g, '')
+      .replace(` ${app.name}/${app.getVersion()}`, '')
+      .replace(/ Chrome\\?.([^\s]+)/g, ' Chrome/91.0.4472.77');
+    console.log(ua);
+    this.webContents.setUserAgent(ua);
+    this.webContents.incrementCapturerCount(Infinity, true);
+
+    // listen webContents events
     this.webContents.on('page-title-updated', (e, title) => {
       this.title = title;
 
@@ -118,7 +131,6 @@ class View {
         dialog.emit('found-in-page', result);
       }
     });
-
     this.webContents.on('certificate-error', (event, url, error, certificate, callback) => {
       console.log(url, error, certificate);
       event.preventDefault();
@@ -168,12 +180,6 @@ class View {
     // });
     // preserve approximate location
 
-    const ua = this.webContents.userAgent
-      .replace(/ Electron\\?.([^\s]+)/g, '')
-      .replace(` ${app.name}/${app.getVersion()}`, '')
-      .replace(/ Chrome\\?.([^\s]+)/g, ' Chrome/91.0.4472.77');
-    console.log(ua);
-    this.webContents.setUserAgent(ua);
     // this.webContents.on('ipc-message', (e, ...args) => {
     //   console.log(e.channel, args);
     // });
@@ -183,8 +189,49 @@ class View {
 
     ipcMain.handle(`get-error-url-${this.id}`, () => this.errorUrl);
 
+    // handle (un)mute tab
     ipcMain.handle(`${TAB_EVENTS.MUTE}-${this.id}`, () => this.webContents.setAudioMuted(true));
     ipcMain.handle(`${TAB_EVENTS.UNMUTE}-${this.id}`, () => this.webContents.setAudioMuted(false));
+
+    // handle tab preview
+    ipcMain.on(`${TAB_EVENTS.MOUSE_OVER}-${this.id}`, async (e, rect, showImagePreview) => {
+      this.hideTabPreviewDialog();
+
+      const dialog = new TabPreviewDialog({
+        x: rect.left - DIALOG.MARGIN,
+        y: rect.bottom,
+        width: rect.width + DIALOG.MARGIN * 2,
+      });
+
+      dialog.show({ focus: true });
+
+      dialog.on('tab-data-preview', async (event) => {
+        let url;
+
+        try {
+          url = new URL(this.lastUrl);
+        } catch (error) {
+          /* error */
+        }
+
+        let image;
+
+        if (showImagePreview) {
+          const nativeImage = await this.webContents.capturePage();
+
+          image = nativeImage.toDataURL({ scaleFactor: 0.3 });
+        }
+
+        event.returnValue = {
+          title: this.title || this.webContents.getTitle(),
+          hostname: url?.hostname,
+          image,
+        };
+      });
+
+      this.tabPreviewDialog = dialog;
+    });
+    ipcMain.on(`${TAB_EVENTS.MOUSE_LEAVE}-${this.id}`, () => this.hideTabPreviewDialog());
 
     this.render(this.opts);
 
@@ -391,6 +438,14 @@ class View {
       if (findDialog.lastValue !== '') {
         this.webContents.findInPage(findDialog.lastValue);
       }
+    }
+  }
+
+  hideTabPreviewDialog() {
+    if (this.tabPreviewDialog) {
+      this.tabPreviewDialog.hide();
+
+      this.tabPreviewDialog = undefined;
     }
   }
 }

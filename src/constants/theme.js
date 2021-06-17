@@ -10,6 +10,7 @@ export const DARK = {
   ACTIVE_COLOR: 'rgb(115, 113, 121)',
   SEPARATOR: 'rgb(82, 81, 92)',
   TEXT_COLOR: 'rgb(255, 255, 255)',
+  TEXT_COLOR_SECONDARY: 'rgb(172, 172, 176)',
 };
 
 export const LIGHT = {
@@ -24,6 +25,13 @@ export const LIGHT = {
   ACTIVE_COLOR: 'rgb(206, 206, 210)',
   SEPARATOR: 'rgb(238, 238, 238)',
   TEXT_COLOR: 'rgb(66, 66, 64)',
+  TEXT_COLOR_SECONDARY: 'rgb(172, 172, 176)',
+};
+
+export const FONT_SIZES = {
+  PRIMARY: 14,
+  SECONDARY: 12,
+  BUTTON_BADGE: 7,
 };
 
 export const DIALOG = {

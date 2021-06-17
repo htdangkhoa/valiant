@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { HIGHLIGHT_COLOR, RADIUS } from 'constants/theme';
+import { FONT_SIZES, HIGHLIGHT_COLOR, RADIUS } from 'constants/theme';
 import Button from './Button';
 
 const ButtonWrapper = styled(Button)`
@@ -10,8 +10,8 @@ const ButtonWrapper = styled(Button)`
 
 const Badge = styled.div`
   position: absolute;
-  font-size: 7px;
-  line-height: 7px;
+  font-size: ${FONT_SIZES.BUTTON_BADGE}px;
+  line-height: ${FONT_SIZES.BUTTON_BADGE}px;
   color: white;
   background-color: ${HIGHLIGHT_COLOR};
   border-radius: ${RADIUS}px;
