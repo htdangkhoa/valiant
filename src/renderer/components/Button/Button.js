@@ -11,30 +11,38 @@ const Button = styled.div`
   padding: ${PADDING}px;
   border-radius: ${RADIUS}px;
 
-  ${({ disable, size, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius }) => css`
-    width: ${size}px;
-    height: ${size}px;
-    min-width: ${size}px;
-    min-height: ${size}px;
-    border-top-left-radius: ${parseRadiusValue(topLeftRadius)};
-    border-top-right-radius: ${parseRadiusValue(topRightRadius)};
-    border-bottom-left-radius: ${parseRadiusValue(bottomLeftRadius)};
-    border-bottom-right-radius: ${parseRadiusValue(bottomRightRadius)};
-
-    pointer-events: ${disable ? 'none' : 'inherit'};
-    opacity: ${disable ? '0.5' : '1'};
-
-    &:hover {
-      background-color: ${DARK.HOVER_COLOR};
-    }
-    &:active {
-      background-color: ${DARK.ACTIVE_COLOR};
-    }
-  `}
+  ${({ disabled, hoverEffect, size, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius }) =>
+    [
+      css`
+        width: ${size}px;
+        height: ${size}px;
+        min-width: ${size}px;
+        min-height: ${size}px;
+        border-top-left-radius: ${parseRadiusValue(topLeftRadius)};
+        border-top-right-radius: ${parseRadiusValue(topRightRadius)};
+        border-bottom-left-radius: ${parseRadiusValue(bottomLeftRadius)};
+        border-bottom-right-radius: ${parseRadiusValue(bottomRightRadius)};
+      `,
+      disabled &&
+        css`
+          pointer-events: none;
+          opacity: 0.5;
+        `,
+      hoverEffect &&
+        css`
+          &:hover {
+            background-color: ${DARK.HOVER_COLOR};
+          }
+          &:active {
+            background-color: ${DARK.ACTIVE_COLOR};
+          }
+        `,
+    ].filter(Boolean)}
 `;
 
 Button.propTypes = {
-  disable: PropTypes.bool,
+  disabled: PropTypes.bool,
+  hoverEffect: PropTypes.bool,
   size: PropTypes.number,
   topLeftRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   topRightRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -44,6 +52,7 @@ Button.propTypes = {
 
 Button.defaultProps = {
   size: 28,
+  hoverEffect: true,
 };
 
 export default Button;

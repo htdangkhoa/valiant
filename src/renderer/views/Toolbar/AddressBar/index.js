@@ -109,11 +109,11 @@ const AddressBard = () => {
 
   return (
     <AddressBarContainer>
-      <NavigationButton disable={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
+      <NavigationButton disabled={!activeTab?.canGoBack} onClick={onGoBack(activeTab?.id)}>
         <IconBack color={DARK.TEXT_COLOR} />
       </NavigationButton>
 
-      <NavigationButton disable={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
+      <NavigationButton disabled={!activeTab?.canGoForward} onClick={onGoForward(activeTab?.id)}>
         <IconForward color={DARK.TEXT_COLOR} />
       </NavigationButton>
 

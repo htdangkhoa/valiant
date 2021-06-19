@@ -90,7 +90,7 @@ class Window {
       }
 
       if (!this.opts.view) {
-        this.viewManager.create({ url: 'https://googlechrome.github.io/samples/picture-in-picture/', active: true });
+        this.viewManager.create({ url: 'https://chrome.google.com/webstore/category/extensions', active: true });
       } else {
         const { view } = this.opts;
         view.render({ nextTo: this.viewManager.views.size, active: true });
@@ -189,7 +189,7 @@ class Window {
     this.webContents.send(this.id, event, ...args);
   }
 
-  async fixBounds() {
+  async fixBounds(dynamicHeight) {
     const { win, webContents } = this;
 
     const { width, height } = win.getContentBounds();
@@ -200,7 +200,7 @@ class Window {
       x: 0,
       y: toolbarContentHeight,
       width,
-      height: height - toolbarContentHeight,
+      height: height - toolbarContentHeight - (typeof dynamicHeight === 'number' ? dynamicHeight : 0),
     };
 
     const view = this.viewManager.views.get(this.viewManager.selected);
