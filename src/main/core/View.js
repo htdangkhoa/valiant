@@ -30,6 +30,7 @@ class View {
         sandbox: true,
         enableRemoteModule: false,
         partition: this.window.incognito ? 'incognito:view' : 'persist:view',
+        autoplayPolicy: 'user-gesture-required',
       },
     });
     this.browserView.setBackgroundColor('#ffffff');
